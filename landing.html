@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="SDGo! — App educativa para alumnos de Técnico en Sistemas Digitales del CECyT 9 IPN. Guías, cuestionarios y seguimiento de progreso.">
+<meta name="theme-color" content="#0D1B4B">
+<title>SDGo! — CECyT 9 IPN</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nv:#0D1B4B;--nv2:#132060;--bl:#1E7FD8;--bl2:#2E9AFF;--bll:#E8F4FF;
+  --gr:#2ECC52;--grd:#1A9939;--grb:#E6FAF0;
+  --bg:#F0F4FF;--card:#fff;--bor:#D0DCFF;--tx:#0D1B4B;--ts:#4A5A8A;
+  --fnt:'Exo 2',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fnt);background:#fff;color:var(--tx);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;height:auto}
+
+/* ── NAV ─────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  background:rgba(13,27,75,.95);backdrop-filter:blur(10px);
+  padding:0 20px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:100;border-bottom:.5px solid rgba(255,255,255,.08);
+}
+.nav-logo{display:flex;align-items:baseline;gap:1px;font-size:20px;font-weight:700}
+.nav-logo .sd{color:#fff}.nav-logo .d{color:var(--bl2)}.nav-logo .go{color:var(--gr);font-size:16px}
+.nav-links{display:flex;align-items:center;gap:20px}
+.nav-links a{font-size:13px;color:rgba(255,255,255,.6);transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:var(--gr);color:var(--nv);font-size:13px;font-weight:600;padding:7px 18px;border-radius:20px;border:none;cursor:pointer;transition:opacity .2s}
+.nav-cta:hover{opacity:.9}
+@media(max-width:500px){.nav-links a{display:none}}
+
+/* ── HERO ────────────────────────────────────── */
+.hero{
+  background:var(--nv);
+  padding:100px 20px 60px;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 70% 50%,rgba(30,127,216,.15) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(46,204,82,.15);border:.5px solid rgba(46,204,82,.3);
+  border-radius:20px;padding:5px 14px;margin-bottom:18px;
+}
+.hero-tag span{font-size:12px;color:var(--gr);font-weight:500}
+.hero-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--gr)}
+.hero h1{font-size:clamp(28px,6vw,42px);font-weight:800;color:#fff;line-height:1.15;margin-bottom:14px}
+.hero h1 em{color:var(--gr);font-style:normal}
+.hero p{font-size:15px;color:rgba(255,255,255,.55);line-height:1.7;max-width:500px;margin-bottom:28px}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+.btn-hero{
+  background:var(--gr);color:var(--nv);font-family:var(--fnt);
+  font-size:15px;font-weight:700;padding:13px 28px;border-radius:10px;
+  border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:transform .15s,opacity .15s;
+}
+.btn-hero:hover{transform:translateY(-1px);opacity:.95}
+.btn-hero-2{
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);
+  font-family:var(--fnt);font-size:15px;padding:13px 24px;border-radius:10px;
+  border:.5px solid rgba(255,255,255,.15);cursor:pointer;
+  transition:background .2s;
+}
+.btn-hero-2:hover{background:rgba(255,255,255,.14)}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.hbadge{background:rgba(30,127,216,.2);border:.5px solid rgba(30,127,216,.35);border-radius:20px;padding:3px 12px;font-size:11px;color:var(--bl2)}
+
+/* ── PHONE MOCKUP HERO ───────────────────────── */
+.hero-phone{
+  margin-top:40px;width:220px;
+  background:var(--nv2);border-radius:36px;
+  padding:8px;border:.5px solid rgba(30,127,216,.3);
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+.hp-scr{background:var(--bg);border-radius:28px;overflow:hidden}
+.hp-sb{background:var(--nv);padding:6px 14px 4px;display:flex;justify-content:space-between}
+.hp-sb span{color:rgba(255,255,255,.8);font-size:9px;font-weight:600}
+.hp-hdr{background:var(--nv);padding:9px 13px 12px}
+.hp-hello{font-size:8px;color:rgba(255,255,255,.5);margin-bottom:1px}
+.hp-name{font-size:13px;font-weight:600;color:#fff}
+.hp-chip{display:inline-flex;gap:4px;align-items:center;background:rgba(46,204,82,.18);border:.5px solid rgba(46,204,82,.3);border-radius:20px;padding:2px 8px;margin-top:4px}
+.hp-chip span{font-size:8px;color:var(--gr);font-weight:500}
+.hp-pb{background:rgba(255,255,255,.15);border-radius:2px;height:3px;margin-top:4px;overflow:hidden}
+.hp-pb-f{background:var(--gr);height:100%;border-radius:2px;width:42%}
+.hp-body{padding:8px}
+.hp-mot{background:var(--grb);border-left:2px solid var(--grd);padding:5px 7px;border-radius:0 5px 5px 0;margin-bottom:6px}
+.hp-mot p{font-size:8px;color:var(--grd);font-weight:500}
+.hp-mc{background:#fff;border-radius:7px;padding:6px 8px;margin-bottom:4px;border:.5px solid var(--bor);display:flex;align-items:center;gap:6px}
+.hp-ic{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.hp-mn{font-size:9px;font-weight:600;color:var(--nv)}
+.hp-ms{font-size:8px;color:var(--ts)}
+.hp-mpb{background:var(--bor);border-radius:2px;height:2px;margin-top:2px;overflow:hidden}
+.hp-bnav{background:#fff;border-top:.5px solid var(--bor);display:flex;padding:5px 0 4px}
+.hp-ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px}
+.hp-ni span:first-child{font-size:14px;line-height:1}
+.hp-ni span:last-child{font-size:6px;color:var(--ts)}
+.hp-ni span:last-child.a{color:var(--nv);font-weight:500}
+
+/* ── STATS BAR ───────────────────────────────── */
+.stats{background:var(--nv2);padding:22px 20px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:16px}
+.stat{text-align:center}
+.stat-n{font-size:28px;font-weight:800;color:var(--gr)}
+.stat-l{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
+
+/* ── SECCIÓN GENÉRICA ────────────────────────── */
+.section{padding:60px 20px;max-width:680px;margin:0 auto}
+.sec-tag{display:inline-block;background:var(--bll);color:#0C447C;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+.sec-h2{font-size:clamp(22px,4vw,30px);font-weight:700;color:var(--nv);margin-bottom:8px;line-height:1.25}
+.sec-sub{font-size:14px;color:var(--ts);line-height:1.7;max-width:500px}
+
+/* ── BENEFICIOS ──────────────────────────────── */
+#beneficios{background:var(--bg)}
+#beneficios .section{max-width:720px}
+.ben-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:28px}
+.ben-card{background:#fff;border-radius:14px;padding:18px 16px;border:.5px solid var(--bor);box-shadow:0 2px 12px rgba(13,27,75,.05)}
+.ben-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px}
+.ben-t{font-size:13px;font-weight:600;color:var(--nv);margin-bottom:4px}
+.ben-s{font-size:12px;color:var(--ts);line-height:1.55}
+
+/* ── CÓMO FUNCIONA ───────────────────────────── */
+#como{background:#fff}
+.steps{display:flex;gap:0;margin-top:32px;position:relative;flex-wrap:wrap}
+.step-line{position:absolute;top:20px;left:20px;right:20px;height:.5px;background:var(--bor)}
+@media(max-width:500px){.step-line{display:none}}
+.step{flex:1;min-width:140px;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1;padding:0 8px}
+.step-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;margin-bottom:10px;flex-shrink:0}
+.step-t{font-size:13px;font-weight:600;color:var(--nv);margin-bottom:4px}
+.step-s{font-size:11px;color:var(--ts);line-height:1.5}
+
+/* ── SHOWCASE ────────────────────────────────── */
+#showcase{background:var(--nv);padding:60px 20px}
+#showcase .inner{max-width:680px;margin:0 auto;display:flex;gap:32px;align-items:center;flex-wrap:wrap}
+#showcase .left{flex:1;min-width:220px}
+#showcase h2{font-size:clamp(22px,4vw,30px);font-weight:700;color:#fff;line-height:1.25;margin-bottom:10px}
+#showcase h2 em{color:var(--gr);font-style:normal}
+#showcase p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:18px}
+.feat-list{display:flex;flex-direction:column;gap:10px}
+.feat{display:flex;align-items:flex-start;gap:10px}
+.feat-dot{width:20px;height:20px;border-radius:50%;background:rgba(46,204,82,.2);border:.5px solid rgba(46,204,82,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.feat-chk{width:8px;height:8px;border-radius:50%;background:var(--gr)}
+.feat-t{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5}
+.feat-t strong{color:#fff;font-weight:600}
+.phones{display:flex;gap:10px;align-items:flex-end;flex-shrink:0}
+.mini-phone{background:var(--nv2);border-radius:18px;padding:5px;border:.5px solid rgba(30,127,216,.25)}
+.mini-scr{width:80px;background:var(--bg);border-radius:13px;overflow:hidden}
+.mp-sb{background:var(--nv);padding:4px 8px;display:flex;justify-content:space-between}
+.mp-sb span{font-size:5px;color:rgba(255,255,255,.7)}
+.mp-hdr{background:var(--nv);padding:6px 8px}
+.mp-t{font-size:8px;font-weight:600;color:#fff}
+.mp-s{font-size:5px;color:rgba(255,255,255,.4)}
+.mp-body{padding:6px 7px}
+
+/* ── INSTALACIÓN ─────────────────────────────── */
+#instalar{background:var(--bg)}
+.install-box{background:#fff;border-radius:16px;border:.5px solid var(--bor);padding:24px;margin-top:24px;box-shadow:0 2px 12px rgba(13,27,75,.06)}
+.install-steps{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.istep{display:flex;align-items:center;gap:12px}
+.istep-num{width:28px;height:28px;border-radius:50%;background:var(--nv);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.istep-t{font-size:13px;color:var(--tx);flex:1;line-height:1.4}
+.istep-t strong{color:var(--nv);font-weight:600}
+.url-box{background:var(--nv);border-radius:10px;padding:14px 18px;margin-top:20px;text-align:center}
+.url-lbl{font-size:10px;color:rgba(255,255,255,.45);margin-bottom:5px}
+.url-val{font-family:'Courier New',monospace;font-size:15px;color:var(--gr);font-weight:600}
+
+/* ── CTA FINAL ───────────────────────────────── */
+#cta-final{background:var(--nv);padding:60px 20px;text-align:center}
+#cta-final h2{font-size:clamp(24px,5vw,36px);font-weight:800;color:#fff;margin-bottom:8px}
+#cta-final h2 em{color:var(--gr);font-style:normal}
+#cta-final p{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:24px}
+.cta-note{font-size:11px;color:rgba(255,255,255,.3);margin-top:12px}
+
+/* ── FOOTER ──────────────────────────────────── */
+footer{background:var(--nv2);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-top:.5px solid rgba(255,255,255,.06)}
+.foot-logo{font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:1px}
+.foot-logo .sd{color:#fff}.foot-logo .d{color:var(--bl2)}.foot-logo .go{color:var(--gr);font-size:13px}
+footer p{font-size:10px;color:rgba(255,255,255,.25);text-align:right;line-height:1.6}
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media(max-width:600px){
+  .hero{padding:80px 16px 48px}
+  .stats{padding:18px 12px}
+  .section{padding:44px 16px}
+  #showcase .inner{flex-direction:column}
+  .phones{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span class="sd">S</span><span class="d">D</span><span class="go">Go!</span></div>
+  <div class="nav-links">
+    <a href="#beneficios">Beneficios</a>
+    <a href="#como">Cómo funciona</a>
+    <a href="#instalar">Instalar</a>
+    <button class="nav-cta" onclick="abrirApp()">Abrir app ›</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag"><div class="hero-tag-dot"></div><span>CECyT 9 · IPN · Sistemas Digitales</span></div>
+  <h1>Estudia con rumbo.<br><em>Practica con propósito.</em></h1>
+  <p>SDGo! organiza tu estudio, te da cuestionarios tipo examen con retroalimentación inmediata y te muestra tu avance en tiempo real. Todo desde tu celular.</p>
+  <div class="hero-btns">
+    <button class="btn-hero" onclick="abrirApp()">Abrir SDGo! &nbsp;›</button>
+    <a href="#como"><button class="btn-hero-2">¿Cómo funciona?</button></a>
+  </div>
+  <div class="hero-badges">
+    <div class="hbadge">Instituto Politécnico Nacional</div>
+    <div class="hbadge">Acceso gratuito</div>
+    <div class="hbadge">Sin descargas</div>
+  </div>
+
+  <!-- Mini mockup del dashboard -->
+  <div class="hero-phone">
+    <div class="hp-scr">
+      <div class="hp-sb"><span>9:41</span><span>WiFi ■</span></div>
+      <div class="hp-hdr">
+        <div class="hp-hello">Bienvenido</div>
+        <div class="hp-name">Grupo 3IM2 · CECyT 9</div>
+        <div class="hp-chip"><span>Progreso: 42%</span></div>
+        <div class="hp-pb"><div class="hp-pb-f"></div></div>
+      </div>
+      <div class="hp-body">
+        <div class="hp-mot"><p>¡Llevas 3 temas esta semana!</p></div>
+        <div class="hp-mc"><div class="hp-ic" style="background:#E8F4FF">💻</div><div><div class="hp-mn">Lenguaje de Programación</div><div class="hp-ms">3 de 6 temas</div><div class="hp-mpb"><div style="background:var(--bl);height:100%;width:50%"></div></div></div></div>
+        <div class="hp-mc"><div class="hp-ic" style="background:#E6FAF0">⚡</div><div><div class="hp-mn">Circuitos Lógicos</div><div class="hp-ms">Completado</div><div class="hp-mpb"><div style="background:var(--gr);height:100%;width:100%"></div></div></div></div>
+        <div class="hp-mc"><div class="hp-ic" style="background:#FFF3DC">🔌</div><div><div class="hp-mn">Circuitos Electrónicos</div><div class="hp-ms">Sin iniciar</div><div class="hp-mpb"><div style="width:0%"></div></div></div></div>
+      </div>
+      <div class="hp-bnav">
+        <div class="hp-ni"><span>🏠</span><span class="a">Inicio</span></div>
+        <div class="hp-ni"><span>📚</span><span>Materias</span></div>
+        <div class="hp-ni"><span>📊</span><span>Progreso</span></div>
+        <div class="hp-ni"><span>🎓</span><span>Asesorías</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat"><div class="stat-n">4</div><div class="stat-l">Materias disponibles</div></div>
+  <div class="stat"><div class="stat-n">18+</div><div class="stat-l">Reactivos tipo examen</div></div>
+  <div class="stat"><div class="stat-n">$0</div><div class="stat-l">Costo para el alumno</div></div>
+  <div class="stat"><div class="stat-n">1</div><div class="stat-l">Clic para entrar</div></div>
+</div>
+
+<!-- BENEFICIOS -->
+<section id="beneficios">
+  <div class="section" style="text-align:center;padding-bottom:0">
+    <div class="sec-tag">¿Por qué SDGo?</div>
+    <h2 class="sec-h2">Todo lo que necesitas para prepararte</h2>
+    <p class="sec-sub" style="margin:0 auto">Una sola app que reemplaza apuntes dispersos, simuladores genéricos y recordatorios sueltos.</p>
+  </div>
+  <div class="section" style="padding-top:20px">
+    <div class="ben-grid">
+      <div class="ben-card">
+        <div class="ben-ico" style="background:var(--bll)">📖</div>
+        <div class="ben-t">Guías organizadas</div>
+        <div class="ben-s">Contenido por unidad y tema, sin buscar en varios lugares.</div>
+      </div>
+      <div class="ben-card">
+        <div class="ben-ico" style="background:var(--grb)">✏️</div>
+        <div class="ben-t">Práctica tipo examen</div>
+        <div class="ben-s">Reactivos similares a los de tus evaluaciones reales del CECyT 9.</div>
+      </div>
+      <div class="ben-card">
+        <div class="ben-ico" style="background:#FFF3DC">⚡</div>
+        <div class="ben-t">Retroalimentación inmediata</div>
+        <div class="ben-s">Sabes al instante qué fallaste y por qué, con explicación detallada.</div>
+      </div>
+      <div class="ben-card">
+        <div class="ben-ico" style="background:var(--grb)">📊</div>
+        <div class="ben-t">Tu avance visible</div>
+        <div class="ben-s">Barra de progreso por materia y tema para saber siempre dónde estás.</div>
+      </div>
+      <div class="ben-card">
+        <div class="ben-ico" style="background:var(--bll)">🎓</div>
+        <div class="ben-t">Asesorías por logros</div>
+        <div class="ben-s">Estudia más, acumula puntos y desbloquea tiempo con tu docente.</div>
+      </div>
+      <div class="ben-card">
+        <div class="ben-ico" style="background:#EEF0FF">🏅</div>
+        <div class="ben-t">Sistema de puntos</div>
+        <div class="ben-s">Gana recompensas académicas reales por tu constancia en el estudio.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section id="como">
+  <div class="section" style="text-align:center">
+    <div class="sec-tag">Cómo funciona</div>
+    <h2 class="sec-h2">En 3 pasos ya estás estudiando</h2>
+    <div class="steps">
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-num" style="background:var(--nv)">1</div>
+        <div class="step-t">Abre SDGo!</div>
+        <div class="step-s">Ingresa tu boleta y grupo. Sin contraseña, sin registro, sin descargas.</div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--bl)">2</div>
+        <div class="step-t">Elige tus materias</div>
+        <div class="step-s">Selecciona las unidades de aprendizaje que cursas este semestre.</div>
+      </div>
+      <div class="step">
+        <div class="step-num" style="background:var(--grd)">3</div>
+        <div class="step-t">Estudia y practica</div>
+        <div class="step-s">Lee la guía, responde el cuestionario y revisa tu avance en tiempo real.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SHOWCASE -->
+<section id="showcase">
+  <div class="inner">
+    <div class="left">
+      <div class="sec-tag" style="background:rgba(46,204,82,.15);color:var(--gr)">Diseñada para ti</div>
+      <h2>Para el alumno<br>de <em>hoy</em></h2>
+      <p>Sin plataformas complicadas. Sin múltiples apps. Solo lo que necesitas para tu carrera de Sistemas Digitales en el CECyT 9.</p>
+      <div class="feat-list">
+        <div class="feat"><div class="feat-dot"><div class="feat-chk"></div></div><div class="feat-t"><strong>Guía + cuestionario en una pantalla</strong> — sin ir y venir entre apps</div></div>
+        <div class="feat"><div class="feat-dot"><div class="feat-chk"></div></div><div class="feat-t"><strong>Funciona con datos móviles</strong> — interfaz ligera, sin videos pesados</div></div>
+        <div class="feat"><div class="feat-dot"><div class="feat-chk"></div></div><div class="feat-t"><strong>Alineada al plan de estudios</strong> del CECyT 9 · IPN</div></div>
+        <div class="feat"><div class="feat-dot"><div class="feat-chk"></div></div><div class="feat-t"><strong>Instálala en tu pantalla de inicio</strong> como cualquier app nativa</div></div>
+      </div>
+    </div>
+    <div class="phones">
+      <!-- Mockup guía -->
+      <div class="mini-phone">
+        <div class="mini-scr">
+          <div class="mp-sb"><span>9:41</span><span>■</span></div>
+          <div class="mp-hdr"><div class="mp-s">Lenguaje de Programación</div><div class="mp-t">Ciclos while</div></div>
+          <div class="mp-body">
+            <div style="background:var(--bll);border-left:2px solid var(--bl);padding:5px 6px;border-radius:0 4px 4px 0;margin-bottom:5px">
+              <div style="font-size:7px;font-weight:600;color:var(--nv);margin-bottom:2px">¿Qué es un ciclo while?</div>
+              <div style="font-size:6px;color:var(--ts);line-height:1.4">Repite mientras la condición sea verdadera.</div>
+            </div>
+            <div style="background:#0A1535;border-radius:4px;padding:5px 6px;margin-bottom:5px">
+              <div style="font-size:6px;color:#79C0FF;font-family:monospace;line-height:1.8">while cond:<br><span style="color:#CDD9E5">  instruccion()</span></div>
+            </div>
+            <div style="background:var(--grb);border-radius:4px;padding:4px 6px">
+              <div style="font-size:6px;font-weight:600;color:var(--grd)">💡 Punto clave</div>
+              <div style="font-size:5px;color:var(--ts);margin-top:1px;line-height:1.4">Siempre modifica la variable de control.</div>
+            </div>
+            <div style="display:flex;gap:3px;margin-top:6px">
+              <button style="flex:1;background:#fff;border:.5px solid var(--bor);border-radius:4px;padding:4px;font-size:5px;color:var(--nv)">‹ Ant</button>
+              <button style="flex:1;background:var(--nv);border:none;border-radius:4px;padding:4px;font-size:5px;color:#fff">Practicar</button>
+              <button style="flex:1;background:#fff;border:.5px solid var(--bor);border-radius:4px;padding:4px;font-size:5px;color:var(--nv)">Sig ›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Mockup cuestionario -->
+      <div class="mini-phone" style="margin-bottom:20px">
+        <div class="mini-scr">
+          <div class="mp-sb"><span>9:41</span><span>■</span></div>
+          <div class="mp-hdr">
+            <div class="mp-s">Circuitos Lógicos</div>
+            <div class="mp-t">Cuestionario</div>
+            <div style="display:flex;gap:4px;align-items:center;margin-top:3px">
+              <div style="flex:1;background:rgba(255,255,255,.15);border-radius:2px;height:2px;overflow:hidden"><div style="background:var(--gr);height:100%;width:40%"></div></div>
+              <span style="font-size:6px;color:var(--gr)">2/5</span>
+            </div>
+          </div>
+          <div class="mp-body">
+            <div style="font-size:7px;font-weight:500;color:var(--tx);margin-bottom:6px;line-height:1.4">¿Cuál es el binario del decimal 13?</div>
+            <div style="background:#fff;border:.5px solid var(--bor);border-radius:4px;padding:4px 5px;margin-bottom:3px;font-size:6px;color:var(--ts)">A · 1011</div>
+            <div style="background:var(--grb);border:.5px solid var(--grd);border-radius:4px;padding:4px 5px;margin-bottom:3px;font-size:6px;color:var(--grd);font-weight:500">B · 1101 ✓</div>
+            <div style="background:#fff;border:.5px solid var(--bor);border-radius:4px;padding:4px 5px;margin-bottom:5px;font-size:6px;color:var(--ts)">C · 1110</div>
+            <div style="background:var(--grb);border-radius:3px;padding:3px 4px;font-size:5px;color:var(--grd);line-height:1.4">¡Correcto! 13÷2=6r1→ ...leyendo: 1101</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALACIÓN -->
+<section id="instalar">
+  <div class="section">
+    <div class="sec-tag">Instalación</div>
+    <h2 class="sec-h2">Sin tiendas de aplicaciones</h2>
+    <p class="sec-sub">SDGo! es una PWA. Se instala directo desde Chrome en tu Android en segundos, sin pasar por Google Play.</p>
+    <div class="install-box">
+      <div style="font-size:13px;font-weight:600;color:var(--nv);margin-bottom:4px">Cómo instalarla en Android</div>
+      <div style="font-size:12px;color:var(--ts)">Solo necesitas Chrome y conexión a internet</div>
+      <div class="install-steps">
+        <div class="istep"><div class="istep-num">1</div><div class="istep-t">Abre <strong>Chrome</strong> en tu celular Android</div></div>
+        <div class="istep"><div class="istep-num">2</div><div class="istep-t">Entra a la URL de SDGo! que aparece abajo</div></div>
+        <div class="istep"><div class="istep-num">3</div><div class="istep-t">Toca el menú <strong>⋮</strong> → <strong>"Añadir a pantalla de inicio"</strong></div></div>
+        <div class="istep"><div class="istep-num">4</div><div class="istep-t">Confirma tocando <strong>"Añadir"</strong> — el ícono aparece en tu pantalla principal</div></div>
+      </div>
+      <div class="url-box">
+        <div class="url-lbl">URL de la aplicación</div>
+        <div class="url-val">natismalopez.github.io/sdgo</div>
+      </div>
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn-hero" onclick="abrirApp()" style="font-size:14px;padding:12px 28px">Abrir SDGo! ahora ›</button>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:var(--bll);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--ts)">
+      <strong style="color:var(--nv)">En iPhone (Safari):</strong> Abre la URL en Safari → toca el ícono compartir <strong>⎦↑⎡</strong> → <strong>"Agregar a inicio"</strong>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section id="cta-final">
+  <h2>¿Listo para estudiar<br>con <em>rumbo</em>?</h2>
+  <p>Abre SDGo! ahora mismo. Solo necesitas tu boleta y grupo.</p>
+  <button class="btn-hero" onclick="abrirApp()" style="font-size:16px;padding:14px 36px">Abrir SDGo! &nbsp;›</button>
+  <p class="cta-note">Acceso gratuito · Sin descargas · Para alumnos del CECyT 9 · IPN</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo"><span class="sd">S</span><span class="d">D</span><span class="go">Go!</span></div>
+  <p>CECyT 9 "Juan de Dios Bátiz" · IPN<br>Proyecto educativo sin fines de lucro · Natisma J. López Salas</p>
+</footer>
+
+<script>
+function abrirApp(){
+  window.location.href='./index.html';
+}
+</script>
+</body>
+</html>
