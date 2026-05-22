@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0D1B4B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SDGo!">
+<title>SDGo! – CECyT 9 IPN</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- ═══════════════════════════════════════════════════════
+     ESTILOS GLOBALES
+════════════════════════════════════════════════════════════ -->
+<style>
+:root {
+  --nv:  #0D1B4B;
+  --nv2: #132060;
+  --nv3: #1A2878;
+  --bl:  #1E7FD8;
+  --bl2: #2E9AFF;
+  --bll: #E8F4FF;
+  --gr:  #2ECC52;
+  --gr2: #39FF6A;
+  --grd: #1A9939;
+  --grb: #E6FAF0;
+  --wh:  #FFFFFF;
+  --bg:  #F0F4FF;
+  --bor: #D0DCFF;
+  --tx:  #0D1B4B;
+  --ts:  #4A5A8A;
+  --am:  #F5A623;
+  --amb: #FFF3DC;
+  --er:  #E74C3C;
+  --erb: #FDECEA;
+  --fnt: 'Exo 2', sans-serif;
+  --mono:'JetBrains Mono', monospace;
+  --radius: 12px;
+  --rad-sm: 8px;
+  --shadow: 0 2px 12px rgba(13,27,75,.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%; width: 100%;
+  font-family: var(--fnt);
+  background: var(--nv);
+  color: var(--tx);
+  overflow: hidden;
+}
+
+/* ── CONTENEDOR PRINCIPAL ── */
+#app {
+  width: 100%; height: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── VISTAS ── */
+.view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .3s;
+}
+.view.hidden       { transform: translateX(100%); opacity: 0; pointer-events: none; }
+.view.slide-left   { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+.view.slide-in     { transform: translateX(0); opacity: 1; }
+
+/* ── STATUS BAR ── */
+.status-bar {
+  background: var(--nv);
+  padding: 10px 18px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.status-bar span { color: rgba(255,255,255,.85); font-size: 11px; font-weight: 600; }
+
+/* ── HEADER ── */
+.header {
+  background: var(--nv);
+  padding: 10px 18px 14px;
+  flex-shrink: 0;
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-back {
+  background: rgba(255,255,255,.12);
+  border: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.header h1 { font-size: 16px; font-weight: 600; color: #fff; }
+.header p  { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 2px; }
+
+/* ── SCROLL AREA ── */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 72px;
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: .5px solid var(--bor);
+  display: flex;
+  padding: 8px 0 6px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+.nav-item .nav-icon { font-size: 20px; line-height: 1; }
+.nav-item .nav-label { font-size: 9px; color: var(--ts); font-weight: 500; }
+.nav-item.active .nav-label { color: var(--nv); }
+.nav-item.active .nav-icon { filter: brightness(0.6) sepia(1) hue-rotate(190deg) saturate(3); }
+
+/* ── SECCIÓN TÍTULO ── */
+.sec-title {
+  font-size: 10px;
+  color: var(--ts);
+  font-weight: 600;
+  padding: 14px 18px 6px;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+}
+
+/* ── CARD ── */
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  margin: 0 14px 10px;
+  border: .5px solid var(--bor);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card-body { padding: 12px 14px; }
+
+/* ── PROGRESS BAR ── */
+.prog-bar-bg {
+  background: rgba(255,255,255,.15);
+  border-radius: 3px;
+  height: 4px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.prog-bar-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+
+/* ── BADGE ── */
+.badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.badge-green  { background: var(--grb); color: var(--grd); }
+.badge-yellow { background: var(--amb); color: #7A5A0A; }
+.badge-gray   { background: #F0F0F8;   color: var(--ts); }
+.badge-blue   { background: var(--bll); color: #0C447C; }
+
+/* ── BOTÓN PRINCIPAL ── */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: var(--rad-sm);
+  font-family: var(--fnt);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .1s, opacity .1s;
+}
+.btn:active { transform: scale(.98); opacity: .9; }
+.btn-primary   { background: var(--gr);  color: var(--nv); }
+.btn-secondary { background: var(--nv);  color: #fff; }
+.btn-outline   { background: transparent; color: var(--nv); border: 1.5px solid var(--bor); }
+.btn-danger    { background: var(--er);  color: #fff; }
+
+/* ── INPUT ── */
+.input-group { margin-bottom: 12px; }
+.input-label {
+  font-size: 11px;
+  color: rgba(255,255,255,.6);
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+.input-field {
+  width: 100%;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--rad-sm);
+  padding: 12px 14px;
+  color: #fff;
+  font-family: var(--fnt);
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s;
+}
+.input-field::placeholder { color: rgba(255,255,255,.35); }
+.input-field:focus { border-color: var(--gr); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--nv);
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: .5px solid rgba(46,204,82,.4);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .3s, transform .3s;
+  z-index: 100;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── PILL CHIP ── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(46,204,82,.15);
+  border: .5px solid rgba(46,204,82,.3);
+  border-radius: 20px;
+  padding: 3px 10px;
+  margin-top: 5px;
+}
+.chip span { font-size: 9px; color: var(--gr); font-weight: 500; }
+.chip-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gr); }
+
+/* ── DIVIDER ── */
+.divider { height: .5px; background: var(--bor); }
+
+/* ── PUNTOS ANIMADOS ── */
+@keyframes pulse-dot {
+  0%,100% { opacity: .4; transform: scale(1); }
+  50%      { opacity: 1;  transform: scale(1.3); }
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 1 — SPLASH / LOGIN
+══════════════════════════════════════════════════════════ */
+#view-splash {
+  background: var(--nv);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 28px;
+  gap: 0;
+}
+
+.splash-logo-wrap {
+  width: 80px; height: 80px;
+  border-radius: 22px;
+  background: var(--nv2);
+  border: 1px solid rgba(30,127,216,.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.splash-logo-sd { font-size: 28px; font-weight: 700; color: var(--bl2); letter-spacing: 1px; }
+.splash-logo-go { font-size: 14px; font-weight: 600; color: var(--gr); }
+
+.splash-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+}
+.splash-name em { color: var(--gr); font-style: normal; }
+.splash-bar { width: 40px; height: 2px; background: var(--bl2); border-radius: 2px; margin-bottom: 10px; }
+.splash-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,.5);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 6px;
+}
+.splash-ipn {
+  background: rgba(30,127,216,.18);
+  border: .5px solid rgba(30,127,216,.35);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 10px;
+  color: var(--bl2);
+  margin-bottom: 28px;
+}
+
+.splash-form { width: 100%; }
+.splash-note {
+  font-size: 10px;
+  color: rgba(255,255,255,.25);
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 2 — DASHBOARD
+══════════════════════════════════════════════════════════ */
+.db-head { background: var(--nv); padding: 12px 18px 16px; flex-shrink: 0; }
+.db-hello { font-size: 11px; color: rgba(255,255,255,.5); margin-bottom: 2px; }
+.db-name  { font-size: 17px; font-weight: 600; color: #fff; }
+
+.mot-banner {
+  background: var(--grb);
+  border-left: 3px solid var(--grd);
+  border-radius: 0 var(--rad-sm) var(--rad-sm) 0;
+  margin: 10px 14px 4px;
+  padding: 8px 12px;
+}
+.mot-banner strong { font-size: 12px; color: var(--grd); display: block; margin-bottom: 2px; }
+.mot-banner span   { font-size: 11px; color: #2A9948; }
+
+.mat-card {
+  background: #fff;
+  border-radius: var(--radius);
+  margin: 0 14px 10px;
+  padding: 12px 14px;
+  border: .5px solid var(--bor);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .15s;
+}
+.mat-card:active { transform: scale(.98); }
+.mat-icon {
+  width: 42px; height: 42px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.mat-info { flex: 1; min-width: 0; }
+.mat-name { font-size: 13px; font-weight: 600; color: var(--nv); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mat-sub  { font-size: 10px; color: var(--ts); margin-top: 1px; }
+.mat-pb   { background: var(--bor); border-radius: 2px; height: 4px; margin-top: 5px; overflow: hidden; }
+.mat-pb div { height: 100%; border-radius: 2px; }
+
+.qa-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 0 14px 14px;
+}
+.qa-btn {
+  background: #fff;
+  border-radius: var(--radius);
+  border: .5px solid var(--bor);
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform .15s;
+}
+.qa-btn:active { transform: scale(.96); }
+.qa-btn .ico { font-size: 22px; }
+.qa-btn .lbl { font-size: 9px; color: var(--nv); font-weight: 500; margin-top: 4px; }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 3 — MATERIA
+══════════════════════════════════════════════════════════ */
+.mat-header { background: var(--nv); padding: 10px 18px 14px; flex-shrink: 0; }
+.mat-pct-pill {
+  margin-left: auto;
+  background: rgba(46,204,82,.2);
+  border: .5px solid rgba(46,204,82,.35);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 10px;
+  color: var(--gr);
+  font-weight: 600;
+}
+
+.util-card {
+  background: #fff;
+  border-radius: var(--radius);
+  margin: 0 14px 10px;
+  border: .5px solid var(--bor);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .15s;
+}
+.util-card:active { transform: scale(.98); }
+.util-head { padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+.util-ic {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.util-t { font-size: 13px; font-weight: 600; color: var(--nv); }
+.util-s { font-size: 10px; color: var(--ts); margin-top: 1px; }
+.util-btn-row {
+  border-top: .5px solid var(--bor);
+  padding: 9px 14px;
+  font-size: 12px;
+  color: var(--bl);
+  font-weight: 500;
+}
+
+.tema-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: .5px solid var(--bor);
+}
+.tema-row:last-child { border: none; }
+.tema-nm { font-size: 12px; color: var(--tx); }
+.dot-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 4 — GUÍA DE ESTUDIO
+══════════════════════════════════════════════════════════ */
+.guia-section {
+  margin: 0 14px 10px;
+  background: #fff;
+  border-radius: var(--radius);
+  border: .5px solid var(--bor);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.def-box {
+  background: var(--bll);
+  border-left: 3px solid var(--bl);
+  border-radius: 0 var(--rad-sm) var(--rad-sm) 0;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.def-t { font-size: 12px; font-weight: 600; color: var(--nv); margin-bottom: 4px; }
+.def-b { font-size: 12px; color: var(--ts); line-height: 1.6; }
+.code-box {
+  background: #0A1535;
+  border-radius: var(--rad-sm);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: .5px solid rgba(30,127,216,.25);
+  overflow-x: auto;
+}
+.code-line { font-family: var(--mono); font-size: 12px; line-height: 1.9; }
+.c-kw { color: #79C0FF; }
+.c-fn { color: #D2A8FF; }
+.c-st { color: #A5D6FF; }
+.c-cm { color: #6E7F9E; }
+.c-nm { color: #FFA657; }
+.c-wh { color: #CDD9E5; }
+.key-box {
+  background: var(--grb);
+  border-radius: var(--rad-sm);
+  padding: 10px 12px;
+  border: .5px solid rgba(46,204,82,.2);
+}
+.key-t { font-size: 11px; font-weight: 600; color: var(--grd); margin-bottom: 3px; }
+.key-b { font-size: 11px; color: var(--ts); line-height: 1.5; }
+
+.nav-guia {
+  display: flex;
+  gap: 8px;
+  margin: 4px 14px 14px;
+}
+.nav-guia button {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--bor);
+  border-radius: var(--rad-sm);
+  padding: 10px;
+  font-family: var(--fnt);
+  font-size: 12px;
+  color: var(--nv);
+  font-weight: 500;
+  cursor: pointer;
+}
+.nav-guia button.main-act {
+  background: var(--nv);
+  color: #fff;
+  border-color: var(--nv);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 5 — CUESTIONARIO
+══════════════════════════════════════════════════════════ */
+.q-prog {
+  background: var(--nv);
+  padding: 10px 18px 14px;
+  flex-shrink: 0;
+}
+.q-prog-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.q-pb-bg { flex: 1; background: rgba(255,255,255,.15); border-radius: 3px; height: 5px; overflow: hidden; }
+.q-pb-fill { background: var(--gr); height: 100%; border-radius: 3px; transition: width .4s ease; }
+.q-cnt { font-size: 11px; color: var(--gr); font-weight: 600; white-space: nowrap; }
+
+.q-body { padding: 16px 14px; }
+.q-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tx);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.q-code-inline {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--bl);
+  background: var(--bll);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Imagen opcional en reactivo */
+.q-img-wrap {
+  margin-bottom: 14px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: .5px solid var(--bor);
+  background: var(--bg);
+}
+.q-img-wrap img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  display: block;
+  background: #fff;
+}
+.q-img-caption {
+  font-size: 10px;
+  color: var(--ts);
+  text-align: center;
+  padding: 5px 10px 7px;
+  background: var(--bg);
+  border-top: .5px solid var(--bor);
+}
+.q-img-error {
+  padding: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ts);
+}
+.q-img-loading {
+  padding: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ts);
+}
+
+.option {
+  background: #fff;
+  border: 1.5px solid var(--bor);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, transform .1s;
+}
+.option:active { transform: scale(.98); }
+.option.correct { background: var(--grb); border-color: var(--grd); }
+.option.wrong   { background: var(--erb); border-color: var(--er); }
+.option.disabled { pointer-events: none; opacity: .6; }
+.opt-ltr {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--bll);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nv);
+  flex-shrink: 0;
+}
+.option.correct .opt-ltr { background: var(--grd); color: #fff; }
+.option.wrong   .opt-ltr { background: var(--er); color: #fff; }
+.opt-text { font-size: 13px; color: var(--tx); }
+
+.feedback-box {
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.feedback-box.ok  { background: var(--grb); border: .5px solid rgba(46,204,82,.3); }
+.feedback-box.bad { background: var(--erb); border: .5px solid rgba(231,76,60,.25); }
+.fb-icon { font-size: 20px; flex-shrink: 0; }
+.fb-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.fb-title.ok  { color: var(--grd); }
+.fb-title.bad { color: var(--er); }
+.fb-text { font-size: 12px; color: var(--ts); line-height: 1.5; }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 6 — RESULTADO CUESTIONARIO
+══════════════════════════════════════════════════════════ */
+.result-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 18px;
+  text-align: center;
+}
+.result-circle {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  border: 4px solid var(--gr);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: var(--grb);
+}
+.result-pct { font-size: 26px; font-weight: 700; color: var(--grd); }
+.result-lbl { font-size: 10px; color: var(--grd); font-weight: 500; }
+.result-title { font-size: 20px; font-weight: 600; color: var(--nv); margin-bottom: 6px; }
+.result-sub { font-size: 13px; color: var(--ts); line-height: 1.6; margin-bottom: 24px; }
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+.r-stat {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 12px 8px;
+  border: .5px solid var(--bor);
+}
+.r-stat-n { font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+.r-stat-l { font-size: 10px; color: var(--ts); }
+.r-pts-banner {
+  width: 100%;
+  background: var(--grb);
+  border: .5px solid rgba(46,204,82,.3);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.r-pts-t { font-size: 13px; color: var(--grd); font-weight: 500; }
+.r-pts-v { font-size: 20px; font-weight: 700; color: var(--grd); }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 7 — ASESORÍAS
+══════════════════════════════════════════════════════════ */
+.nivel-card {
+  background: var(--nv2);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 12px 14px 10px;
+  border: .5px solid rgba(30,127,216,.3);
+}
+.nivel-lbl { font-size: 10px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+.nivel-val { font-size: 18px; font-weight: 700; color: #fff; }
+.nivel-hint { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 4px; }
+.nivel-pb-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.nivel-pb-bg { flex: 1; background: rgba(255,255,255,.12); border-radius: 3px; height: 5px; overflow: hidden; }
+.nivel-pts { font-size: 10px; color: var(--gr); font-weight: 600; }
+
+.doc-card {
+  background: #fff;
+  border-radius: var(--radius);
+  margin: 0 14px 10px;
+  padding: 12px 14px;
+  border: .5px solid var(--bor);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow);
+}
+.avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--bll);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nv);
+  flex-shrink: 0;
+}
+.doc-name { font-size: 13px; font-weight: 600; color: var(--nv); }
+.doc-sub  { font-size: 11px; color: var(--ts); margin-top: 1px; }
+.doc-disp {
+  font-size: 10px; color: var(--grd);
+  background: var(--grb);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+.prox-card {
+  background: var(--bll);
+  border-radius: var(--radius);
+  margin: 0 14px 10px;
+  padding: 12px 14px;
+  border: .5px solid rgba(30,127,216,.2);
+}
+.prox-t { font-size: 12px; font-weight: 600; color: var(--nv); margin-bottom: 3px; }
+.prox-s { font-size: 11px; color: var(--ts); }
+
+.logro-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: .5px solid var(--bor);
+}
+.logro-row:last-child { border: none; }
+.logro-ic {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--bll);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.logro-tx { font-size: 12px; color: var(--tx); flex: 1; }
+.logro-pt { font-size: 11px; color: var(--grd); font-weight: 600; }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA 8 — LOGROS / TIENDA
+══════════════════════════════════════════════════════════ */
+.pts-card {
+  background: var(--nv2);
+  border-radius: var(--radius);
+  margin: 12px 14px 10px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: .5px solid rgba(46,204,82,.25);
+}
+.pts-l { font-size: 10px; color: rgba(255,255,255,.5); margin-bottom: 4px; }
+.pts-v { font-size: 32px; font-weight: 700; color: var(--gr); line-height: 1; }
+.pts-s { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 3px; }
+.pts-tag {
+  background: rgba(30,127,216,.25);
+  border: .5px solid rgba(30,127,216,.4);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--bl2);
+  font-weight: 500;
+}
+
+.rec-card {
+  background: #fff;
+  border-radius: var(--radius);
+  margin: 0 14px 8px;
+  padding: 12px 14px;
+  border: .5px solid var(--bor);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow);
+}
+.rec-card.locked { opacity: .5; }
+.rec-ico { font-size: 22px; width: 34px; text-align: center; flex-shrink: 0; }
+.rec-n { font-size: 13px; font-weight: 600; color: var(--nv); }
+.rec-s { font-size: 10px; color: var(--ts); margin-top: 1px; }
+.rec-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; margin-left: auto; flex-shrink: 0; }
+.rec-pts { font-size: 11px; color: var(--grd); font-weight: 600; }
+.can-btn {
+  background: var(--nv);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 5px 11px;
+  font-size: 11px;
+  font-family: var(--fnt);
+  font-weight: 500;
+  cursor: pointer;
+}
+.can-btn.no { background: var(--bor); color: var(--ts); }
+
+.hist-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: .5px solid var(--bor);
+}
+.hist-row:last-child { border: none; }
+.hist-ic { width: 28px; height: 28px; border-radius: 8px; background: var(--grb); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.hist-tx { font-size: 12px; color: var(--tx); flex: 1; }
+.hist-dt { font-size: 10px; color: var(--ts); }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA DE SELECCIÓN DE MATERIAS
+══════════════════════════════════════════════════════════ */
+.sel-header {
+  background: var(--nv);
+  padding: 16px 18px 20px;
+  flex-shrink: 0;
+}
+.sel-titulo { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.sel-sub    { font-size: 12px; color: rgba(255,255,255,.5); line-height: 1.5; }
+.sel-counter {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sel-count-txt { font-size: 11px; color: rgba(255,255,255,.5); }
+.sel-count-num { font-size: 13px; font-weight: 600; color: var(--gr); }
+
+.mat-sel-card {
+  background: #fff;
+  border-radius: var(--radius);
+  margin: 0 14px 10px;
+  padding: 14px;
+  border: 2px solid var(--bor);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: border-color .2s, background .2s, transform .1s;
+}
+.mat-sel-card:active { transform: scale(.98); }
+.mat-sel-card.selected {
+  border-color: var(--gr);
+  background: var(--grb);
+}
+.mat-sel-check {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--bor);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all .2s;
+}
+.mat-sel-card.selected .mat-sel-check {
+  background: var(--gr);
+  border-color: var(--gr);
+}
+.check-mark { color: #fff; font-size: 13px; display: none; }
+.mat-sel-card.selected .check-mark { display: block; }
+.mat-sel-info { flex: 1; }
+.mat-sel-name { font-size: 14px; font-weight: 600; color: var(--nv); }
+.mat-sel-unidad { font-size: 11px; color: var(--ts); margin-top: 2px; }
+.mat-sel-temas  { font-size: 10px; color: var(--ts); margin-top: 4px; }
+
+.sel-footer {
+  padding: 14px;
+  background: #fff;
+  border-top: .5px solid var(--bor);
+  flex-shrink: 0;
+}
+.sel-footer-note {
+  font-size: 10px;
+  color: var(--ts);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA DE CARGA
+══════════════════════════════════════════════════════════ */
+#view-loading {
+  background: var(--nv);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.loading-logo { font-size: 36px; font-weight: 700; color: #fff; }
+.loading-logo em { color: var(--gr); font-style: normal; }
+.loading-dots { display: flex; gap: 8px; }
+.ld { width: 8px; height: 8px; border-radius: 50%; background: var(--gr); animation: pulse-dot 1.4s ease infinite; }
+.ld:nth-child(2) { animation-delay: .2s; }
+.ld:nth-child(3) { animation-delay: .4s; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     HTML DE LA APP
+════════════════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- CARGA -->
+  <div class="view" id="view-loading">
+    <div class="loading-logo">SDG<em>o!</em></div>
+    <div class="loading-dots"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div>
+  </div>
+
+  <!-- SPLASH / LOGIN -->
+  <div class="view hidden" id="view-splash">
+    <div class="splash-logo-wrap">
+      <div class="splash-logo-sd">SD</div>
+      <div class="splash-logo-go">Go! ›</div>
+    </div>
+    <div class="splash-name">SDG<em>o!</em></div>
+    <div class="splash-bar"></div>
+    <p class="splash-sub">Tu guía de estudio para<br>Sistemas Digitales · CECyT 9</p>
+    <div class="splash-ipn">Instituto Politécnico Nacional</div>
+    <div class="splash-form">
+      <div class="input-group">
+        <label class="input-label">Matrícula</label>
+        <input class="input-field" id="inp-matricula" type="number" placeholder="Ej. 2024630001" inputmode="numeric">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Grupo</label>
+        <input class="input-field" id="inp-grupo" type="text" placeholder="Ej. 5AM" autocomplete="off">
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Entrar a SDGo! &nbsp;›</button>
+    </div>
+    <p class="splash-note">Acceso con datos institucionales · Sin contraseña</p>
+  </div>
+
+  <!-- SELECCIÓN DE MATERIAS -->
+  <div class="view hidden" id="view-seleccion">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="sel-header">
+      <div class="sel-titulo">Elige tus materias</div>
+      <div class="sel-sub">Selecciona las que cursas este semestre. Podrás cambiarlas después desde Configuración.</div>
+      <div class="sel-counter">
+        <div class="sel-count-txt">Seleccionadas</div>
+        <div class="sel-count-num" id="sel-count">0 materias</div>
+      </div>
+    </div>
+    <div class="scroll-area" style="padding-bottom:90px">
+      <div style="height:12px"></div>
+      <div id="sel-materias-list"></div>
+    </div>
+    <div class="sel-footer">
+      <button class="btn btn-primary" id="btn-confirmar-sel" onclick="confirmarSeleccion()">
+        Confirmar selección ›
+      </button>
+      <div class="sel-footer-note">Selecciona al menos una materia para continuar</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view hidden" id="view-dashboard">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="db-head">
+      <div class="db-hello">Bienvenido de regreso</div>
+      <div class="db-name" id="db-name">Grupo 5AM</div>
+      <div class="chip"><div class="chip-dot"></div><span id="db-prog-label">Progreso: 0%</span></div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="db-prog-bar" style="width:0%;background:var(--gr)"></div></div>
+    </div>
+    <div class="scroll-area">
+      <div class="mot-banner">
+        <strong id="mot-title">¡Empieza hoy!</strong>
+        <span id="mot-sub">Elige una materia para comenzar tu estudio.</span>
+      </div>
+      <div class="sec-title">Mis materias</div>
+      <div id="materias-list"></div>
+      <div class="sec-title">Accesos rápidos</div>
+      <div class="qa-grid">
+        <div class="qa-btn" onclick="navTo('view-cuestionario')"><div class="ico">✏️</div><div class="lbl">Cuestionario</div></div>
+        <div class="qa-btn" onclick="navTo('view-logros')"><div class="ico">📊</div><div class="lbl">Mi avance</div></div>
+        <div class="qa-btn" onclick="navTo('view-asesorias')"><div class="ico">🎓</div><div class="lbl">Asesoría</div></div>
+        <div class="qa-btn" onclick="navTo('view-logros')"><div class="ico">🏅</div><div class="lbl">Logros</div></div>
+      </div>
+    </div>
+    <div class="bottom-nav" id="bnav-dash">
+      <div class="nav-item active" onclick="setTab(0)"><div class="nav-icon">🏠</div><div class="nav-label">Inicio</div></div>
+      <div class="nav-item" onclick="setTab(1)"><div class="nav-icon">📚</div><div class="nav-label">Temas</div></div>
+      <div class="nav-item" onclick="setTab(2)"><div class="nav-icon">📊</div><div class="nav-label">Progreso</div></div>
+      <div class="nav-item" onclick="setTab(3)"><div class="nav-icon">🎓</div><div class="nav-label">Asesorías</div></div>
+    </div>
+  </div>
+
+  <!-- MATERIA -->
+  <div class="view hidden" id="view-materia">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="mat-header">
+      <div class="header-row">
+        <button class="btn-back" onclick="navBack()">‹</button>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:600;color:#fff" id="mat-titulo">Materia</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5)" id="mat-subtitulo">Unidad</div>
+        </div>
+        <div class="mat-pct-pill" id="mat-pct">0%</div>
+      </div>
+    </div>
+    <div class="scroll-area">
+      <div style="height:12px"></div>
+      <div class="util-card" onclick="navTo('view-guia')">
+        <div class="util-head">
+          <div class="util-ic" style="background:var(--bll)">📖</div>
+          <div><div class="util-t">Guía de estudio</div><div class="util-s">Contenido estructurado por tema</div></div>
+        </div>
+        <div class="util-btn-row">Ver guía completa ›</div>
+      </div>
+      <div class="util-card" onclick="startCuestionario()">
+        <div class="util-head">
+          <div class="util-ic" style="background:var(--grb)">✏️</div>
+          <div><div class="util-t">Cuestionario tipo examen</div><div id="util-q-sub" class="util-s">Cargando reactivos…</div></div>
+        </div>
+        <div class="util-btn-row">Iniciar práctica ›</div>
+      </div>
+      <div class="util-card" onclick="navTo('view-logros')">
+        <div class="util-head">
+          <div class="util-ic" style="background:var(--amb)">📊</div>
+          <div><div class="util-t">Mi avance aquí</div><div class="util-s">Historial de resultados</div></div>
+        </div>
+        <div class="util-btn-row">Ver detalle ›</div>
+      </div>
+      <div class="sec-title">Temas de la unidad</div>
+      <div class="card" style="padding:0"><div id="temas-list"></div></div>
+      <div style="padding:8px 18px 6px;display:flex;gap:14px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ts)"><div class="dot-status" style="background:var(--gr)"></div>Completado</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ts)"><div class="dot-status" style="background:var(--am)"></div>En proceso</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--ts)"><div class="dot-status" style="background:var(--bor)"></div>Pendiente</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GUÍA DE ESTUDIO -->
+  <div class="view hidden" id="view-guia">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="header">
+      <div class="header-row">
+        <button class="btn-back" onclick="navBack()">‹</button>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5)" id="guia-mat-sub">Materia · Unidad</div>
+          <div style="font-size:14px;font-weight:600;color:#fff" id="guia-tema-titulo">Tema</div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-area" id="guia-content"></div>
+  </div>
+
+  <!-- CUESTIONARIO -->
+  <div class="view hidden" id="view-cuestionario">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="q-prog">
+      <div style="font-size:10px;color:rgba(255,255,255,.5)" id="q-mat-label">Materia · Cuestionario</div>
+      <div style="font-size:14px;font-weight:600;color:#fff">Cuestionario tipo examen</div>
+      <div class="q-prog-row">
+        <div class="q-pb-bg"><div class="q-pb-fill" id="q-pb" style="width:0%"></div></div>
+        <div class="q-cnt" id="q-cnt">0 / 0</div>
+      </div>
+    </div>
+    <div class="scroll-area">
+      <div class="q-body" id="q-body"></div>
+      <div style="padding:0 14px 14px">
+        <button class="btn btn-secondary" id="btn-siguiente" onclick="nextQuestion()" style="display:none">Siguiente pregunta ›</button>
+        <button class="btn btn-primary" id="btn-finalizar" onclick="finalizarCuestionario()" style="display:none">Ver resultado ›</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="view hidden" id="view-resultado">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="header">
+      <div style="font-size:15px;font-weight:600;color:#fff">Resultado del cuestionario</div>
+    </div>
+    <div class="scroll-area">
+      <div class="result-body">
+        <div class="result-circle">
+          <div class="result-pct" id="res-pct">0%</div>
+          <div class="result-lbl">Calificación</div>
+        </div>
+        <div class="result-title" id="res-title">¡Buen trabajo!</div>
+        <div class="result-sub" id="res-sub">Sigue practicando para mejorar.</div>
+        <div class="result-stats">
+          <div class="r-stat"><div class="r-stat-n" id="res-ok" style="color:var(--grd)">0</div><div class="r-stat-l">Correctas</div></div>
+          <div class="r-stat"><div class="r-stat-n" id="res-bad" style="color:var(--er)">0</div><div class="r-stat-l">Incorrectas</div></div>
+          <div class="r-stat"><div class="r-stat-n" id="res-total">0</div><div class="r-stat-l">Total</div></div>
+        </div>
+        <div class="r-pts-banner">
+          <div class="r-pts-t">✨ Puntos ganados esta sesión</div>
+          <div class="r-pts-v" id="res-pts">+0</div>
+        </div>
+        <button class="btn btn-secondary" style="margin-bottom:10px" onclick="navTo('view-dashboard')">Volver al inicio</button>
+        <button class="btn btn-outline" onclick="startCuestionario()">Repetir cuestionario</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASESORÍAS -->
+  <div class="view hidden" id="view-asesorias">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="header">
+      <div style="font-size:10px;color:rgba(255,255,255,.5)">Acompañamiento académico</div>
+      <div style="font-size:16px;font-weight:600;color:#fff">Mis asesorías</div>
+    </div>
+    <div class="scroll-area">
+      <div class="nivel-card">
+        <div class="nivel-lbl">Tu nivel de acceso</div>
+        <div class="nivel-val" id="as-nivel">Nivel 1 — Inicial</div>
+        <div class="nivel-pb-row">
+          <div class="nivel-pb-bg"><div class="prog-bar-fill" id="as-pb" style="width:0%;background:var(--gr)"></div></div>
+          <div class="nivel-pts" id="as-pts">0 pts</div>
+        </div>
+        <div class="nivel-hint" id="as-hint">Completa cuestionarios para subir de nivel</div>
+      </div>
+      <div class="doc-card">
+        <div class="avatar">NL</div>
+        <div>
+          <div class="doc-name">Profra. N. López Salas</div>
+          <div class="doc-sub">Programación · Sistemas Digitales</div>
+          <div class="doc-disp">Disponible: Mar y Jue 14–16 h</div>
+        </div>
+      </div>
+      <div style="padding:0 14px 10px">
+        <button class="btn btn-primary" id="btn-solicitar" onclick="solicitarAsesoria()">Solicitar asesoría ›</button>
+      </div>
+      <div class="prox-card">
+        <div class="prox-t">Próxima disponibilidad</div>
+        <div class="prox-s">Jueves · 14:00 h · Sala de cómputo 3</div>
+      </div>
+      <div class="sec-title">Logros recientes</div>
+      <div class="card card-body" id="as-logros-list"></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="setTab(0)"><div class="nav-icon">🏠</div><div class="nav-label">Inicio</div></div>
+      <div class="nav-item" onclick="setTab(1)"><div class="nav-icon">📚</div><div class="nav-label">Temas</div></div>
+      <div class="nav-item" onclick="setTab(2)"><div class="nav-icon">📊</div><div class="nav-label">Progreso</div></div>
+      <div class="nav-item active" onclick="setTab(3)"><div class="nav-icon">🎓</div><div class="nav-label">Asesorías</div></div>
+    </div>
+  </div>
+
+  <!-- LOGROS / TIENDA -->
+  <div class="view hidden" id="view-logros">
+    <div class="status-bar"><span>9:41</span><span>●●● WiFi ■</span></div>
+    <div class="header">
+      <div style="font-size:10px;color:rgba(255,255,255,.5)">Tienda académica</div>
+      <div style="font-size:16px;font-weight:600;color:#fff">Mis logros y recompensas</div>
+    </div>
+    <div class="scroll-area">
+      <div class="pts-card">
+        <div>
+          <div class="pts-l">Puntos acumulados</div>
+          <div class="pts-v" id="lg-pts">0</div>
+          <div class="pts-s" id="lg-faltan">— pts para Nivel 2</div>
+        </div>
+        <div style="text-align:right">
+          <div class="pts-tag" id="lg-nivel">Nivel 1</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);margin-top:6px">Progreso al siguiente</div>
+          <div style="background:rgba(255,255,255,.12);border-radius:2px;height:4px;width:80px;overflow:hidden;margin-top:3px">
+            <div id="lg-pb" style="background:var(--gr);height:100%;width:0%;border-radius:2px;transition:width .5s"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sec-title">Recompensas disponibles</div>
+      <div id="recompensas-list"></div>
+      <div class="sec-title">Historial de logros</div>
+      <div class="card card-body" id="historial-list"></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="setTab(0)"><div class="nav-icon">🏠</div><div class="nav-label">Inicio</div></div>
+      <div class="nav-item" onclick="setTab(1)"><div class="nav-icon">📚</div><div class="nav-label">Temas</div></div>
+      <div class="nav-item active" onclick="setTab(2)"><div class="nav-icon">📊</div><div class="nav-label">Progreso</div></div>
+      <div class="nav-item" onclick="setTab(3)"><div class="nav-icon">🎓</div><div class="nav-label">Asesorías</div></div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     DATOS DE LA APP
+     ──────────────────────────────────────────────────────
+     Aquí se define el contenido académico de SDGo!
+     Para conectar con Google Sheets, sustituye el objeto
+     DATA por una llamada a Google Apps Script así:
+     
+     fetch('https://script.google.com/macros/s/TU_ID/exec')
+       .then(r => r.json())
+       .then(data => { DATA = data; initApp(); });
+════════════════════════════════════════════════════════════ -->
+<script>
+const DATA = {
+  materias: [
+    {
+      id: 'prog',
+      nombre: 'Programación',
+      icono: '💻',
+      color: '#E8F4FF',
+      unidad: 'Unidad 2 — Estructuras de control',
+      temas: [
+        'Estructuras if / else',
+        'Ciclos for',
+        'Ciclos while',
+        'Arreglos unidimensionales',
+        'Funciones y parámetros',
+        'Recursividad'
+      ],
+      guia: [
+        {
+          titulo: 'Tema 3: Ciclos while',
+          tipo: 'definicion',
+          pregunta: '¿Qué es un ciclo while?',
+          respuesta: 'Un ciclo while repite un bloque de código mientras una condición sea verdadera. Se utiliza cuando no se sabe de antemano cuántas veces debe repetirse la instrucción.'
+        },
+        {
+          titulo: 'Sintaxis en Python',
+          tipo: 'codigo',
+          lineas: [
+            { tipo: 'kw', texto: 'while' },
+            { tipo: 'wh', texto: ' condicion:' },
+            { tipo: 'cm', texto: '    # bloque de código' },
+            { tipo: 'fn', texto: '    instruccion' },
+            { tipo: 'wh', texto: '()' }
+          ]
+        },
+        {
+          titulo: 'Ejemplo práctico',
+          tipo: 'codigo',
+          lineas: [
+            { tipo: 'nm', texto: 'contador' },
+            { tipo: 'wh', texto: ' = ' },
+            { tipo: 'nm', texto: '0' },
+            { tipo: 'kw', texto: 'while' },
+            { tipo: 'wh', texto: ' ' },
+            { tipo: 'nm', texto: 'contador' },
+            { tipo: 'wh', texto: ' < ' },
+            { tipo: 'nm', texto: '5' },
+            { tipo: 'wh', texto: ':' },
+            { tipo: 'fn', texto: '    print' },
+            { tipo: 'wh', texto: '(' },
+            { tipo: 'st', texto: '"Vuelta"' },
+            { tipo: 'wh', texto: ', contador)' },
+            { tipo: 'nm', texto: '    contador' },
+            { tipo: 'wh', texto: ' += ' },
+            { tipo: 'nm', texto: '1' }
+          ]
+        },
+        {
+          titulo: 'Punto clave',
+          tipo: 'clave',
+          texto: 'Si la condición nunca se vuelve falsa, el ciclo se convierte en infinito. Siempre incluye una instrucción que modifique la variable de control.'
+        }
+      ],
+      cuestionario: [
+        {
+          pregunta: '¿Cuántas veces se ejecuta el siguiente ciclo si contador inicia en 0?\n\nwhile contador < 3:  contador += 1',
+          opciones: ['2 veces', '3 veces', 'Infinitamente', 'Genera un error'],
+          correcta: 1,
+          imagen_url: '',
+          imagen_caption: '',
+          explicacion: 'El ciclo itera con contador = 0, 1 y 2. Cuando contador llega a 3, la condición es falsa y el ciclo termina. Total: 3 iteraciones.'
+        },
+        {
+          pregunta: '¿Qué sucede si la condición de un while nunca se vuelve falsa?',
+          opciones: ['El ciclo termina automáticamente', 'El programa genera un ciclo infinito', 'Se ejecuta solo una vez', 'Python lo corrige solo'],
+          correcta: 1,
+          explicacion: 'Sin una condición que se vuelva falsa, el ciclo while se ejecuta indefinidamente, causando un ciclo infinito que bloquea el programa.'
+        },
+        {
+          pregunta: '¿Cuál es la diferencia principal entre un ciclo for y un while?',
+          opciones: ['El for es más rápido', 'El for itera un número definido de veces; el while lo hace mientras una condición sea verdadera', 'El while solo funciona con números', 'No hay diferencia'],
+          correcta: 1,
+          explicacion: 'El ciclo for itera sobre una secuencia definida. El ciclo while repite mientras se cumpla una condición, sin saber de antemano cuántas veces.'
+        },
+        {
+          pregunta: 'En Python, ¿qué instrucción rompe un ciclo while de forma inmediata?',
+          opciones: ['stop', 'break', 'exit', 'return'],
+          correcta: 1,
+          explicacion: 'La instrucción break termina inmediatamente la ejecución del ciclo y el flujo continúa con el código posterior al bloque while.'
+        },
+        {
+          pregunta: '¿Qué imprime este código?\n\ni = 10\nwhile i > 0:\n    i -= 3\nprint(i)',
+          opciones: ['1', '-2', '0', 'Error'],
+          correcta: 1,
+          explicacion: 'i toma valores: 10, 7, 4, 1, -2. Al llegar a -2 la condición i > 0 es falsa. Se imprime -2.'
+        }
+      ]
+    },
+    {
+      id: 'elec',
+      nombre: 'Electrónica Digital',
+      icono: '⚙️',
+      color: '#E6FAF0',
+      unidad: 'Unidad 1 — Sistemas numéricos y lógica',
+      temas: [
+        'Sistema binario',
+        'Sistema hexadecimal',
+        'Conversión de bases',
+        'Compuertas lógicas',
+        'Álgebra de Boole',
+        'Circuitos combinacionales'
+      ],
+      guia: [
+        {
+          titulo: 'Tema 1: Sistema binario',
+          tipo: 'definicion',
+          pregunta: '¿Qué es el sistema binario?',
+          respuesta: 'El sistema binario es un sistema de numeración de base 2 que usa únicamente dos dígitos: 0 y 1. Es el sistema que usan los computadores para representar toda la información digital.'
+        },
+        {
+          titulo: 'Representación en binario',
+          tipo: 'codigo',
+          lineas: [
+            { tipo: 'cm', texto: '# Decimal → Binario' },
+            { tipo: 'fn', texto: 'bin' },
+            { tipo: 'wh', texto: '(' },
+            { tipo: 'nm', texto: '10' },
+            { tipo: 'wh', texto: ')  → ' },
+            { tipo: 'st', texto: "'0b1010'" },
+            { tipo: 'fn', texto: 'bin' },
+            { tipo: 'wh', texto: '(' },
+            { tipo: 'nm', texto: '255' },
+            { tipo: 'wh', texto: ') → ' },
+            { tipo: 'st', texto: "'0b11111111'" }
+          ]
+        },
+        {
+          titulo: 'Punto clave',
+          tipo: 'clave',
+          texto: 'Para convertir decimal a binario, divide repetidamente entre 2 y lee los residuos de abajo hacia arriba. El resultado es la representación binaria.'
+        }
+      ],
+      cuestionario: [
+        {
+          pregunta: '¿Cuál es la representación binaria del número decimal 13?',
+          opciones: ['1011', '1101', '1110', '1001'],
+          correcta: 1,
+          explicacion: '13 ÷ 2 = 6 r1, 6 ÷ 2 = 3 r0, 3 ÷ 2 = 1 r1, 1 ÷ 2 = 0 r1. Leyendo de abajo: 1101.'
+        },
+        {
+          pregunta: '¿Cuántos dígitos utiliza el sistema binario?',
+          opciones: ['8', '10', '2', '16'],
+          correcta: 2,
+          explicacion: 'El sistema binario es de base 2 y utiliza únicamente dos dígitos: 0 y 1.'
+        },
+        {
+          pregunta: '¿Qué valor decimal representa el binario 1010?',
+          opciones: ['8', '10', '12', '6'],
+          correcta: 1,
+          explicacion: '1010 = 1×8 + 0×4 + 1×2 + 0×1 = 8 + 0 + 2 + 0 = 10.'
+        }
+      ]
+    },
+    {
+      id: 'bd',
+      nombre: 'Bases de Datos',
+      icono: '🗄️',
+      color: '#FFF3DC',
+      unidad: 'Unidad 1 — Fundamentos y modelo relacional',
+      temas: [
+        'Conceptos fundamentales',
+        'Modelo entidad-relación',
+        'Normalización',
+        'SQL básico: SELECT',
+        'SQL: INSERT, UPDATE, DELETE',
+        'Relaciones y llaves'
+      ],
+      guia: [
+        {
+          titulo: 'Tema 1: ¿Qué es una base de datos?',
+          tipo: 'definicion',
+          pregunta: '¿Qué es una base de datos?',
+          respuesta: 'Una base de datos es un conjunto organizado de datos relacionados entre sí, almacenados de forma estructurada para facilitar su acceso, gestión y actualización eficiente.'
+        },
+        {
+          titulo: 'Consulta básica en SQL',
+          tipo: 'codigo',
+          lineas: [
+            { tipo: 'kw', texto: 'SELECT ' },
+            { tipo: 'nm', texto: 'nombre' },
+            { tipo: 'wh', texto: ', ' },
+            { tipo: 'nm', texto: 'apellido' },
+            { tipo: 'kw', texto: ' FROM ' },
+            { tipo: 'fn', texto: 'alumnos' },
+            { tipo: 'kw', texto: ' WHERE ' },
+            { tipo: 'nm', texto: 'grupo' },
+            { tipo: 'wh', texto: ' = ' },
+            { tipo: 'st', texto: "'5AM'" }
+          ]
+        },
+        {
+          titulo: 'Punto clave',
+          tipo: 'clave',
+          texto: 'El modelo relacional organiza los datos en tablas (relaciones) con filas (registros) y columnas (atributos). Las llaves primarias identifican de forma única cada registro.'
+        }
+      ],
+      cuestionario: [
+        {
+          pregunta: '¿Qué instrucción SQL se usa para consultar datos de una tabla?',
+          opciones: ['INSERT', 'UPDATE', 'SELECT', 'DELETE'],
+          correcta: 2,
+          explicacion: 'SELECT permite consultar y recuperar datos de una o más tablas. Es la instrucción más utilizada en SQL.'
+        },
+        {
+          pregunta: '¿Qué es una llave primaria en una base de datos relacional?',
+          opciones: ['Un índice de búsqueda', 'Un campo que identifica de forma única cada registro', 'Una contraseña de acceso', 'Un tipo de tabla especial'],
+          correcta: 1,
+          explicacion: 'La llave primaria (Primary Key) es un campo o conjunto de campos que identifica de manera única a cada registro dentro de una tabla.'
+        }
+      ]
+    },
+    {
+      id: 'redes',
+      nombre: 'Redes',
+      icono: '🌐',
+      color: '#F0ECFF',
+      unidad: 'Unidad 1 — Fundamentos de redes',
+      temas: [
+        'Conceptos básicos de redes',
+        'Modelo OSI',
+        'Protocolo TCP/IP',
+        'Direccionamiento IP',
+        'Dispositivos de red'
+      ],
+      guia: [
+        {
+          titulo: 'Tema 1: ¿Qué es una red de computadoras?',
+          tipo: 'definicion',
+          pregunta: '¿Qué es una red de computadoras?',
+          respuesta: 'Una red de computadoras es un conjunto de dispositivos interconectados que comparten recursos e información. Permiten la comunicación entre equipos dentro de un mismo edificio (LAN) o a nivel mundial (Internet).'
+        },
+        {
+          titulo: 'Punto clave',
+          tipo: 'clave',
+          texto: 'El modelo OSI tiene 7 capas: Física, Enlace de datos, Red, Transporte, Sesión, Presentación y Aplicación. Cada capa tiene una función específica en la transmisión de datos.'
+        }
+      ],
+      cuestionario: [
+        {
+          pregunta: '¿Cuántas capas tiene el modelo OSI?',
+          opciones: ['4', '5', '6', '7'],
+          correcta: 3,
+          explicacion: 'El modelo OSI (Open Systems Interconnection) se compone de 7 capas: Física, Enlace de datos, Red, Transporte, Sesión, Presentación y Aplicación.'
+        },
+        {
+          pregunta: '¿Qué significa LAN?',
+          opciones: ['Large Area Network', 'Local Area Network', 'Linked Access Node', 'Logical Address Network'],
+          correcta: 1,
+          explicacion: 'LAN significa Local Area Network (Red de Área Local). Se refiere a una red que conecta dispositivos en un área geográfica pequeña como una oficina o escuela.'
+        }
+      ]
+    }
+  ],
+  recompensas: [
+    { id: 'r1', nombre: 'Asesoría express', desc: '30 min con la docente', ico: '🎓', costo: 20 },
+    { id: 'r2', nombre: 'Material PDF extra', desc: 'Guía de repaso avanzada', ico: '📄', costo: 10 },
+    { id: 'r3', nombre: 'Insignia de dominio', desc: 'Tema completado 100%', ico: '🏅', costo: 5 },
+    { id: 'r4', nombre: 'Punto de participación', desc: 'Registro ante el docente', ico: '⭐', costo: 100 }
+  ]
+};
+
+/* ══════════════════════════════════════════════════════════
+   ESTADO GLOBAL
+══════════════════════════════════════════════════════════ */
+let STATE = {
+  matricula: '',
+  grupo: '',
+  puntos: 0,
+  logros: [],
+  progreso: {},
+  canjesRealizados: [],
+  materiasInscritas: []   // IDs de materias que eligió el alumno
+};
+
+let currentMateria = null;
+let cuestionario = { preguntas: [], idx: 0, correctas: 0, respondida: false };
+let viewHistory = [];
+
+/* ══════════════════════════════════════════════════════════
+   PERSISTENCIA (localStorage)
+══════════════════════════════════════════════════════════ */
+function saveState() {
+  localStorage.setItem('sdgo_state', JSON.stringify(STATE));
+}
+function loadState() {
+  const saved = localStorage.getItem('sdgo_state');
+  if (saved) {
+    try { STATE = { ...STATE, ...JSON.parse(saved) }; } catch(e) {}
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAVEGACIÓN
+══════════════════════════════════════════════════════════ */
+function navTo(viewId) {
+  const current = document.querySelector('.view:not(.hidden):not(.slide-left)');
+  if (current && current.id !== viewId) {
+    if (!viewHistory.includes(current.id)) viewHistory.push(current.id);
+    current.classList.add('slide-left');
+  }
+  const next = document.getElementById(viewId);
+  next.classList.remove('hidden', 'slide-left');
+  setTimeout(() => next.classList.add('slide-in'), 10);
+}
+
+function navBack() {
+  const prev = viewHistory.pop() || 'view-dashboard';
+  const current = document.querySelector('.view.slide-in, .view:not(.hidden):not(.slide-left)');
+  if (current) {
+    current.classList.remove('slide-in');
+    current.classList.add('hidden');
+    current.classList.remove('slide-left');
+  }
+  const target = document.getElementById(prev);
+  target.classList.remove('hidden', 'slide-left');
+  setTimeout(() => target.classList.add('slide-in'), 10);
+}
+
+function setTab(idx) {
+  const views = ['view-dashboard', 'view-materia', 'view-logros', 'view-asesorias'];
+  navTo(views[idx]);
+  refreshView(views[idx]);
+}
+
+/* ══════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════ */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ══════════════════════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════════════════════ */
+function doLogin() {
+  const m = document.getElementById('inp-matricula').value.trim();
+  const g = document.getElementById('inp-grupo').value.trim().toUpperCase();
+  if (!m || m.length < 5) { toast('⚠️ Ingresa tu matrícula completa'); return; }
+  if (!g) { toast('⚠️ Ingresa tu grupo'); return; }
+  STATE.matricula = m;
+  STATE.grupo = g;
+  saveState();
+
+  // Primera vez: mostrar selección de materias
+  // Regresos: ir directo al dashboard
+  if (!STATE.materiasInscritas || STATE.materiasInscritas.length === 0) {
+    renderSeleccionMaterias();
+    navTo('view-seleccion');
+  } else {
+    initDashboard();
+    navTo('view-dashboard');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SELECCIÓN DE MATERIAS
+══════════════════════════════════════════════════════════ */
+let seleccionTemp = [];
+
+function renderSeleccionMaterias() {
+  seleccionTemp = [...(STATE.materiasInscritas || [])];
+  const list = document.getElementById('sel-materias-list');
+  list.innerHTML = '';
+  DATA.materias.forEach(mat => {
+    const activa = seleccionTemp.includes(mat.id);
+    list.innerHTML += `
+      <div class="mat-sel-card ${activa ? 'selected' : ''}" id="sel-card-${mat.id}" onclick="toggleMateria('${mat.id}')">
+        <div class="mat-sel-check">
+          <span class="check-mark">✓</span>
+        </div>
+        <div class="mat-icon" style="background:${mat.color};width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${mat.icono}</div>
+        <div class="mat-sel-info">
+          <div class="mat-sel-name">${mat.nombre}</div>
+          <div class="mat-sel-unidad">${mat.unidad}</div>
+          <div class="mat-sel-temas">${mat.temas.length} temas · ${mat.cuestionario.length} reactivos</div>
+        </div>
+      </div>`;
+  });
+  actualizarContadorSel();
+}
+
+function toggleMateria(id) {
+  const idx = seleccionTemp.indexOf(id);
+  if (idx >= 0) seleccionTemp.splice(idx, 1);
+  else seleccionTemp.push(id);
+
+  const card = document.getElementById('sel-card-' + id);
+  card.classList.toggle('selected', seleccionTemp.includes(id));
+  actualizarContadorSel();
+}
+
+function actualizarContadorSel() {
+  const n = seleccionTemp.length;
+  document.getElementById('sel-count').textContent =
+    n === 0 ? 'Ninguna seleccionada' : `${n} materia${n > 1 ? 's' : ''} seleccionada${n > 1 ? 's' : ''}`;
+  const btn = document.getElementById('btn-confirmar-sel');
+  btn.disabled = n === 0;
+  btn.style.opacity = n === 0 ? '.4' : '1';
+}
+
+function confirmarSeleccion() {
+  if (seleccionTemp.length === 0) { toast('⚠️ Selecciona al menos una materia'); return; }
+  STATE.materiasInscritas = [...seleccionTemp];
+  saveState();
+  toast(`✅ ${seleccionTemp.length} materia${seleccionTemp.length > 1 ? 's' : ''} guardada${seleccionTemp.length > 1 ? 's' : ''}`);
+  initDashboard();
+  navTo('view-dashboard');
+}
+
+/* ══════════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════════ */
+function initDashboard() {
+  document.getElementById('db-name').textContent = `Grupo ${STATE.grupo}`;
+
+  // Solo materias inscritas
+  const inscritas = DATA.materias.filter(m =>
+    STATE.materiasInscritas.includes(m.id)
+  );
+
+  // Progreso global solo sobre las inscritas
+  let totalTemas = 0, completados = 0;
+  inscritas.forEach(m => {
+    totalTemas += m.temas.length;
+    const p = STATE.progreso[m.id];
+    if (p) completados += p.temasCompletos || 0;
+  });
+  const pct = totalTemas ? Math.round((completados / totalTemas) * 100) : 0;
+  document.getElementById('db-prog-bar').style.width = pct + '%';
+  document.getElementById('db-prog-label').textContent = `Progreso global: ${pct}%`;
+
+  // Banner motivacional
+  const logros = STATE.logros.length;
+  if (logros === 0) {
+    document.getElementById('mot-title').textContent = '¡Empieza hoy!';
+    document.getElementById('mot-sub').textContent = 'Elige una materia para comenzar tu estudio.';
+  } else {
+    document.getElementById('mot-title').textContent = `Llevas ${logros} logro${logros > 1 ? 's' : ''} acumulado${logros > 1 ? 's' : ''}`;
+    document.getElementById('mot-sub').textContent = `Tienes ${STATE.puntos} pts. ¡Sigue así para desbloquear asesorías!`;
+  }
+
+  // Tarjetas solo de materias inscritas
+  const list = document.getElementById('materias-list');
+  list.innerHTML = '';
+
+  if (inscritas.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center;padding:24px 18px">
+        <div style="font-size:32px;margin-bottom:10px">📚</div>
+        <div style="font-size:14px;font-weight:600;color:var(--nv);margin-bottom:6px">Sin materias inscritas</div>
+        <div style="font-size:12px;color:var(--ts);margin-bottom:16px">Agrega las materias que cursas este semestre.</div>
+        <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="abrirSeleccion()">Inscribir materias ›</button>
+      </div>`;
+    return;
+  }
+
+  inscritas.forEach(mat => {
+    const p = STATE.progreso[mat.id] || { temasCompletos: 0 };
+    const pctMat = Math.round((p.temasCompletos / mat.temas.length) * 100);
+    const badge = pctMat === 100
+      ? '<span class="badge badge-green">Completo</span>'
+      : pctMat > 0
+        ? '<span class="badge badge-yellow">En proceso</span>'
+        : '<span class="badge badge-gray">Pendiente</span>';
+    const fillColor = pctMat === 100 ? 'var(--gr)' : pctMat > 0 ? 'var(--am)' : 'var(--bor)';
+    list.innerHTML += `
+      <div class="mat-card" onclick="openMateria('${mat.id}')">
+        <div class="mat-icon" style="background:${mat.color}">${mat.icono}</div>
+        <div class="mat-info">
+          <div class="mat-name">${mat.nombre}</div>
+          <div class="mat-sub">${p.temasCompletos} de ${mat.temas.length} temas</div>
+          <div class="mat-pb"><div style="width:${pctMat}%;background:${fillColor}"></div></div>
+        </div>
+        ${badge}
+      </div>`;
+  });
+
+  // Botón para gestionar materias
+  list.innerHTML += `
+    <div style="text-align:center;padding:4px 0 8px">
+      <button onclick="abrirSeleccion()" style="background:none;border:none;font-size:12px;color:var(--ts);cursor:pointer;font-family:var(--fnt);text-decoration:underline">
+        + Agregar o quitar materias
+      </button>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   MATERIA
+══════════════════════════════════════════════════════════ */
+function openMateria(id) {
+  currentMateria = DATA.materias.find(m => m.id === id);
+  if (!currentMateria) return;
+
+  document.getElementById('mat-titulo').textContent = currentMateria.nombre;
+  document.getElementById('mat-subtitulo').textContent = currentMateria.unidad;
+
+  const p = STATE.progreso[id] || { temasCompletos: 0 };
+  const pct = Math.round((p.temasCompletos / currentMateria.temas.length) * 100);
+  document.getElementById('mat-pct').textContent = pct + '%';
+
+  document.getElementById('util-q-sub').textContent =
+    `${currentMateria.cuestionario.length} reactivos · Retroalimentación inmediata`;
+
+  // Lista de temas
+  const list = document.getElementById('temas-list');
+  list.innerHTML = '';
+  currentMateria.temas.forEach((t, i) => {
+    const done = i < (p.temasCompletos || 0);
+    const active = i === (p.temasCompletos || 0);
+    const color = done ? 'var(--gr)' : active ? 'var(--am)' : 'var(--bor)';
+    list.innerHTML += `
+      <div class="tema-row">
+        <div class="tema-nm">${i + 1}. ${t}</div>
+        <div class="dot-status" style="background:${color}"></div>
+      </div>`;
+  });
+
+  navTo('view-materia');
+}
+
+/* ══════════════════════════════════════════════════════════
+   GUÍA
+══════════════════════════════════════════════════════════ */
+function openGuia() {
+  if (!currentMateria) return;
+  document.getElementById('guia-mat-sub').textContent = `${currentMateria.nombre} · ${currentMateria.unidad}`;
+  document.getElementById('guia-tema-titulo').textContent = currentMateria.guia[0]?.titulo || '';
+
+  const content = document.getElementById('guia-content');
+  content.innerHTML = '<div style="height:12px"></div>';
+
+  currentMateria.guia.forEach(bloque => {
+    if (bloque.tipo === 'definicion') {
+      content.innerHTML += `
+        <div class="guia-section">
+          <div class="def-box">
+            <div class="def-t">${bloque.pregunta}</div>
+            <div class="def-b">${bloque.respuesta}</div>
+          </div>
+        </div>`;
+    } else if (bloque.tipo === 'codigo') {
+      const lineas = bloque.lineas || [];
+      let codigoHTML = '';
+      let lineaActual = '';
+      lineas.forEach(l => {
+        if (l.tipo === 'cm' || (l.tipo === 'kw' && lineaActual.length > 0 && !lineaActual.includes('class="c-kw"'))) {
+          codigoHTML += `<div class="code-line">${lineaActual}</div>`;
+          lineaActual = '';
+        }
+        lineaActual += `<span class="c-${l.tipo}">${l.texto}</span>`;
+      });
+      if (lineaActual) codigoHTML += `<div class="code-line">${lineaActual}</div>`;
+      content.innerHTML += `
+        <div class="guia-section">
+          <div class="def-t" style="margin-bottom:8px;font-size:11px;color:var(--ts);text-transform:uppercase;letter-spacing:.5px">${bloque.titulo}</div>
+          <div class="code-box">${codigoHTML}</div>
+        </div>`;
+    } else if (bloque.tipo === 'clave') {
+      content.innerHTML += `
+        <div class="guia-section">
+          <div class="key-box">
+            <div class="key-t">💡 ${bloque.titulo}</div>
+            <div class="key-b">${bloque.texto}</div>
+          </div>
+        </div>`;
+    }
+  });
+
+  // Botones de navegación
+  content.innerHTML += `
+    <div class="nav-guia">
+      <button onclick="navBack()">‹ Volver</button>
+      <button class="main-act" onclick="startCuestionario()">Practicar ✏️</button>
+      <button onclick="navTo('view-dashboard')">Inicio</button>
+    </div>`;
+
+  navTo('view-guia');
+
+  // Marcar primer tema como en proceso
+  if (currentMateria) {
+    if (!STATE.progreso[currentMateria.id]) {
+      STATE.progreso[currentMateria.id] = { temasCompletos: 0 };
+    }
+    saveState();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CUESTIONARIO
+══════════════════════════════════════════════════════════ */
+function startCuestionario() {
+  if (!currentMateria || !currentMateria.cuestionario.length) {
+    toast('⚠️ No hay cuestionario disponible aún');
+    return;
+  }
+  cuestionario = {
+    preguntas: [...currentMateria.cuestionario].sort(() => Math.random() - .5),
+    idx: 0,
+    correctas: 0,
+    respondida: false
+  };
+  document.getElementById('q-mat-label').textContent = `${currentMateria.nombre} · Cuestionario`;
+  renderPregunta();
+  navTo('view-cuestionario');
+}
+
+function renderPregunta() {
+  const total = cuestionario.preguntas.length;
+  const idx   = cuestionario.idx;
+  const pct   = Math.round((idx / total) * 100);
+
+  document.getElementById('q-pb').style.width = pct + '%';
+  document.getElementById('q-cnt').textContent = `${idx + 1} / ${total}`;
+  document.getElementById('btn-siguiente').style.display = 'none';
+  document.getElementById('btn-finalizar').style.display = 'none';
+  cuestionario.respondida = false;
+
+  const preg   = cuestionario.preguntas[idx];
+  const letras = ['A', 'B', 'C', 'D'];
+
+  // Bloque de imagen: se muestra solo si el reactivo tiene imagen_url
+  const imagenHTML = preg.imagen_url ? `
+    <div class="q-img-wrap" id="q-img-wrap">
+      <div class="q-img-loading" id="q-img-msg">⏳ Cargando imagen…</div>
+      <img
+        id="q-img"
+        src="${preg.imagen_url}"
+        alt="Imagen del reactivo"
+        style="display:none"
+        onload="document.getElementById('q-img-msg').style.display='none';
+                this.style.display='block'"
+        onerror="document.getElementById('q-img-msg').innerHTML='⚠️ No se pudo cargar la imagen.';
+                 document.getElementById('q-img-msg').className='q-img-error'"
+      />
+      ${preg.imagen_caption
+        ? `<div class="q-img-caption">${preg.imagen_caption}</div>`
+        : ''}
+    </div>` : '';
+
+  document.getElementById('q-body').innerHTML = `
+    <div class="q-text">${preg.pregunta.replace(/\n/g, '<br>')}</div>
+    ${imagenHTML}
+    ${preg.opciones.map((op, i) => `
+      <div class="option" id="opt-${i}" onclick="responder(${i})">
+        <div class="opt-ltr">${letras[i]}</div>
+        <div class="opt-text">${op}</div>
+      </div>`).join('')}
+    <div id="feedback-area"></div>`;
+}
+
+function responder(idx) {
+  if (cuestionario.respondida) return;
+  cuestionario.respondida = true;
+
+  const preg = cuestionario.preguntas[cuestionario.idx];
+  const correcta = preg.correcta;
+  const esCorrecto = idx === correcta;
+  if (esCorrecto) cuestionario.correctas++;
+
+  // Colorear opciones
+  for (let i = 0; i < preg.opciones.length; i++) {
+    const el = document.getElementById('opt-' + i);
+    el.classList.add('disabled');
+    if (i === correcta) el.classList.add('correct');
+    else if (i === idx && !esCorrecto) el.classList.add('wrong');
+  }
+
+  // Feedback
+  document.getElementById('feedback-area').innerHTML = `
+    <div class="feedback-box ${esCorrecto ? 'ok' : 'bad'}">
+      <div class="fb-icon">${esCorrecto ? '✅' : '❌'}</div>
+      <div>
+        <div class="fb-title ${esCorrecto ? 'ok' : 'bad'}">${esCorrecto ? '¡Correcto!' : 'Incorrecto'}</div>
+        <div class="fb-text">${preg.explicacion}</div>
+      </div>
+    </div>`;
+
+  const esUltima = cuestionario.idx === cuestionario.preguntas.length - 1;
+  document.getElementById(esUltima ? 'btn-finalizar' : 'btn-siguiente').style.display = 'flex';
+}
+
+function nextQuestion() {
+  cuestionario.idx++;
+  renderPregunta();
+}
+
+function finalizarCuestionario() {
+  const total     = cuestionario.preguntas.length;
+  const correctas = cuestionario.correctas;
+  const pct       = Math.round((correctas / total) * 100);
+  const ptsGanados = Math.round(pct / 10);
+
+  // Actualizar estado
+  STATE.puntos += ptsGanados;
+  if (!STATE.progreso[currentMateria.id]) STATE.progreso[currentMateria.id] = { temasCompletos: 0 };
+  if (pct >= 60) {
+    STATE.progreso[currentMateria.id].temasCompletos =
+      Math.min(currentMateria.temas.length,
+        (STATE.progreso[currentMateria.id].temasCompletos || 0) + 1);
+  }
+  STATE.logros.unshift({
+    texto: `Cuestionario de ${currentMateria.nombre} (${pct}%)`,
+    pts: `+${ptsGanados}`,
+    fecha: 'Hoy'
+  });
+  saveState();
+
+  // Pantalla resultado
+  const titulo = pct >= 80 ? '¡Excelente trabajo!' : pct >= 60 ? '¡Buen avance!' : '¡Sigue practicando!';
+  const sub    = pct >= 80
+    ? 'Dominas este tema. Avanza al siguiente.'
+    : pct >= 60 ? 'Aprobado. Refuerza los temas donde fallaste.'
+    : 'No te rindas. Revisa la guía e inténtalo de nuevo.';
+
+  document.getElementById('res-pct').textContent  = pct + '%';
+  document.getElementById('res-title').textContent = titulo;
+  document.getElementById('res-sub').textContent   = sub;
+  document.getElementById('res-ok').textContent    = correctas;
+  document.getElementById('res-bad').textContent   = total - correctas;
+  document.getElementById('res-total').textContent = total;
+  document.getElementById('res-pts').textContent   = `+${ptsGanados}`;
+
+  document.getElementById('result-circle').style.borderColor =
+    pct >= 80 ? 'var(--gr)' : pct >= 60 ? 'var(--am)' : 'var(--er)';
+
+  navTo('view-resultado');
+}
+
+/* ══════════════════════════════════════════════════════════
+   ASESORÍAS
+══════════════════════════════════════════════════════════ */
+function refreshAsesorias() {
+  const pts = STATE.puntos;
+  let nivel = 1, nivelLabel = 'Nivel 1 — Inicial', nextPts = 20;
+  if (pts >= 100) { nivel = 4; nivelLabel = 'Nivel 4 — Experto';   nextPts = 0; }
+  else if (pts >= 50)  { nivel = 3; nivelLabel = 'Nivel 3 — Avanzado'; nextPts = 100 - pts; }
+  else if (pts >= 20)  { nivel = 2; nivelLabel = 'Nivel 2 — Intermedio'; nextPts = 50 - pts; }
+
+  const pctNivel = nivel === 4 ? 100 : Math.round((pts / (nivel === 1 ? 20 : nivel === 2 ? 50 : 100)) * 100);
+
+  document.getElementById('as-nivel').textContent = nivelLabel;
+  document.getElementById('as-pts').textContent = pts + ' pts';
+  document.getElementById('as-pb').style.width = pctNivel + '%';
+  document.getElementById('as-hint').textContent = nivel < 4
+    ? `${nextPts} pts más para Nivel ${nivel + 1}` : '¡Nivel máximo alcanzado!';
+
+  const btn = document.getElementById('btn-solicitar');
+  if (pts >= 20) {
+    btn.disabled = false;
+    btn.className = 'btn btn-primary';
+    btn.textContent = 'Solicitar asesoría ›';
+  } else {
+    btn.disabled = true;
+    btn.className = 'btn btn-outline';
+    btn.textContent = `Necesitas ${20 - pts} pts más`;
+  }
+
+  const lgList = document.getElementById('as-logros-list');
+  if (!STATE.logros.length) {
+    lgList.innerHTML = '<div style="font-size:12px;color:var(--ts);text-align:center;padding:8px">Aún no tienes logros. ¡Empieza un cuestionario!</div>';
+  } else {
+    lgList.innerHTML = STATE.logros.slice(0, 4).map(l => `
+      <div class="logro-row">
+        <div class="logro-ic">🏆</div>
+        <div class="logro-tx">${l.texto}</div>
+        <div class="logro-pt">${l.pts} pts</div>
+      </div>`).join('');
+  }
+}
+
+function solicitarAsesoria() {
+  if (STATE.puntos < 20) { toast('⚠️ Necesitas más puntos'); return; }
+  toast('✅ Solicitud enviada. La docente te confirmará el horario.');
+  STATE.logros.unshift({ texto: 'Asesoría solicitada', pts: '0', fecha: 'Hoy' });
+  saveState();
+}
+
+/* ══════════════════════════════════════════════════════════
+   LOGROS / TIENDA
+══════════════════════════════════════════════════════════ */
+function refreshLogros() {
+  const pts = STATE.puntos;
+  let nivelLabel = 'Nivel 1', nextPts = 20;
+  if (pts >= 100) { nivelLabel = 'Nivel 4'; nextPts = 0; }
+  else if (pts >= 50) { nivelLabel = 'Nivel 3'; nextPts = 100 - pts; }
+  else if (pts >= 20) { nivelLabel = 'Nivel 2'; nextPts = 50 - pts; }
+
+  const pctBarra = pts >= 100 ? 100 : pts < 20 ? Math.round(pts/20*100)
+    : pts < 50 ? Math.round((pts-20)/30*100) : Math.round((pts-50)/50*100);
+
+  document.getElementById('lg-pts').textContent = pts;
+  document.getElementById('lg-faltan').textContent = pts < 100 ? `${nextPts} pts para siguiente nivel` : '¡Nivel máximo!';
+  document.getElementById('lg-nivel').textContent = nivelLabel;
+  document.getElementById('lg-pb').style.width = pctBarra + '%';
+
+  const recList = document.getElementById('recompensas-list');
+  recList.innerHTML = DATA.recompensas.map(r => {
+    const canCanjear = pts >= r.costo && !STATE.canjesRealizados.includes(r.id);
+    const yaCanjeada = STATE.canjesRealizados.includes(r.id);
+    return `
+      <div class="rec-card ${canCanjear ? '' : 'locked'}">
+        <div class="rec-ico">${r.ico}</div>
+        <div>
+          <div class="rec-n">${r.nombre}</div>
+          <div class="rec-s">${r.desc}</div>
+        </div>
+        <div class="rec-right">
+          <div class="rec-pts">${r.costo} pts</div>
+          <button class="can-btn ${canCanjear ? '' : 'no'}" onclick="canjear('${r.id}')">
+            ${yaCanjeada ? 'Canjeado' : canCanjear ? 'Canjear' : 'Bloqueado'}
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+
+  const histList = document.getElementById('historial-list');
+  if (!STATE.logros.length) {
+    histList.innerHTML = '<div style="font-size:12px;color:var(--ts);text-align:center;padding:8px">Tu historial aparecerá aquí.</div>';
+  } else {
+    histList.innerHTML = STATE.logros.slice(0, 6).map(l => `
+      <div class="hist-row">
+        <div class="hist-ic">🏆</div>
+        <div class="hist-tx">${l.texto}</div>
+        <div class="hist-dt">${l.fecha || 'Hoy'}</div>
+      </div>`).join('');
+  }
+}
+
+function canjear(id) {
+  const r = DATA.recompensas.find(x => x.id === id);
+  if (!r) return;
+  if (STATE.canjesRealizados.includes(id)) { toast('Ya canjeaste esta recompensa'); return; }
+  if (STATE.puntos < r.costo) { toast(`⚠️ Necesitas ${r.costo - STATE.puntos} pts más`); return; }
+  STATE.puntos -= r.costo;
+  STATE.canjesRealizados.push(id);
+  STATE.logros.unshift({ texto: `Canjeaste: ${r.nombre}`, pts: `-${r.costo}`, fecha: 'Hoy' });
+  saveState();
+  refreshLogros();
+  toast(`✅ ¡${r.nombre} canjeada!`);
+}
+
+/* ══════════════════════════════════════════════════════════
+   REFRESH VIEWS
+══════════════════════════════════════════════════════════ */
+function refreshView(viewId) {
+  if (viewId === 'view-dashboard')  initDashboard();
+  if (viewId === 'view-asesorias') refreshAsesorias();
+  if (viewId === 'view-logros')    refreshLogros();
+}
+
+/* ══════════════════════════════════════════════════════════
+   INICIO DE LA APP
+══════════════════════════════════════════════════════════ */
+function initApp() {
+  loadState();
+  setTimeout(() => {
+    document.getElementById('view-loading').classList.add('hidden');
+    if (STATE.matricula && STATE.grupo && STATE.materiasInscritas && STATE.materiasInscritas.length > 0) {
+      // Usuario conocido con materias ya elegidas → dashboard directo
+      initDashboard();
+      const dash = document.getElementById('view-dashboard');
+      dash.classList.remove('hidden');
+      dash.classList.add('slide-in');
+    } else if (STATE.matricula && STATE.grupo) {
+      // Usuario conocido sin materias → selección
+      renderSeleccionMaterias();
+      const sel = document.getElementById('view-seleccion');
+      sel.classList.remove('hidden');
+      sel.classList.add('slide-in');
+    } else {
+      // Usuario nuevo → splash
+      const splash = document.getElementById('view-splash');
+      splash.classList.remove('hidden');
+      splash.classList.add('slide-in');
+    }
+  }, 1600);
+}
+
+function abrirSeleccion() {
+  renderSeleccionMaterias();
+  viewHistory.push('view-dashboard');
+  navTo('view-seleccion');
+}
+
+// Exponer funciones al HTML
+window.openGuia      = openGuia;
+window.doLogin       = doLogin;
+window.navTo         = navTo;
+window.navBack       = navBack;
+window.setTab        = setTab;
+window.openMateria   = openMateria;
+window.startCuestionario     = startCuestionario;
+window.responder             = responder;
+window.nextQuestion          = nextQuestion;
+window.finalizarCuestionario = finalizarCuestionario;
+window.solicitarAsesoria     = solicitarAsesoria;
+window.canjear               = canjear;
+window.confirmarSeleccion    = confirmarSeleccion;
+window.toggleMateria         = toggleMateria;
+window.abrirSeleccion        = abrirSeleccion;
+
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+initApp();
+</script>
+</body>
+</html>
