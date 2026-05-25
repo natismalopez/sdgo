@@ -614,80 +614,50 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <script>
 // ════════════════════════════════════════════════
-// DATOS (se reemplazarán con Google Sheets)
+// URL DE LA API
 // ════════════════════════════════════════════════
-const DATA = {
-  materias:[
-    {id:'lp',nombre:'Lenguaje de Programación',icono:'💻',color:'#E8F4FF',
-     unidad:'Unidad 2 — Estructuras de control',
-     temas:['Introducción a la programación','Variables y tipos de datos','Estructuras if / else','Ciclos for','Ciclos while','Arreglos y funciones'],
-     guia:[
-       {tipo:'def',preg:'¿Qué es un ciclo while?',resp:'Un ciclo while repite un bloque de código mientras una condición sea verdadera. Se usa cuando no se sabe cuántas veces repetir.'},
-       {tipo:'cod',titulo:'Sintaxis',lineas:[['k','while'],['w',' condicion:'],['c','    # bloque'],['f','    instruccion'],['w','()']]},
-       {tipo:'cod',titulo:'Ejemplo',lineas:[['n','contador'],['w',' = '],['n','0'],['k','\nwhile'],['w',' contador < 5:'],['f','\n    print'],['w','("Vuelta", contador)'],['n','\n    contador'],['w',' += 1']]},
-       {tipo:'clave',texto:'Si la condición nunca es falsa el ciclo es infinito. Siempre modifica la variable de control.'}
-     ],
-     cuestionario:[
-       {p:'¿Cuántas veces itera el ciclo si contador inicia en 0 y la condición es contador < 3?',ops:['2 veces','3 veces','Infinitamente','Genera error'],c:1,exp:'Corre con 0,1,2. Al llegar a 3 la condición es falsa. Total: 3 veces.',img:''},
-       {p:'¿Qué instrucción termina un ciclo while de inmediato?',ops:['stop','break','exit','return'],c:1,exp:'break termina el ciclo y el flujo continúa con el código posterior.',img:''},
-       {p:'¿Qué tipo de dato es: edadAlumno = 17?',ops:['String','Float','Integer','Boolean'],c:2,exp:'17 es entero sin decimales → tipo Integer.',img:''},
-       {p:'¿Cuál es la diferencia entre for y while?',ops:['for es más rápido','for itera número definido; while mientras condición sea verdadera','while solo funciona con números','No hay diferencia'],c:1,exp:'for itera secuencia definida. while repite mientras se cumpla condición.',img:''},
-       {p:'¿Qué imprime este código?\ni=10\nwhile i>0:\n    i-=3\nprint(i)',ops:['1','-2','0','Error'],c:1,exp:'i toma 10,7,4,1,-2. Al llegar a -2 la condición i>0 es falsa. Imprime -2.',img:''},
-     ]
-    },
-    {id:'ce',nombre:'Circuitos Electrónicos',icono:'🔌',color:'#FFF3DC',
-     unidad:'Unidad 1 — Fundamentos de electricidad',
-     temas:['Conceptos básicos de electricidad','Ley de Ohm','Circuitos en serie','Circuitos en paralelo','Componentes básicos','Medición con multímetro'],
-     guia:[
-       {tipo:'def',preg:'¿Qué establece la Ley de Ohm?',resp:'La Ley de Ohm establece que el voltaje es igual a la corriente multiplicada por la resistencia: V = I × R.'},
-       {tipo:'cod',titulo:'Fórmula',lineas:[['c','# V=Voltaje(V)  I=Corriente(A)  R=Resistencia(Ω)'],['k','V'],['w',' = '],['n','I'],['w',' × '],['n','R']]},
-       {tipo:'clave',texto:'En serie la corriente es igual en todos los componentes. En paralelo el voltaje es igual en todos.'}
-     ],
-     cuestionario:[
-       {p:'Si R=10Ω e I=2A ¿cuál es el voltaje?',ops:['5 V','12 V','20 V','8 V'],c:2,exp:'V = I × R = 2 × 10 = 20 V.',img:''},
-       {p:'¿En qué circuito la corriente es igual en todos los componentes?',ops:['Paralelo','Serie','Mixto','Abierto'],c:1,exp:'En serie los componentes están uno tras otro; la misma corriente pasa por todos.',img:''},
-       {p:'¿Qué instrumento mide voltaje, corriente y resistencia?',ops:['Osciloscopio','Generador','Multímetro','Fuente de poder'],c:2,exp:'El multímetro mide voltaje, corriente y resistencia en un mismo dispositivo.',img:''},
-       {p:'¿Qué ley establece V = I × R?',ops:['Kirchhoff','Faraday','Ohm','Coulomb'],c:2,exp:'La Ley de Ohm relaciona voltaje, corriente y resistencia mediante V = I × R.',img:''},
-     ]
-    },
-    {id:'clc',nombre:'Circuitos Lógicos Combinatorios',icono:'⚡',color:'#E6FAF0',
-     unidad:'Unidad 1 — Álgebra de Boole y compuertas lógicas',
-     temas:['Sistema binario','Sistema hexadecimal','Conversión entre bases','Compuertas lógicas','Álgebra de Boole','Tablas de verdad'],
-     guia:[
-       {tipo:'def',preg:'¿Qué es una compuerta lógica?',resp:'Una compuerta lógica es un circuito que realiza una operación booleana sobre entradas binarias y produce una salida binaria.'},
-       {tipo:'cod',titulo:'Compuertas principales',lineas:[['c','# AND:  1 solo si TODAS las entradas son 1'],['c','# OR:   1 si AL MENOS UNA entrada es 1'],['c','# NOT:  invierte la entrada (0→1, 1→0)'],['c','# NAND: inverso de AND'],['c','# XOR:  1 si las entradas son DIFERENTES']]},
-       {tipo:'clave',texto:'Las operaciones del Álgebra de Boole son AND (·), OR (+) y NOT (complemento). Con ellas se construye cualquier función lógica.'}
-     ],
-     cuestionario:[
-       {p:'¿Cuál es el binario del decimal 13?',ops:['1011','1101','1110','1001'],c:1,exp:'13÷2=6r1→6÷2=3r0→3÷2=1r1→1÷2=0r1. Leyendo: 1101.',img:''},
-       {p:'Compuerta AND con A=1 y B=0 ¿cuál es la salida?',ops:['1','0','Indefinido','Depende'],c:1,exp:'AND produce 1 solo si TODAS las entradas son 1. B=0 → salida 0.',img:''},
-       {p:'¿Qué valor decimal es el binario 1010?',ops:['8','10','12','6'],c:1,exp:'1×8+0×4+1×2+0×1 = 10.',img:''},
-       {p:'Compuerta OR con A=0 y B=0 ¿cuál es la salida?',ops:['1','0','2','Indefinido'],c:1,exp:'OR produce 1 si AL MENOS UNA es 1. Ambas 0 → salida 0.',img:''},
-       {p:'¿Qué operación realiza la compuerta NOT?',ops:['Suma lógica','Producto lógico','Inversión lógica','XOR'],c:2,exp:'NOT invierte la entrada: 0→1 y 1→0.',img:''},
-     ]
-    },
-    {id:'ie',nombre:'Instrumentación Electrónica',icono:'📡',color:'#F0ECFF',
-     unidad:'Unidad 1 — Sistemas de medición',
-     temas:['Introducción a la instrumentación','Sensores y transductores','Señales analógicas y digitales','Conversión A/D y D/A','Instrumentos de medición','Calibración'],
-     guia:[
-       {tipo:'def',preg:'¿Qué es un transductor?',resp:'Un transductor convierte una magnitud física del entorno (temperatura, luz, presión) en una señal eléctrica que puede ser procesada por un sistema electrónico.'},
-       {tipo:'cod',titulo:'Tipos de señales',lineas:[['c','# Analógica: varía continuamente'],['c','# Ejemplo: temperatura 0°C a 100°C'],['c',''],['c','# Digital: solo dos valores'],['c','# 0 = bajo (0V)   1 = alto (5V)']]},
-       {tipo:'clave',texto:'La conversión A/D transforma señales del mundo real en valores que puede procesar una computadora. La resolución del convertidor determina la precisión.'}
-     ],
-     cuestionario:[
-       {p:'¿Qué tipo de señal varía de forma continua?',ops:['Digital','Analógica','Binaria','Pulsada'],c:1,exp:'Las señales analógicas varían continuamente y pueden tomar cualquier valor en un rango.',img:''},
-       {p:'¿Cuál es la función de un transductor?',ops:['Amplificar señales','Convertir magnitud física en señal eléctrica','Almacenar energía','Filtrar ruido'],c:1,exp:'El transductor convierte energía física en eléctrica para ser procesada.',img:''},
-       {p:'¿Qué hace un convertidor A/D?',ops:['Digital a analógico','Analógico a digital','Amplifica señales','Filtra frecuencias'],c:1,exp:'A/D transforma señal analógica continua en valores digitales discretos.',img:''},
-       {p:'¿Qué es calibrar un instrumento?',ops:['Encenderlo','Comparar lecturas con patrón para ajustarlo','Limpiarlo','Cambiar baterías'],c:1,exp:'Calibrar es comparar con un patrón de referencia y corregir desviaciones.',img:''},
-     ]
-    },
+const API_URL = 'https://script.google.com/macros/s/AKfycbxv0aV0SFVJo1MpQRoSA9LJ9-7j0RCaR-f6vthaWYZxb6_TyzCPyJ9OA-uveVFG1yyt/exec';
+
+// ════════════════════════════════════════════════
+// GUÍAS LOCALES (contenido de estudio por materia)
+// ════════════════════════════════════════════════
+const GUIAS = {
+  lp:[
+    {tipo:'def',preg:'¿Qué es un ciclo while?',resp:'Un ciclo while repite un bloque de código mientras una condición sea verdadera. Se usa cuando no se sabe cuántas veces repetir.'},
+    {tipo:'cod',titulo:'Sintaxis',lineas:[['k','while'],['w',' condicion:'],['c','    # bloque de código'],['f','    instruccion'],['w','()']]},
+    {tipo:'cod',titulo:'Ejemplo práctico',lineas:[['n','contador'],['w',' = '],['n','0'],['k','\nwhile'],['w',' contador < 5:'],['f','\n    print'],['w','("Vuelta", contador)'],['n','\n    contador'],['w',' += 1']]},
+    {tipo:'clave',texto:'Si la condición nunca es falsa el ciclo es infinito. Siempre modifica la variable de control dentro del ciclo.'}
   ],
-  recompensas:[
-    {id:'r1',n:'Asesoría express',s:'30 min con la docente',ico:'🎓',pts:20},
-    {id:'r2',n:'Material PDF extra',s:'Guía de repaso avanzada',ico:'📄',pts:10},
-    {id:'r3',n:'Insignia de dominio',s:'Tema completado al 100%',ico:'🏅',pts:5},
-    {id:'r4',n:'Punto de participación',s:'Registro ante el docente',ico:'⭐',pts:100},
+  ce:[
+    {tipo:'def',preg:'¿Qué establece la Ley de Ohm?',resp:'La Ley de Ohm establece que el voltaje es igual a la corriente multiplicada por la resistencia: V = I × R.'},
+    {tipo:'cod',titulo:'Fórmula',lineas:[['c','# V = Voltaje (Volts)'],['c','# I = Corriente (Amperes)'],['c','# R = Resistencia (Ohms)'],['k','V'],['w',' = '],['n','I'],['w',' × '],['n','R']]},
+    {tipo:'clave',texto:'En serie la corriente es igual en todos los componentes. En paralelo el voltaje es igual en todos los componentes.'}
+  ],
+  clc:[
+    {tipo:'def',preg:'¿Qué es una compuerta lógica?',resp:'Una compuerta lógica es un circuito que realiza una operación booleana sobre entradas binarias y produce una salida binaria.'},
+    {tipo:'cod',titulo:'Compuertas principales',lineas:[['c','# AND: 1 solo si TODAS las entradas son 1'],['c','# OR:  1 si AL MENOS UNA entrada es 1'],['c','# NOT: invierte la entrada (0 a 1, 1 a 0)'],['c','# NAND: inverso de AND'],['c','# XOR: 1 si las entradas son DIFERENTES']]},
+    {tipo:'clave',texto:'Las operaciones del Álgebra de Boole son AND, OR y NOT. Con ellas se construye cualquier función lógica.'}
+  ],
+  ie:[
+    {tipo:'def',preg:'¿Qué es un transductor?',resp:'Un transductor convierte una magnitud física del entorno en una señal eléctrica que puede ser procesada por un sistema electrónico.'},
+    {tipo:'cod',titulo:'Tipos de señales',lineas:[['c','# Analógica: varía continuamente'],['c','# Ejemplo: temperatura 0 a 100 grados'],['c',''],['c','# Digital: solo dos valores'],['c','# 0 = bajo (0V)   1 = alto (5V)']]},
+    {tipo:'clave',texto:'La conversión A/D transforma señales del mundo real en valores digitales. La resolución del convertidor determina la precisión.'}
   ]
+};
+
+// ════════════════════════════════════════════════
+// DATA — se llena desde el API al abrir
+// ════════════════════════════════════════════════
+let DATA = {
+  materias: [],
+  recompensas:[
+    {id:'r1',n:'Asesoría express',s:'30 min con la docente',ico:'🎓',pts:20,tipo:'asesoria',recurso:''},
+    {id:'r2',n:'Material PDF extra',s:'Guía de repaso avanzada',ico:'📄',pts:10,tipo:'pdf',recurso:''},
+    {id:'r3',n:'Insignia de dominio',s:'Tema completado al 100%',ico:'🏅',pts:5,tipo:'logro',recurso:''},
+    {id:'r4',n:'Punto de participación',s:'Registro ante el docente',ico:'⭐',pts:100,tipo:'logro',recurso:''},
+  ],
+  asesorias:[],
+  config:{}
 };
 
 // ════════════════════════════════════════════════
@@ -1036,6 +1006,19 @@ function finalizarQuiz(){
   if(pct>=60) ST.progreso[curMat.id].temas=Math.min(curMat.temas.length,(ST.progreso[curMat.id].temas||0)+1);
   ST.logros.unshift({t:`Cuestionario ${curMat.nombre} (${pct}%)`,pts:`+${gpts}`,f:'Hoy'});
   save();
+  // Enviar resultado al Sheets (en background)
+  enviarResultado({
+    boleta:         ST.boleta,
+    nombre:         ST.boleta,
+    grupo:          ST.grupo,
+    materia_id:     curMat.id,
+    materia_nombre: curMat.nombre,
+    calificacion:   pct,
+    correctas:      quiz.correctas,
+    total:          total,
+    puntos:         gpts,
+    modo:           'inscrito'
+  });
   // Pantalla resultado
   const titulo=pct>=80?'¡Excelente trabajo!':pct>=60?'¡Buen avance!':'Sigue practicando';
   const desc=pct>=80?'Dominas este tema. Avanza al siguiente.':pct>=60?'Aprobado. Refuerza los temas fallados.':'Revisa la guía e inténtalo de nuevo.';
@@ -1066,9 +1049,36 @@ function renderAse(){
   document.getElementById('ase-pts').textContent=pts+' pts';
   document.getElementById('ase-pb').style.width=pct+'%';
   document.getElementById('ase-hint').textContent=niv<4?`${sig} pts más para Nivel ${niv+1}`:'¡Nivel máximo alcanzado!';
-  // Docentes
-  document.getElementById('docentes-list').innerHTML=`
-    <div class="doc-card">
+  // Docentes — desde API o fallback
+  const lista = document.getElementById('docentes-list');
+  const inscritas = ST.inscritas || [];
+  const ases = (DATA.asesorias || []).filter(a => inscritas.includes(a.materia_id));
+  if (ases.length) {
+    // Agrupar por profesor
+    const porProf = {};
+    ases.forEach(a => {
+      if (!porProf[a.profesor]) porProf[a.profesor] = [];
+      porProf[a.profesor].push(a);
+    });
+    lista.innerHTML = Object.entries(porProf).map(([prof, slots]) => {
+      const initiales = prof.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+      const disponibles = slots.filter(s => s.disponible);
+      const horarios = disponibles.map(s =>
+        `${s.dia} ${s.hora_inicio}–${s.hora_fin} · ${s.lugar}`
+      ).join('<br>');
+      return `<div class="doc-card">
+        <div class="av">${initiales}</div>
+        <div>
+          <div class="doc-n">${prof}</div>
+          <div class="doc-s">${[...new Set(slots.map(s=>s.materia))].join(', ')}</div>
+          ${disponibles.length
+            ? `<div class="doc-disp">${horarios}</div>`
+            : `<div class="doc-nodisp">Sin disponibilidad esta semana</div>`}
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    lista.innerHTML = `<div class="doc-card">
       <div class="av">NL</div>
       <div>
         <div class="doc-n">Profra. N. López Salas</div>
@@ -1076,6 +1086,7 @@ function renderAse(){
         <div class="doc-disp">Mar y Jue 14:00–16:00 · Sala 3</div>
       </div>
     </div>`;
+  }
   // Botón solicitar
   const btn=document.getElementById('btn-sol');
   if(pts>=20){
@@ -1149,27 +1160,91 @@ function canjear(id){
 }
 
 // ════════════════════════════════════════════════
+// API — carga datos desde Google Sheets
+// ════════════════════════════════════════════════
+async function cargarDatosAPI() {
+  try {
+    const res  = await Promise.race([
+      fetch(API_URL),
+      new Promise((_,r) => setTimeout(()=>r('timeout'), 7000))
+    ]);
+    if (res === 'timeout') throw new Error('timeout');
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    const d = json.data;
+    // Construir materias: API + guías locales
+    DATA.materias = (d.materias || []).map(m => ({
+      id:          m.id,
+      nombre:      m.nombre,
+      icono:       m.icono,
+      color:       m.color,
+      unidad:      m.unidad,
+      temas:       (d.temas   && d.temas[m.id])    || [],
+      guia:        GUIAS[m.id] || [],
+      cuestionario:(d.reactivos && d.reactivos[m.id]) || []
+    }));
+    DATA.recompensas = d.recompensas || DATA.recompensas;
+    DATA.asesorias   = d.asesorias   || [];
+    DATA.config      = d.configuracion || {};
+    // Guardar caché para modo offline
+    try {
+      localStorage.setItem('sdgo_cache', JSON.stringify({
+        ts: Date.now(),
+        materias: DATA.materias,
+        recompensas: DATA.recompensas,
+        asesorias: DATA.asesorias
+      }));
+    } catch(e) {}
+    return true;
+  } catch(e) {
+    console.warn('API no disponible:', e.message, '— usando caché');
+    // Intentar caché
+    try {
+      const cache = JSON.parse(localStorage.getItem('sdgo_cache') || 'null');
+      if (cache && cache.materias && cache.materias.length) {
+        DATA.materias    = cache.materias;
+        DATA.recompensas = cache.recompensas || DATA.recompensas;
+        DATA.asesorias   = cache.asesorias   || [];
+        return true;
+      }
+    } catch(ce) {}
+    return false;
+  }
+}
+
+// Enviar resultado al Sheets (sin bloquear la UI)
+async function enviarResultado(payload) {
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accion: 'resultado', ...payload })
+    });
+  } catch(e) { console.warn('No se pudo guardar resultado:', e.message); }
+}
+
+// ════════════════════════════════════════════════
 // INICIO DE LA APP
 // ════════════════════════════════════════════════
-function initApp(){
-  try { load(); } catch(e){ console.warn('localStorage error',e); }
-  // Mecanismo de seguridad: si en 3 segundos sigue en carga, forzar splash
-  const safety = setTimeout(()=>{ showView('v-splash'); }, 3000);
-  setTimeout(()=>{
-    clearTimeout(safety);
-    try {
-      if(ST.boleta && ST.grupo && ST.inscritas && ST.inscritas.length > 0){
-        renderDash(); showView('v-dash');
-      } else if(ST.boleta && ST.grupo){
-        renderSel(); showView('v-sel');
-      } else {
-        showView('v-splash');
-      }
-    } catch(e){
-      console.warn('initApp error',e);
+async function initApp() {
+  try { load(); } catch(e) {}
+  // Mostrar pantalla de carga
+  showView('v-load');
+  // Cargar datos del API
+  await cargarDatosAPI();
+  // Navegar según el estado del alumno
+  try {
+    if (ST.boleta && ST.grupo && ST.inscritas && ST.inscritas.length > 0) {
+      renderDash(); showView('v-dash');
+    } else if (ST.boleta && ST.grupo) {
+      renderSel(); showView('v-sel');
+    } else {
       showView('v-splash');
     }
-  }, 1500);
+  } catch(e) {
+    console.warn('initApp nav error:', e);
+    showView('v-splash');
+  }
 }
 
 // Registrar Service Worker
