@@ -416,7 +416,10 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 <!-- DASHBOARD -->
 <div class="view" id="v-dash">
   <div class="db-hdr">
-    <div class="db-hello">Bienvenido de regreso</div>
+    <div class="db-hello" style="display:flex;justify-content:space-between;align-items:center">
+    <span>Bienvenido de regreso</span>
+    <button onclick="cerrarSesion()" style="background:rgba(255,255,255,.15);border:none;color:rgba(255,255,255,.6);font-size:11px;padding:3px 10px;border-radius:12px;cursor:pointer;font-family:var(--fnt)">Salir</button>
+  </div>
     <div class="db-name" id="db-name">Grupo —</div>
     <div class="db-chip"><span id="db-prog-lbl">Progreso: 0%</span></div>
     <div class="pb-bg"><div class="pb-fill" id="db-pb" style="width:0%;background:var(--gr)"></div></div>
@@ -646,7 +649,13 @@ let DATA = {
     {id:'r3',n:'Insignia de dominio',s:'Tema completado al 100%',ico:'🏅',pts:5,tipo:'logro',recurso:''},
     {id:'r4',n:'Punto de participación',s:'Registro ante el docente',ico:'⭐',pts:100,tipo:'logro',recurso:''},
   ],
-  asesorias:[],
+  asesorias:[
+    {profesor:'N. López Salas',materia_id:'lp',materia:'Lenguaje de Programación',dia:'Martes',hora_inicio:'14:00',hora_fin:'16:00',lugar:'Sala de cómputo 3',disponible:true,notas:'Traer dudas de ejercicios'},
+    {profesor:'N. López Salas',materia_id:'lp',materia:'Lenguaje de Programación',dia:'Jueves',hora_inicio:'14:00',hora_fin:'16:00',lugar:'Sala de cómputo 3',disponible:true,notas:''},
+    {profesor:'N. López Salas',materia_id:'clc',materia:'Circuitos Lógicos Combinatorios',dia:'Miércoles',hora_inicio:'10:00',hora_fin:'12:00',lugar:'Sala de cómputo 1',disponible:false,notas:'Suspendida esta semana'},
+    {profesor:'N. López Salas',materia_id:'ce',materia:'Circuitos Electrónicos',dia:'Lunes',hora_inicio:'13:00',hora_fin:'14:00',lugar:'Lab. Electrónica',disponible:true,notas:''},
+    {profesor:'N. López Salas',materia_id:'ie',materia:'Instrumentación Electrónica',dia:'Viernes',hora_inicio:'11:00',hora_fin:'13:00',lugar:'Lab. Electrónica',disponible:true,notas:'Llevar calculadora'},
+  ],
   config:{}
 };
 
@@ -663,11 +672,36 @@ let quiz = {preguntas:[],idx:0,correctas:0,respondida:false};
 let navStack = [];
 
 // ════════════════════════════════════════════════
-// PERSISTENCIA
+// PERSISTENCIA — guardado por boleta de alumno
 // ════════════════════════════════════════════════
-function save(){ localStorage.setItem('sdgo',JSON.stringify(ST)) }
-function load(){
-  try{ const s=localStorage.getItem('sdgo'); if(s) ST={...ST,...JSON.parse(s)} }catch(e){}
+function save(){
+  if(!ST.boleta) return;
+  const data={
+    puntos:   ST.puntos,
+    logros:   ST.logros,
+    progreso: ST.progreso,
+    canjes:   ST.canjes,
+    inscritas:ST.inscritas
+  };
+  try{ localStorage.setItem('sdgo_'+ST.boleta, JSON.stringify(data)); }catch(e){}
+}
+function loadAlumno(boleta){
+  try{
+    const s=localStorage.getItem('sdgo_'+boleta);
+    if(s){
+      const d=JSON.parse(s);
+      ST.puntos   = d.puntos   || 0;
+      ST.logros   = d.logros   || [];
+      ST.progreso = d.progreso || {};
+      ST.canjes   = d.canjes   || [];
+      ST.inscritas= d.inscritas|| [];
+    } else {
+      // Alumno nuevo en este dispositivo
+      ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[]; ST.inscritas=[];
+    }
+  }catch(e){
+    ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[]; ST.inscritas=[];
+  }
 }
 
 // ════════════════════════════════════════════════
@@ -744,9 +778,51 @@ function validarGrupo(g){
 }
 
 // ════════════════════════════════════════════════
+// SINCRONIZACIÓN DE PROGRESO ENTRE DISPOSITIVOS
+// ════════════════════════════════════════════════
+async function sincronizarProgreso(boleta) {
+  try {
+    const res = await Promise.race([
+      fetch(`${API_URL}?accion=progreso&boleta=${encodeURIComponent(boleta)}`),
+      new Promise((_,r) => setTimeout(() => r('timeout'), 6000))
+    ]);
+    if (res === 'timeout') return false;
+    const json = await res.json();
+    if (!json.ok || !json.data) return false;
+    const d = json.data;
+    let cambios = false;
+    // Progreso: usar el mayor entre local y Sheets
+    if (d.progreso) {
+      Object.entries(d.progreso).forEach(([mid, prog]) => {
+        const localTemas = ST.progreso[mid]?.temas || 0;
+        if (prog.temas > localTemas) {
+          ST.progreso[mid] = prog;
+          cambios = true;
+        }
+      });
+    }
+    // Puntos: usar el mayor
+    if ((d.puntos || 0) > ST.puntos) {
+      ST.puntos = d.puntos;
+      cambios = true;
+    }
+    // Logros: usar los del Sheets si tiene más
+    if (d.logros && d.logros.length > 0 && d.logros.length >= ST.logros.length) {
+      ST.logros = d.logros;
+      cambios = true;
+    }
+    if (cambios) save();
+    return true;
+  } catch(e) {
+    console.warn('Sync progreso:', e.message);
+    return false;
+  }
+}
+
+// ════════════════════════════════════════════════
 // LOGIN
 // ════════════════════════════════════════════════
-function doLogin(){
+async function doLogin(){
   const b = document.getElementById('inp-boleta').value.trim();
   const g = document.getElementById('inp-grupo').value.trim().toUpperCase();
   const eb = document.getElementById('err-boleta');
@@ -767,8 +843,24 @@ function doLogin(){
     eg.classList.remove('show');
   }
   if(!ok) return;
+
+  // Mostrar estado de carga en el botón
+  const btnLogin = document.querySelector('#v-splash .btn');
+  const textoOriginal = btnLogin.textContent;
+  btnLogin.textContent = 'Sincronizando…';
+  btnLogin.disabled = true;
+
+  // Cargar datos locales del alumno
   ST.boleta=b; ST.grupo=g;
-  save();
+  loadAlumno(b);
+
+  // Sincronizar progreso desde Sheets
+  await sincronizarProgreso(b);
+
+  // Restaurar botón
+  btnLogin.textContent = textoOriginal;
+  btnLogin.disabled = false;
+
   if(!ST.inscritas||ST.inscritas.length===0){
     renderSel(); navTo('v-sel');
   } else {
@@ -1039,28 +1131,33 @@ function renderAse(){
   document.getElementById('ase-pts').textContent=pts+' pts';
   document.getElementById('ase-pb').style.width=pct+'%';
   document.getElementById('ase-hint').textContent=niv<4?`${sig} pts más para Nivel ${niv+1}`:'¡Nivel máximo alcanzado!';
-  // Docentes — desde API o fallback
+  // Docentes — desde API (o fallback del DATA inicial)
   const lista = document.getElementById('docentes-list');
   const inscritas = ST.inscritas || [];
-  const ases = (DATA.asesorias || []).filter(a => inscritas.includes(a.materia_id));
-  if (ases.length) {
-    // Agrupar por profesor
-    const porProf = {};
-    ases.forEach(a => {
-      if (!porProf[a.profesor]) porProf[a.profesor] = [];
-      porProf[a.profesor].push(a);
-    });
+  // Usar asesorías del API; si está vacío usar las del DATA inicial
+  const todasAses = DATA.asesorias && DATA.asesorias.length ? DATA.asesorias : [];
+  // Filtrar solo las materias inscritas por el alumno
+  const ases = todasAses.filter(a => inscritas.length===0 || inscritas.includes(a.materia_id));
+  // Agrupar por profesor
+  const porProf = {};
+  ases.forEach(a => {
+    if (!porProf[a.profesor]) porProf[a.profesor] = [];
+    porProf[a.profesor].push(a);
+  });
+  if (Object.keys(porProf).length) {
     lista.innerHTML = Object.entries(porProf).map(([prof, slots]) => {
-      const initiales = prof.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
-      const disponibles = slots.filter(s => s.disponible);
+      const initiales = prof.replace('Profra.','').replace('Prof.','').trim().split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+      // Solo mostrar horarios disponibles
+      const disponibles = slots.filter(s => s.disponible === true || s.disponible === 'true' || s.disponible === 'SI');
       const horarios = disponibles.map(s =>
         `${s.dia} ${s.hora_inicio}–${s.hora_fin} · ${s.lugar}`
       ).join('<br>');
+      const materias = [...new Set(slots.map(s => s.materia))].join(' · ');
       return `<div class="doc-card">
         <div class="av">${initiales}</div>
-        <div>
+        <div style="flex:1">
           <div class="doc-n">${prof}</div>
-          <div class="doc-s">${[...new Set(slots.map(s=>s.materia))].join(', ')}</div>
+          <div class="doc-s">${materias}</div>
           ${disponibles.length
             ? `<div class="doc-disp">${horarios}</div>`
             : `<div class="doc-nodisp">Sin disponibilidad esta semana</div>`}
@@ -1068,14 +1165,7 @@ function renderAse(){
       </div>`;
     }).join('');
   } else {
-    lista.innerHTML = `<div class="doc-card">
-      <div class="av">NL</div>
-      <div>
-        <div class="doc-n">Profra. N. López Salas</div>
-        <div class="doc-s">Lenguaje de Programación · Sistemas Digitales</div>
-        <div class="doc-disp">Mar y Jue 14:00–16:00 · Sala 3</div>
-      </div>
-    </div>`;
+    lista.innerHTML = '<div style="font-size:12px;color:var(--ts);padding:10px">No hay asesorías disponibles para tus materias.</div>';
   }
   // Botón solicitar
   const btn=document.getElementById('btn-sol');
@@ -1258,28 +1348,27 @@ async function enviarResultado(payload) {
   } catch(e) { console.warn('No se pudo guardar resultado:', e.message); }
 }
 
+function cerrarSesion(){
+  ST.boleta=''; ST.grupo='';
+  ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[]; ST.inscritas=[];
+  curMat=null; navStack=[];
+  // Limpiar campos del formulario
+  const ib=document.getElementById('inp-boleta');
+  const ig=document.getElementById('inp-grupo');
+  if(ib) ib.value='';
+  if(ig) ig.value='';
+  showView('v-splash');
+}
+
 // ════════════════════════════════════════════════
 // INICIO DE LA APP
 // ════════════════════════════════════════════════
 async function initApp() {
-  try { load(); } catch(e) {}
-  // Mostrar pantalla de carga
+  // Siempre mostrar pantalla de carga mientras se obtienen datos del API
   showView('v-load');
-  // Cargar datos del API
   await cargarDatosAPI();
-  // Navegar según el estado del alumno
-  try {
-    if (ST.boleta && ST.grupo && ST.inscritas && ST.inscritas.length > 0) {
-      renderDash(); showView('v-dash');
-    } else if (ST.boleta && ST.grupo) {
-      renderSel(); showView('v-sel');
-    } else {
-      showView('v-splash');
-    }
-  } catch(e) {
-    console.warn('initApp nav error:', e);
-    showView('v-splash');
-  }
+  // Siempre pedir login — el progreso se carga al identificarse
+  showView('v-splash');
 }
 
 // Registrar Service Worker
