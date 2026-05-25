@@ -656,7 +656,7 @@ const DATA = {
      guia:[
        {tipo:'def',preg:'¿Qué es una compuerta lógica?',resp:'Una compuerta lógica es un circuito que realiza una operación booleana sobre entradas binarias y produce una salida binaria.'},
        {tipo:'cod',titulo:'Compuertas principales',lineas:[['c','# AND:  1 solo si TODAS las entradas son 1'],['c','# OR:   1 si AL MENOS UNA entrada es 1'],['c','# NOT:  invierte la entrada (0→1, 1→0)'],['c','# NAND: inverso de AND'],['c','# XOR:  1 si las entradas son DIFERENTES']]},
-       {tipo:'clave',texto:'Las operaciones básicas del Álgebra de Boole son AND(·), OR(+) y NOT(\\'). Con ellas se construye cualquier función lógica.'}
+       {tipo:'clave',texto:'Las operaciones del Álgebra de Boole son AND (·), OR (+) y NOT (complemento). Con ellas se construye cualquier función lógica.'}
      ],
      cuestionario:[
        {p:'¿Cuál es el binario del decimal 13?',ops:['1011','1101','1110','1001'],c:1,exp:'13÷2=6r1→6÷2=3r0→3÷2=1r1→1÷2=0r1. Leyendo: 1101.',img:''},
@@ -1152,16 +1152,24 @@ function canjear(id){
 // INICIO DE LA APP
 // ════════════════════════════════════════════════
 function initApp(){
-  load();
+  try { load(); } catch(e){ console.warn('localStorage error',e); }
+  // Mecanismo de seguridad: si en 3 segundos sigue en carga, forzar splash
+  const safety = setTimeout(()=>{ showView('v-splash'); }, 3000);
   setTimeout(()=>{
-    if(ST.boleta&&ST.grupo&&ST.inscritas&&ST.inscritas.length>0){
-      renderDash(); showView('v-dash');
-    } else if(ST.boleta&&ST.grupo){
-      renderSel(); showView('v-sel');
-    } else {
+    clearTimeout(safety);
+    try {
+      if(ST.boleta && ST.grupo && ST.inscritas && ST.inscritas.length > 0){
+        renderDash(); showView('v-dash');
+      } else if(ST.boleta && ST.grupo){
+        renderSel(); showView('v-sel');
+      } else {
+        showView('v-splash');
+      }
+    } catch(e){
+      console.warn('initApp error',e);
       showView('v-splash');
     }
-  },1500);
+  }, 1500);
 }
 
 // Registrar Service Worker
