@@ -365,7 +365,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- CARGA -->
 <div class="view active" id="v-load">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div style="flex:1;background:var(--nv);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
     <div class="load-logo">SDG<em>o!</em></div>
     <div class="load-dots"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div>
@@ -374,7 +373,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- SPLASH / LOGIN -->
 <div class="view" id="v-splash">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div style="flex:1;background:var(--nv);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 28px">
     <div class="sp-logo"><div class="sp-sd">SD</div><div class="sp-go">Go! ›</div></div>
     <div class="sp-name">SDG<em>o!</em></div>
@@ -400,7 +398,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- SELECCIÓN DE MATERIAS -->
 <div class="view" id="v-sel">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="sel-hdr">
     <h1>Elige tus materias</h1>
     <p>Selecciona las unidades de aprendizaje que cursas este semestre. Podrás agregar o quitar materias después.</p>
@@ -418,7 +415,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- DASHBOARD -->
 <div class="view" id="v-dash">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="db-hdr">
     <div class="db-hello">Bienvenido de regreso</div>
     <div class="db-name" id="db-name">Grupo —</div>
@@ -434,7 +430,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- MATERIA -->
 <div class="view" id="v-mat">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="hdr">
     <div class="hdr-row">
       <button class="btn-back" onclick="navBack()">‹</button>
@@ -479,7 +474,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- GUÍA -->
 <div class="view" id="v-guia">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="hdr">
     <div class="hdr-row">
       <button class="btn-back" onclick="navBack()">‹</button>
@@ -495,7 +489,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- CUESTIONARIO -->
 <div class="view" id="v-quiz">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="q-hdr">
     <div class="qs" id="q-sub">Materia · Cuestionario</div>
     <div class="qt">Cuestionario tipo examen</div>
@@ -515,7 +508,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- RESULTADO -->
 <div class="view" id="v-res">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="hdr"><h1>Resultado del cuestionario</h1></div>
   <div class="scroll no-nav">
     <div class="res-body">
@@ -544,7 +536,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- ASESORÍAS -->
 <div class="view" id="v-ase">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="hdr"><p style="font-size:10px;color:rgba(255,255,255,.5)">Acompañamiento académico</p><h1>Mis asesorías</h1></div>
   <div class="scroll">
     <div class="niv-card">
@@ -568,7 +559,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#0D1B4B;overf
 
 <!-- LOGROS -->
 <div class="view" id="v-log">
-  <div class="sb"><span>9:41</span><span>WiFi ■</span></div>
   <div class="hdr"><p style="font-size:10px;color:rgba(255,255,255,.5)">Tienda académica</p><h1>Mis logros y recompensas</h1></div>
   <div class="scroll">
     <div class="pts-card">
@@ -1208,6 +1198,51 @@ async function cargarDatosAPI() {
         return true;
       }
     } catch(ce) {}
+    // Sin caché — usar datos locales de respaldo
+    DATA.materias = [
+      {id:'lp',nombre:'Lenguaje de Programación',icono:'💻',color:'#E8F4FF',
+       unidad:'Unidad 2 — Estructuras de control',
+       temas:['Introducción a la programación','Variables y tipos de datos','Estructuras if / else','Ciclos for','Ciclos while','Arreglos y funciones'],
+       guia: GUIAS['lp']||[],
+       cuestionario:[
+         {p:'¿Cuántas veces itera el ciclo si contador inicia en 0 y la condición es contador < 3?',ops:['2 veces','3 veces','Infinitamente','Genera error'],c:1,exp:'Corre con 0,1,2. Al llegar a 3 la condición es falsa. Total: 3 veces.',img:''},
+         {p:'¿Qué instrucción termina un ciclo while de inmediato?',ops:['stop','break','exit','return'],c:1,exp:'break termina el ciclo y el flujo continúa con el código posterior.',img:''},
+         {p:'¿Qué tipo de dato es: edadAlumno = 17?',ops:['String','Float','Integer','Boolean'],c:2,exp:'17 es entero sin decimales: tipo Integer.',img:''},
+         {p:'¿Cuál es la diferencia entre for y while?',ops:['for es más rápido','for itera número definido; while mientras condición sea verdadera','while solo funciona con números','No hay diferencia'],c:1,exp:'for itera secuencia definida. while repite mientras condición sea verdadera.',img:''},
+         {p:'¿Qué imprime: i=10 / while i>0: i-=3 / print(i)?',ops:['1','-2','0','Error'],c:1,exp:'i: 10,7,4,1,-2. Al llegar a -2 la condición i>0 es falsa. Imprime -2.',img:''},
+       ]},
+      {id:'ce',nombre:'Circuitos Electrónicos',icono:'🔌',color:'#FFF3DC',
+       unidad:'Unidad 1 — Fundamentos de electricidad',
+       temas:['Conceptos básicos de electricidad','Ley de Ohm','Circuitos en serie','Circuitos en paralelo','Componentes básicos','Medición con multímetro'],
+       guia: GUIAS['ce']||[],
+       cuestionario:[
+         {p:'Si R=10Ω e I=2A ¿cuál es el voltaje?',ops:['5 V','12 V','20 V','8 V'],c:2,exp:'V = I × R = 2 × 10 = 20 V.',img:''},
+         {p:'¿En qué circuito la corriente es igual en todos los componentes?',ops:['Paralelo','Serie','Mixto','Abierto'],c:1,exp:'En serie los componentes están uno tras otro; la misma corriente pasa por todos.',img:''},
+         {p:'¿Qué instrumento mide voltaje, corriente y resistencia?',ops:['Osciloscopio','Generador','Multímetro','Fuente de poder'],c:2,exp:'El multímetro mide voltaje, corriente y resistencia.',img:''},
+         {p:'¿Qué ley establece V = I × R?',ops:['Kirchhoff','Faraday','Ohm','Coulomb'],c:2,exp:'La Ley de Ohm relaciona voltaje, corriente y resistencia.',img:''},
+       ]},
+      {id:'clc',nombre:'Circuitos Lógicos Combinatorios',icono:'⚡',color:'#E6FAF0',
+       unidad:'Unidad 1 — Álgebra de Boole y compuertas lógicas',
+       temas:['Sistema binario','Sistema hexadecimal','Conversión entre bases','Compuertas lógicas','Álgebra de Boole','Tablas de verdad'],
+       guia: GUIAS['clc']||[],
+       cuestionario:[
+         {p:'¿Cuál es el binario del decimal 13?',ops:['1011','1101','1110','1001'],c:1,exp:'13: 8+4+1=13. Binario: 1101.',img:''},
+         {p:'AND con A=1 y B=0 ¿cuál es la salida?',ops:['1','0','Indefinido','Depende'],c:1,exp:'AND produce 1 solo si TODAS son 1. B=0 entonces salida es 0.',img:''},
+         {p:'¿Qué decimal es el binario 1010?',ops:['8','10','12','6'],c:1,exp:'1×8+0×4+1×2+0×1 = 10.',img:''},
+         {p:'OR con A=0 y B=0 ¿cuál es la salida?',ops:['1','0','2','Indefinido'],c:1,exp:'OR produce 1 si AL MENOS UNA es 1. Ambas 0, salida es 0.',img:''},
+         {p:'¿Qué hace la compuerta NOT?',ops:['Suma lógica','Producto lógico','Inversión lógica','XOR'],c:2,exp:'NOT invierte: 0 a 1 y 1 a 0.',img:''},
+       ]},
+      {id:'ie',nombre:'Instrumentación Electrónica',icono:'📡',color:'#F0ECFF',
+       unidad:'Unidad 1 — Sistemas de medición',
+       temas:['Introducción a la instrumentación','Sensores y transductores','Señales analógicas y digitales','Conversión A/D y D/A','Instrumentos de medición','Calibración'],
+       guia: GUIAS['ie']||[],
+       cuestionario:[
+         {p:'¿Qué tipo de señal varía de forma continua?',ops:['Digital','Analógica','Binaria','Pulsada'],c:1,exp:'Las señales analógicas varían continuamente en un rango.',img:''},
+         {p:'¿Cuál es la función de un transductor?',ops:['Amplificar señales','Convertir magnitud física en señal eléctrica','Almacenar energía','Filtrar ruido'],c:1,exp:'Convierte energía física en eléctrica para ser procesada.',img:''},
+         {p:'¿Qué hace un convertidor A/D?',ops:['Digital a analógico','Analógico a digital','Amplifica','Filtra'],c:1,exp:'Transforma señal analógica en valores digitales discretos.',img:''},
+         {p:'¿Qué es calibrar un instrumento?',ops:['Encenderlo','Comparar con patrón para ajustarlo','Limpiarlo','Cambiar baterías'],c:1,exp:'Calibrar es comparar con un patrón de referencia y corregir desviaciones.',img:''},
+       ]},
+    ];
     return false;
   }
 }
