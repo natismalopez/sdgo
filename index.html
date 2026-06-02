@@ -195,27 +195,16 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:var(--gu);ove
 .q-prog-row .qpb-f{background:var(--na);height:100%;border-radius:3px;transition:width .35s}
 .q-cnt{font-size:10px;color:var(--na);font-weight:700;white-space:nowrap}
 .q-body{padding:14px 12px;position:relative;user-select:none;-webkit-user-select:none}
-/* Marca de agua — cubre toda la pantalla del cuestionario */
+/* Marca de agua — patrón SVG diagonal sobre toda la pantalla */
 #wm-overlay{
-  position:fixed;inset:0;pointer-events:none;
-  z-index:50;overflow:hidden;
+  position:fixed;inset:0;
+  pointer-events:none;
+  z-index:9999;
   display:none;
+  background-repeat:repeat;
+  background-size:280px 120px;
 }
 #wm-overlay.activo{ display:block; }
-.wm-row{
-  display:flex;gap:0;white-space:nowrap;
-  margin-bottom:32px;
-  animation:none;
-}
-.wm-row span{
-  font-size:13px;font-weight:700;
-  color:rgba(123,17,53,.18);
-  letter-spacing:3px;user-select:none;
-  font-family:'JetBrains Mono',monospace;
-  transform:rotate(-25deg);
-  display:inline-block;
-  padding:0 18px;
-}
 /* Aviso de captura */
 .cap-warning{
   position:fixed;top:0;left:50%;transform:translateX(-50%);
@@ -1671,26 +1660,30 @@ function activarMarcaAgua() {
   const overlay = document.getElementById('wm-overlay');
   if (!overlay) return;
   const boleta = ST.boleta || '??????????';
-  const txt = `${boleta} · SDGo! CECyT9 ·  `;
-  // Calcular cuántas filas y columnas necesitamos para cubrir la pantalla
-  const W = window.screen.width  || 430;
-  const H = window.screen.height || 900;
-  const cols = Math.ceil(W / 160) + 4;
-  const rows = Math.ceil(H / 55) + 3;
-  let content = '';
-  for (let r = 0; r < rows; r++) {
-    content += '<div class="wm-row" style="margin-top:' + (r===0?'-20':'0') + 'px">';
-    for (let c = 0; c < cols; c++) {
-      content += '<span>' + txt + '</span>';
-    }
-    content += '</div>';
-  }
-  overlay.innerHTML = content;
+  const txt = boleta + ' · SDGo! CECyT9 IPN · ';
+  // Generar patrón SVG con el texto en diagonal
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='280' height='120' viewBox='0 0 280 120'>
+    <text x='-10' y='55'
+      font-family='monospace' font-size='12' font-weight='bold'
+      fill='rgba(123,17,53,0.20)'
+      transform='rotate(-28 140 60)'
+      letter-spacing='2'>${txt}</text>
+    <text x='-10' y='105'
+      font-family='monospace' font-size='12' font-weight='bold'
+      fill='rgba(123,17,53,0.20)'
+      transform='rotate(-28 140 60)'
+      letter-spacing='2'>${txt}</text>
+  </svg>`;
+  const encoded = 'data:image/svg+xml,' + encodeURIComponent(svg);
+  overlay.style.backgroundImage = 'url("' + encoded + '")';
   overlay.classList.add('activo');
 }
 function desactivarMarcaAgua() {
   const overlay = document.getElementById('wm-overlay');
-  if (overlay) { overlay.classList.remove('activo'); overlay.innerHTML = ''; }
+  if (overlay) {
+    overlay.classList.remove('activo');
+    overlay.style.backgroundImage = '';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
