@@ -326,10 +326,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
     <div class="sp-bar"></div>
     <p class="sp-sub">Tu guía de estudio para<br>Sistemas Digitales · CECyT 9</p>
     <div class="sp-ipn">Instituto Politécnico Nacional</div>
-    <div class="sp-tabs">
-      <div class="sp-tab on" id="tab-login" onclick="switchTab('login')">Entrar</div>
-      <div class="sp-tab" id="tab-reg" onclick="switchTab('reg')">Registrarme</div>
-    </div>
     <!-- LOGIN -->
     <div class="sp-form" id="form-login">
       <div class="ig">
@@ -343,7 +339,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
         <div class="err-msg" id="li-err-grupo">Formato inválido — Usa: 1IM1 a 6IV10</div>
       </div>
       <button class="btn btn-p" id="btn-login" onclick="doLogin()">Entrar a SDGo! ›</button>
-      <p class="sp-note">¿Primera vez? Toca "Registrarme" para crear tu perfil</p>
+      <p class="sp-note" style="margin-top:6px"><span style="color:rgba(255,255,255,.7);cursor:pointer;text-decoration:underline" onclick="switchTab('reg')">¿Primera vez? Crea tu perfil aquí</span></p>
     </div>
     <!-- REGISTRO -->
     <div class="sp-form" id="form-reg" style="display:none">
@@ -461,8 +457,8 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
   <div class="hdr">
     <div class="hdr-row">
       <button class="btn-back" onclick="navBack()">‹</button>
-      <div><p id="g-mat-s" style="font-size:10px;color:rgba(255,255,255,.5)">Materia</p><h1 id="g-tema-t" style="font-size:14px">Tema</h1></div>
-      <div style="margin-left:auto;background:rgba(255,255,255,.12);border-radius:20px;padding:2px 9px;font-size:9px;color:rgba(255,255,255,.6)">En estudio</div>
+      <div><p id="g-mat-s" style="font-size:10px;color:var(--ts)">Materia</p><h1 id="g-tema-t" style="font-size:14px;color:var(--nv)">Tema</h1></div>
+      <div style="margin-left:auto;background:var(--gub);border-radius:20px;padding:2px 9px;font-size:9px;color:var(--gu);font-weight:600">En estudio</div>
     </div>
   </div>
   <div class="scroll nonav" id="g-content"></div>
@@ -478,8 +474,8 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 
 <div class="view" id="v-quiz">
   <div class="hdr q-hdr">
-    <div class="qs" id="q-sub">Materia</div>
-    <div class="qt">Cuestionario tipo examen</div>
+    <div class="qs" id="q-sub" style="color:var(--ts)">Materia</div>
+    <div class="qt" style="color:var(--nv)">Cuestionario tipo examen</div>
     <div class="q-prog-row">
       <div class="qpb"><div class="qpb-f" id="q-pb" style="width:0%"></div></div>
       <div class="q-cnt" id="q-cnt">1 / 0</div>
@@ -597,26 +593,216 @@ const LIMITE_MIN = 45; // minutos de estudio por día (recomendación pedagógic
 // GUÍAS LOCALES
 // ═══════════════════════════════════════════════════════
 const GUIAS = {
+  // ── LENGUAJE DE PROGRAMACIÓN — 6 temas completos ────────
   lp:[
-    {tipo:'def',preg:'¿Qué es un ciclo while?',resp:'Un ciclo while repite un bloque de código mientras una condición sea verdadera. Se usa cuando no se sabe cuántas veces repetir la instrucción.'},
-    {tipo:'cod',titulo:'Sintaxis en Python',lineas:[['k','while'],['cw',' condicion:'],['cc','    # bloque de código'],['cf','    instruccion'],['cw','()']]},
-    {tipo:'cod',titulo:'Ejemplo práctico',lineas:[['cn','contador'],['cw',' = '],['cn','0'],['k','\nwhile'],['cw',' contador < 5:'],['cf','\n    print'],['cw','("Vuelta", contador)'],['cn','\n    contador'],['cw',' += 1']]},
-    {tipo:'clave',texto:'Si la condición nunca es falsa, el ciclo es infinito. Siempre modifica la variable de control dentro del ciclo.'}
+    { // Tema 0: Introducción a la programación
+      fichas:[
+        {tipo:'def',preg:'¿Qué es un algoritmo?',resp:'Un algoritmo es una secuencia ordenada y finita de instrucciones que resuelve un problema específico. Todo programa de computadora parte de un algoritmo bien definido.'},
+        {tipo:'cod',titulo:'Ejemplo de algoritmo en pseudocódigo',lineas:[
+          ['cc','// Algoritmo: sumar dos números'],
+          ['k','INICIO\n'],
+          ['cw','  leer '],['cn','num1, num2\n'],
+          ['cn','  suma'],['cw',' = '],['cn','num1'],['cw',' + '],['cn','num2\n'],
+          ['cw','  escribir '],['cf','"Resultado: "'],['cw',' + '],['cn','suma\n'],
+          ['k','FIN']
+        ]},
+        {tipo:'clave',texto:'Un algoritmo debe ser finito (termina), preciso (pasos claros) y efectivo (resuelve el problema). Un diagrama de flujo lo representa visualmente con símbolos estándar.'}
+      ],
+      reactivos:[
+        {p:'¿Cuál es la característica principal de un algoritmo?',ops:['Es infinito','Es una secuencia ordenada y finita de instrucciones','Es solo para computadoras','Es un lenguaje de programación'],c:1,exp:'Un algoritmo es una secuencia ordenada, finita y efectiva de instrucciones para resolver un problema.',img:''},
+        {p:'¿Qué herramienta visual representa un algoritmo con símbolos gráficos?',ops:['Pseudocódigo','Código fuente','Diagrama de flujo','Tabla de verdad'],c:2,exp:'El diagrama de flujo usa símbolos estándar (óvalos, rectángulos, rombos) para representar el flujo de un algoritmo.',img:''},
+        {p:'¿Cuál de estas NO es una característica de un buen algoritmo?',ops:['Finito','Preciso','Ambiguo','Efectivo'],c:2,exp:'Un buen algoritmo debe ser finito, preciso y efectivo. La ambigüedad lo hace incorrecto porque genera instrucciones confusas.',img:''},
+        {p:'¿En qué orden se ejecutan las instrucciones de un programa por defecto?',ops:['Aleatoriamente','De la última a la primera','De forma secuencial, de arriba hacia abajo','El programador lo decide en cada caso'],c:2,exp:'La ejecución secuencial es el flujo por defecto: las instrucciones se ejecutan de arriba hacia abajo en orden.',img:''},
+        {p:'¿Qué representa el pseudocódigo?',ops:['Código listo para ejecutar en Python','Una descripción informal de un algoritmo en lenguaje natural','Un tipo de compilador','El resultado final de un programa'],c:1,exp:'El pseudocódigo describe los pasos de un algoritmo en lenguaje natural estructurado, sin seguir la sintaxis exacta de ningún lenguaje.',img:''}
+      ]
+    },
+    { // Tema 1: Variables y tipos de datos
+      fichas:[
+        {tipo:'def',preg:'¿Qué es una variable?',resp:'Una variable es un espacio de memoria con nombre que almacena información que puede cambiar durante la ejecución del programa. El tipo de dato define qué puede guardar y cuánto espacio ocupa.'},
+        {tipo:'cod',titulo:'Tipos de datos en Python',lineas:[
+          ['cc','# Entero — números sin decimales'],
+          ['cn','edad'],['cw',' = '],['cn','17\n'],
+          ['cc','# Flotante — números con decimales'],
+          ['cn','promedio'],['cw',' = '],['cn','9.5\n'],
+          ['cc','# Cadena — texto entre comillas'],
+          ['cn','nombre'],['cw',' = '],['cf','"Ana García"\n'],
+          ['cc','# Booleano — solo True o False'],
+          ['cn','aprobado'],['cw',' = '],['k','True']
+        ]},
+        {tipo:'clave',texto:'Python detecta el tipo automáticamente (tipado dinámico). Puedes verificar el tipo con type(variable). Los nombres de variables deben ser descriptivos y sin espacios.'}
+      ],
+      reactivos:[
+        {p:'¿Qué es una variable en programación?',ops:['Un valor que nunca cambia','Un espacio de memoria con nombre para guardar datos','Un tipo de error del programa','Un operador matemático'],c:1,exp:'Una variable es un espacio de memoria identificado por un nombre que puede cambiar su valor durante la ejecución.',img:''},
+        {p:'¿Qué tipo de dato corresponde a: promedio = 9.5?',ops:['int (entero)','str (cadena)','float (flotante)','bool (booleano)'],c:2,exp:'9.5 tiene decimales, por lo tanto es de tipo float (número de punto flotante).',img:''},
+        {p:'¿Qué tipo de dato corresponde a: aprobado = True?',ops:['int','str','float','bool'],c:3,exp:'True y False son los únicos valores posibles del tipo bool (booleano), que representa condiciones verdadero/falso.',img:''},
+        {p:'¿Cuál es un nombre de variable válido en Python?',ops:['2datos','mi variable','mi_dato','for'],c:2,exp:'mi_dato es válido. No puede empezar con número, no puede tener espacios y no puede ser una palabra reservada como for.',img:''},
+        {p:'¿Qué función de Python dice de qué tipo es una variable?',ops:['typeOf()','typeof()','type()','getType()'],c:2,exp:'type(variable) devuelve el tipo de dato. Ejemplo: type(3.14) devuelve <class "float">.',img:''}
+      ]
+    },
+    { // Tema 2: Estructuras if / else
+      fichas:[
+        {tipo:'def',preg:'¿Qué es una estructura condicional?',resp:'Una estructura condicional evalúa una expresión lógica y ejecuta un bloque de código si es verdadera (if) y otro diferente si es falsa (else). Permite que el programa tome decisiones.'},
+        {tipo:'cod',titulo:'if / elif / else en Python',lineas:[
+          ['cn','nota'],['cw',' = '],['cn','8.5\n\n'],
+          ['k','if '],['cn','nota'],['cw',' >= '],['cn','9'],['cw',': \n'],
+          ['cw','    '],['cf','print'],['cw','("Excelente")\n'],
+          ['k','elif '],['cn','nota'],['cw',' >= '],['cn','7'],['cw',':\n'],
+          ['cw','    '],['cf','print'],['cw','("Aprobado")  '],['cc','# ← ejecuta este\n'],
+          ['k','else'],['cw',':\n'],
+          ['cw','    '],['cf','print'],['cw','("Reprobado")']
+        ]},
+        {tipo:'clave',texto:'El bloque else es opcional. Se pueden encadenar múltiples condiciones con elif. Python usa indentación (espacios) para definir los bloques de código — es obligatoria y debe ser consistente.'}
+      ],
+      reactivos:[
+        {p:'if x > 10: print("mayor") — Si x = 10, ¿qué imprime el programa?',ops:['"mayor"','Nada — la condición es falsa','Error de sintaxis','"10"'],c:1,exp:'x=10 no es mayor que 10, es igual. La condición x>10 es False, por lo que no se ejecuta el print.',img:''},
+        {p:'¿Para qué sirve el bloque else?',ops:['Para repetir código','Para ejecutar código cuando la condición del if es falsa','Para declarar variables','Para terminar el programa'],c:1,exp:'else contiene el código que se ejecuta cuando la condición del if evalúa como False.',img:''},
+        {p:'nota=8. if nota>=9: A elif nota>=7: B else: C — ¿Qué se ejecuta?',ops:['Solo A','Solo B — porque 8 >= 7','Solo C','A y B'],c:1,exp:'nota=8 no cumple nota>=9 (falso), pero sí cumple nota>=7 (verdadero), por lo que se ejecuta B.',img:''},
+        {p:'¿Qué símbolo se usa en Python para comparar si dos valores son iguales?',ops:['=','!=','==','>='],c:2,exp:'== es el operador de comparación de igualdad. Un solo = es asignación (guardar un valor).',img:''},
+        {p:'¿Cuántos elif puede tener una estructura if en Python?',ops:['Solo uno','Máximo tres','Ninguno obligatoriamente — pueden ser los que se necesiten','Exactamente dos'],c:2,exp:'Se puede tener cualquier número de elif. No hay límite, aunque demasiados pueden hacer el código difícil de leer.',img:''}
+      ]
+    },
+    { // Tema 3: Ciclos for
+      fichas:[
+        {tipo:'def',preg:'¿Qué es un ciclo for?',resp:'El ciclo for repite un bloque de código para cada elemento de una secuencia (lista, rango, texto). Se usa cuando se conoce de antemano el número de repeticiones o se quiere recorrer una colección.'},
+        {tipo:'cod',titulo:'for con range() en Python',lineas:[
+          ['cc','# range(fin) — del 0 al fin-1'],
+          ['k','for '],['cn','i'],['cw',' in '],['cf','range'],['cw','('],['cn','5'],['cw','):\n'],
+          ['cw','    '],['cf','print'],['cw','(i)  '],['cc','# imprime: 0 1 2 3 4\n\n'],
+          ['cc','# range(inicio, fin, paso)'],
+          ['k','for '],['cn','i'],['cw',' in '],['cf','range'],['cw','('],['cn','2'],['cw',', '],['cn','10'],['cw',', '],['cn','2'],['cw','):\n'],
+          ['cw','    '],['cf','print'],['cw','(i)  '],['cc','# imprime: 2 4 6 8']
+        ]},
+        {tipo:'clave',texto:'range(fin) empieza en 0. range(inicio, fin) el fin es exclusivo (no se incluye). range(inicio, fin, paso) controla de cuánto en cuánto avanza el contador. break termina el ciclo anticipadamente.'}
+      ],
+      reactivos:[
+        {p:'for i in range(4): ¿cuántas veces se ejecuta el ciclo?',ops:['3 veces','4 veces','5 veces','Depende del valor de i'],c:1,exp:'range(4) genera los valores 0,1,2,3 — cuatro iteraciones. El 4 no se incluye.',img:''},
+        {p:'range(2, 8, 2) genera los valores:',ops:['2, 4, 6, 8','2, 4, 6','0, 2, 4, 6','2, 3, 4, 5, 6, 7'],c:1,exp:'Empieza en 2, avanza de 2 en 2, y para antes de llegar a 8. Genera: 2, 4, 6.',img:''},
+        {p:'¿Cuándo conviene usar for en vez de while?',ops:['Cuando no se sabe cuántas veces repetir','Cuando el número de repeticiones es conocido o se recorre una colección','Cuando hay un error en el programa','Siempre — for es mejor que while'],c:1,exp:'for es ideal cuando el número de iteraciones es conocido o cuando se recorre una secuencia. while es para condiciones indefinidas.',img:''},
+        {p:'¿Qué instrucción termina un ciclo for antes de completarse?',ops:['stop','end','break','exit'],c:2,exp:'break interrumpe el ciclo inmediatamente y la ejecución continúa con el código que viene después del for.',img:''},
+        {p:'for i in range(1, 6): print(i) — ¿Cuál es el último valor que imprime?',ops:['6','5','4','1'],c:1,exp:'range(1,6) genera 1,2,3,4,5. El 6 no se incluye porque el fin es exclusivo.',img:''}
+      ]
+    },
+    { // Tema 4: Ciclos while
+      fichas:[
+        {tipo:'def',preg:'¿Qué es un ciclo while?',resp:'Un ciclo while repite un bloque de código mientras una condición sea verdadera. Se usa cuando no se sabe de antemano cuántas veces se necesita repetir.'},
+        {tipo:'cod',titulo:'while en Python — ejemplo práctico',lineas:[
+          ['cn','contador'],['cw',' = '],['cn','0\n'],
+          ['k','while '],['cn','contador'],['cw',' < '],['cn','5'],['cw',':\n'],
+          ['cw','    '],['cf','print'],['cw','("Vuelta", '],['cn','contador'],['cw',')\n'],
+          ['cn','    contador'],['cw',' += '],['cn','1  '],['cc','# IMPORTANTE: modificar la variable\n\n'],
+          ['cc','# Resultado: Vuelta 0, Vuelta 1, Vuelta 2, Vuelta 3, Vuelta 4']
+        ]},
+        {tipo:'clave',texto:'Si la condición nunca llega a ser falsa, el ciclo es infinito y el programa se cuelga. Siempre modifica la variable de control dentro del ciclo. break termina el ciclo inmediatamente.'}
+      ],
+      reactivos:[
+        {p:'contador=0; while contador<3: contador+=1 — ¿Cuántas veces itera?',ops:['2 veces','3 veces','4 veces','Infinitamente'],c:1,exp:'contador toma los valores 0, 1, 2. Cuando llega a 3 la condición contador<3 es False. Total: 3 iteraciones.',img:''},
+        {p:'¿Qué instrucción termina un ciclo while de inmediato?',ops:['stop','break','exit','return'],c:1,exp:'break termina el ciclo y la ejecución continúa con el código posterior al bloque while.',img:''},
+        {p:'i=10; while i>0: i-=3; print(i) — ¿Qué imprime?',ops:['1','-2','0','Error'],c:1,exp:'i toma los valores: 10→7→4→1→-2. Cuando i=-2 la condición i>0 es False. El print está fuera del ciclo, imprime -2.',img:''},
+        {p:'¿Cuál es la diferencia principal entre for y while?',ops:['for es más rápido','for itera número definido; while repite mientras condición sea verdadera','while solo funciona con números','No hay diferencia práctica'],c:1,exp:'for itera sobre una secuencia conocida. while repite mientras se cumpla una condición que puede depender de eventos externos.',img:''},
+        {p:'¿Qué problema causa no modificar la variable de control en un while?',ops:['El programa termina inmediatamente','Se genera un ciclo infinito','La variable se reinicia sola','Se produce un error de sintaxis'],c:1,exp:'Si la variable de control no cambia, la condición siempre será verdadera y el ciclo nunca terminará (ciclo infinito).',img:''}
+      ]
+    },
+    { // Tema 5: Arreglos y funciones
+      fichas:[
+        {tipo:'def',preg:'¿Qué es una lista y qué es una función?',resp:'Una lista (arreglo) es una colección ordenada de elementos accesibles por índice. Una función es un bloque de código con nombre que realiza una tarea específica y puede reutilizarse.'},
+        {tipo:'cod',titulo:'Listas y funciones en Python',lineas:[
+          ['cc','# Lista — índices empiezan en 0'],
+          ['cn','notas'],['cw',' = ['],['cn','8.5'],['cw',', '],['cn','9'],['cw',', '],['cn','7.5'],['cw',', '],['cn','10'],['cw',']\n'],
+          ['cf','print'],['cw','(notas['],['cn','0'],['cw','])  '],['cc','# → 8.5 (primer elemento)\n'],
+          ['cn','notas'],['cw','.append('],['cn','9.5'],['cw',')  '],['cc','# agregar al final\n\n'],
+          ['cc','# Función — def + nombre + parámetros'],
+          ['k','def '],['cn','calcular_promedio'],['cw','(lista):\n'],
+          ['cw','    '],['k','return '],['cf','sum'],['cw','(lista) / '],['cf','len'],['cw','(lista)\n\n'],
+          ['cf','print'],['cw','(calcular_promedio(notas))  '],['cc','# → 8.9']
+        ]},
+        {tipo:'clave',texto:'Los índices de una lista empiezan en 0. len(lista) da el número de elementos. Las funciones reciben parámetros y devuelven un resultado con return. Evitan repetir código.'}
+      ],
+      reactivos:[
+        {p:'lista = [5, 10, 15, 20] — ¿Qué valor tiene lista[2]?',ops:['5','10','15','20'],c:2,exp:'El índice 0 es 5, el índice 1 es 10, el índice 2 es 15. Los índices empiezan en 0.',img:''},
+        {p:'¿Qué función devuelve la cantidad de elementos de una lista?',ops:['count()','size()','len()','length()'],c:2,exp:'len(lista) devuelve el número de elementos. Ejemplo: len([1,2,3]) → 3.',img:''},
+        {p:'def area(b, h): return (b * h) / 2 — area(6, 4) = ?',ops:['24','12','10','8'],c:1,exp:'area(6,4) = (6×4)/2 = 24/2 = 12. Es la fórmula del área de un triángulo.',img:''},
+        {p:'¿Para qué sirve la instrucción return en una función?',ops:['Imprimir en pantalla','Devolver un valor como resultado de la función','Declarar una variable','Terminar el programa'],c:1,exp:'return devuelve el resultado de la función al lugar donde fue llamada. Sin return, la función devuelve None.',img:''},
+        {p:'lista = [1, 2, 3]; lista.append(4) — ¿Cuántos elementos tiene ahora?',ops:['3','4','5','Error'],c:1,exp:'append() agrega un elemento al final de la lista. La lista tenía 3 elementos, ahora tiene 4: [1,2,3,4].',img:''}
+      ]
+    }
   ],
+
+  // ── CIRCUITOS ELECTRÓNICOS — Tema 0 de ejemplo ──────────
   ce:[
-    {tipo:'def',preg:'¿Qué establece la Ley de Ohm?',resp:'La Ley de Ohm establece que el voltaje es igual a la corriente multiplicada por la resistencia: V = I × R.'},
-    {tipo:'cod',titulo:'Fórmula',lineas:[['cc','# V = Voltaje (Volts)'],['cc','# I = Corriente (Amperes)'],['cc','# R = Resistencia (Ohms)'],['k','V'],['cw',' = '],['cn','I'],['cw',' × '],['cn','R']]},
-    {tipo:'clave',texto:'En serie la corriente es igual en todos los componentes. En paralelo el voltaje es igual en todos.'}
+    { // Tema 0: Conceptos básicos de electricidad
+      fichas:[
+        {tipo:'def',preg:'¿Qué es la electricidad y qué es el voltaje?',resp:'La electricidad es el flujo de electrones a través de un conductor. El voltaje (V) es la diferencia de potencial que impulsa ese flujo. La corriente (I) es la cantidad de carga que fluye por segundo y la resistencia (R) se opone al flujo.'},
+        {tipo:'cod',titulo:'Ley de Ohm — relación V, I, R',lineas:[
+          ['cc','# V = Voltaje en Voltios (V)'],
+          ['cc','# I = Corriente en Amperes (A)'],
+          ['cc','# R = Resistencia en Ohms (Ω)\n'],
+          ['k','V'],['cw',' = '],['cn','I'],['cw',' × '],['cn','R'],['cw','    '],['cc','# Voltaje'],
+          ['k','\nI'],['cw',' = '],['cn','V'],['cw',' / '],['cn','R'],['cw','    '],['cc','# Corriente'],
+          ['k','\nR'],['cw',' = '],['cn','V'],['cw',' / '],['cn','I'],['cw','    '],['cc','# Resistencia']
+        ]},
+        {tipo:'clave',texto:'La Ley de Ohm relaciona voltaje, corriente y resistencia. Si R=10Ω e I=2A entonces V=20V. El multímetro mide las tres magnitudes.'}
+      ],
+      reactivos:[
+        {p:'Si R=10Ω e I=2A ¿cuál es el voltaje?',ops:['5 V','12 V','20 V','8 V'],c:2,exp:'V = I × R = 2 × 10 = 20 V. Esta es la Ley de Ohm.',img:''},
+        {p:'¿En qué tipo de circuito la corriente es igual en todos los componentes?',ops:['Paralelo','Serie','Mixto','Abierto'],c:1,exp:'En un circuito en serie los componentes están conectados uno tras otro y la misma corriente pasa por todos.',img:''},
+        {p:'¿Qué instrumento mide voltaje, corriente y resistencia?',ops:['Osciloscopio','Generador de señales','Multímetro','Fuente de poder'],c:2,exp:'El multímetro es un instrumento que mide voltaje, corriente y resistencia en un mismo dispositivo.',img:''},
+        {p:'¿Qué ley establece que V = I × R?',ops:['Kirchhoff','Faraday','Ohm','Coulomb'],c:2,exp:'La Ley de Ohm relaciona voltaje, corriente y resistencia: V = I × R.',img:''},
+        {p:'En un circuito en paralelo ¿qué magnitud es igual en todos los componentes?',ops:['Corriente','Resistencia','Voltaje','Frecuencia'],c:2,exp:'En un circuito en paralelo el voltaje es el mismo en todos los componentes. La corriente se divide.',img:''}
+      ]
+    }
   ],
+
+  // ── CIRCUITOS LÓGICOS COMBINATORIOS — Tema 0 de ejemplo ──
   clc:[
-    {tipo:'def',preg:'¿Qué es una compuerta lógica?',resp:'Una compuerta lógica realiza una operación booleana sobre entradas binarias y produce una salida binaria. Son los bloques fundamentales de los circuitos digitales.'},
-    {tipo:'cod',titulo:'Compuertas principales',lineas:[['cc','# AND: 1 solo si TODAS las entradas son 1'],['cc','# OR:  1 si AL MENOS UNA entrada es 1'],['cc','# NOT: invierte la entrada (0 → 1, 1 → 0'],['cc','# XOR: 1 si las entradas son DIFERENTES']]},
-    {tipo:'clave',texto:'Las operaciones del Álgebra de Boole son AND, OR y NOT. Con ellas se construye cualquier función lógica digital.'}
+    { // Tema 0: Sistema binario
+      fichas:[
+        {tipo:'def',preg:'¿Qué es el sistema binario?',resp:'El sistema binario es un sistema de numeración de base 2 que usa solo dos dígitos: 0 y 1. Es el lenguaje nativo de las computadoras porque representa los dos estados eléctricos: apagado (0) y encendido (1).'},
+        {tipo:'cod',titulo:'Conversión decimal a binario',lineas:[
+          ['cc','# Decimal 13 → Binario'],
+          ['cc','# Dividir entre 2 y anotar residuos:\n'],
+          ['cn','13'],['cw',' ÷ 2 = '],['cn','6'],['cw',' residuo '],['cf','1\n'],
+          ['cn',' 6'],['cw',' ÷ 2 = '],['cn','3'],['cw',' residuo '],['cf','0\n'],
+          ['cn',' 3'],['cw',' ÷ 2 = '],['cn','1'],['cw',' residuo '],['cf','1\n'],
+          ['cn',' 1'],['cw',' ÷ 2 = '],['cn','0'],['cw',' residuo '],['cf','1\n\n'],
+          ['cc','# Leer residuos de abajo hacia arriba:'],
+          ['k','13'],['cw','(decimal) = '],['k','1101'],['cw','(binario)']
+        ]},
+        {tipo:'clave',texto:'Para convertir binario a decimal: multiplica cada bit por su posición (potencia de 2). 1101 = 1×8 + 1×4 + 0×2 + 1×1 = 8+4+0+1 = 13.'}
+      ],
+      reactivos:[
+        {p:'¿Cuál es la representación binaria del decimal 13?',ops:['1011','1101','1110','1001'],c:1,exp:'13 = 8+4+1 = 1×8+1×4+0×2+1×1 = 1101 en binario.',img:''},
+        {p:'¿Qué decimal representa el binario 1010?',ops:['8','10','12','6'],c:1,exp:'1×8 + 0×4 + 1×2 + 0×1 = 8+0+2+0 = 10.',img:''},
+        {p:'¿Cuántos dígitos usa el sistema binario?',ops:['8','10','2','16'],c:2,exp:'El sistema binario es de base 2 y usa solo dos dígitos: 0 y 1.',img:''},
+        {p:'¿Qué representa el 0 en el sistema binario en términos eléctricos?',ops:['Voltaje alto','Estado encendido','Sin señal o estado apagado','Corriente máxima'],c:2,exp:'El 0 binario representa el estado de apagado o voltaje bajo en los circuitos digitales.',img:''},
+        {p:'¿Qué decimal es el binario 1111?',ops:['8','15','16','12'],c:1,exp:'1×8+1×4+1×2+1×1 = 8+4+2+1 = 15.',img:''}
+      ]
+    }
   ],
+
+  // ── INSTRUMENTACIÓN ELECTRÓNICA — Tema 0 de ejemplo ─────
   ie:[
-    {tipo:'def',preg:'¿Qué es un transductor?',resp:'Un transductor convierte una magnitud física del entorno (temperatura, luz, presión) en una señal eléctrica que puede ser procesada por un sistema electrónico.'},
-    {tipo:'cod',titulo:'Tipos de señales',lineas:[['cc','# Analógica: varía de forma continua'],['cc','# Ejemplo: temperatura 0 a 100 grados'],['cc',''],['cc','# Digital: solo dos valores posibles'],['cc','# 0 = bajo (0V)   1 = alto (5V)']]},
-    {tipo:'clave',texto:'La conversión A/D transforma señales del mundo real en valores digitales. La resolución del convertidor determina la precisión de la medición.'}
+    { // Tema 0: Introducción a la instrumentación
+      fichas:[
+        {tipo:'def',preg:'¿Qué es la instrumentación electrónica?',resp:'La instrumentación electrónica estudia los sistemas de medición y control de variables físicas (temperatura, presión, velocidad). Incluye sensores, transductores, amplificadores y sistemas de adquisición de datos.'},
+        {tipo:'cod',titulo:'Tipos de señales',lineas:[
+          ['cc','# Señal ANALÓGICA — varía continuamente'],
+          ['cc','# Ejemplo: temperatura de 0°C a 100°C'],
+          ['cc','# Puede tomar cualquier valor en el rango\n'],
+          ['cc','# Señal DIGITAL — solo dos valores'],
+          ['cn','0'],['cw',' = bajo (0V ≈ 0)'],['cc','   // apagado'],
+          ['cn','\n1'],['cw',' = alto (5V ≈ 1)'],['cc','  // encendido\n'],
+          ['cc','# Conversión A/D: transforma analógica → digital']
+        ]},
+        {tipo:'clave',texto:'Un transductor convierte energía física en eléctrica. Un sensor detecta la magnitud física. La calibración compara el instrumento con un patrón de referencia para corregir errores.'}
+      ],
+      reactivos:[
+        {p:'¿Qué tipo de señal varía de forma continua en un rango?',ops:['Digital','Analógica','Binaria','Discreta'],c:1,exp:'Las señales analógicas pueden tomar cualquier valor dentro de un rango, variando de forma continua.',img:''},
+        {p:'¿Cuál es la función principal de un transductor?',ops:['Amplificar señales eléctricas','Convertir una magnitud física en señal eléctrica','Almacenar energía','Filtrar ruido eléctrico'],c:1,exp:'Un transductor convierte una forma de energía (física, química, lumínica) en energía eléctrica que puede procesarse.',img:''},
+        {p:'¿Qué hace un convertidor A/D?',ops:['Transforma señal digital en analógica','Transforma señal analógica en digital','Amplifica la señal analógica','Filtra frecuencias no deseadas'],c:1,exp:'El convertidor Analógico-Digital (A/D) transforma una señal analógica continua en valores digitales discretos.',img:''},
+        {p:'¿Qué es calibrar un instrumento de medición?',ops:['Encenderlo y esperar que se estabilice','Comparar sus lecturas con un patrón de referencia y ajustarlo','Limpiarlo para evitar errores','Cambiarle las baterías regularmente'],c:1,exp:'Calibrar es comparar las lecturas del instrumento con un patrón de referencia conocido y corregir las desviaciones.',img:''},
+        {p:'¿Cuál es la ventaja de una señal digital sobre una analógica?',ops:['Es más precisa en todos los casos','Es menos susceptible al ruido eléctrico','Puede almacenar más información','Es más rápida siempre'],c:1,exp:'Las señales digitales solo tienen dos estados (0 y 1), lo que las hace más resistentes al ruido que las señales analógicas.',img:''}
+      ]
+    }
   ]
 };
 
@@ -638,6 +824,7 @@ const INSIGNIAS_DEF = [
 // ═══════════════════════════════════════════════════════
 let DATA = {
   materias:[],
+  reactivosPorTema:{},
   recompensas:[
     {id:'cita',n:'Cita de tutoría',s:'30 min con la docente (presencial o Meet)',ico:'🎓',pts:500,tipo:'cita',recurso:''},
     {id:'punto',n:'Punto extra en calificación',s:'Se registra ante la docente (tope: 4 por semestre)',ico:'⭐',pts:1000,tipo:'punto',recurso:''},
@@ -676,7 +863,8 @@ function save(){
       canjes:ST.canjes, inscritas:ST.inscritas, insignias:ST.insignias,
       rachaActual:ST.rachaActual, ultimoDia:ST.ultimoDia,
       tiempoHoy:ST.tiempoHoy, fechaHoy:ST.fechaHoy,
-      puntosCanje:ST.puntosCanje
+      puntosCanje:ST.puntosCanje,
+      primerLoginHoy: ST.primerLoginHoy||null
     }));
   }catch(e){}
 }
@@ -693,6 +881,8 @@ function loadAlumno(boleta){
       const hoy=fechaHoy();
       ST.fechaHoy=hoy;
       ST.tiempoHoy=(d.fechaHoy===hoy)?(d.tiempoHoy||0):0;
+      // Restaurar primerLoginHoy solo si es el mismo día
+      ST.primerLoginHoy=(d.fechaHoy===hoy && d.primerLoginHoy)?d.primerLoginHoy:null;
     } else {
       ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
       ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0;
@@ -743,8 +933,15 @@ function tiempoAgotado(){
   return mins>=LIMITE_MIN;
 }
 function tiempoHoyTotal(){
-  if(!ST.sesionInicio) return ST.tiempoHoy;
-  return ST.tiempoHoy+Math.floor((Date.now()-ST.sesionInicio)/60000);
+  const hoy = fechaHoy();
+  // Si es otro día, el tiempo es 0
+  if(ST.fechaHoy !== hoy) return 0;
+  // Si hay timestamp de inicio del día, calcular tiempo transcurrido real
+  if(ST.primerLoginHoy){
+    const transcurrido = Math.floor((Date.now() - ST.primerLoginHoy) / 60000);
+    return Math.min(transcurrido, LIMITE_MIN + 60);
+  }
+  return ST.tiempoHoy;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -831,8 +1028,8 @@ function verificarInsignias(){
 // ═══════════════════════════════════════════════════════
 // NAVEGACIÓN
 // ═══════════════════════════════════════════════════════
-const NAV_VIEWS=['v-dash','v-ins','v-log','v-ase'];
-const NAV_IDX={'v-dash':0,'v-ins':1,'v-log':2,'v-ase':3};
+const NAV_VIEWS=['v-dash','v-ins','v-log','v-ase','v-mat'];
+const NAV_IDX={'v-dash':0,'v-ins':1,'v-log':2,'v-ase':3,'v-mat':0};
 function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -870,10 +1067,11 @@ function validarEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 // TABS LOGIN / REGISTRO
 // ═══════════════════════════════════════════════════════
 function switchTab(t){
-  document.getElementById('tab-login').className='sp-tab'+(t==='login'?' on':'');
-  document.getElementById('tab-reg').className='sp-tab'+(t==='reg'?' on':'');
-  document.getElementById('form-login').style.display=t==='login'?'block':'none';
-  document.getElementById('form-reg').style.display=t==='reg'?'block':'none';
+  // Tabs eliminados — solo controlar visibilidad de formularios
+  const fl=document.getElementById('form-login');
+  const fr=document.getElementById('form-reg');
+  if(fl) fl.style.display=t==='login'?'block':'none';
+  if(fr) fr.style.display=t==='reg'?'block':'none';
 }
 
 // ═══════════════════════════════════════════════════════
@@ -890,6 +1088,14 @@ async function doLogin(){
   btn.textContent='Sincronizando…'; btn.disabled=true;
   ST.boleta=b; ST.grupo=g;
   loadAlumno(b);
+  // Registrar primer login del día si no existe
+  const hoyLogin = fechaHoy();
+  if(ST.fechaHoy !== hoyLogin || !ST.primerLoginHoy){
+    ST.fechaHoy = hoyLogin;
+    ST.primerLoginHoy = ST.primerLoginHoy || Date.now();
+    if(ST.fechaHoy !== hoyLogin) ST.tiempoHoy = 0;
+  }
+  save();
   await sincronizarProgreso(b);
   btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
   actualizarRacha();
@@ -919,6 +1125,10 @@ async function doRegistro(){
   ST.boleta=b; ST.grupo=g; ST.nombre=nombre; ST.curp=curp; ST.email=email;
   loadAlumno(b);
   ST.nombre=nombre; ST.curp=curp; ST.email=email;
+  const hoyReg = fechaHoy();
+  ST.fechaHoy = hoyReg;
+  ST.primerLoginHoy = ST.primerLoginHoy || Date.now();
+  save();
   await sincronizarProgreso(b);
   btn.textContent='Crear mi perfil ›'; btn.disabled=false;
   actualizarRacha();
@@ -1066,31 +1276,41 @@ function abrirMateria(id){
 // ═══════════════════════════════════════════════════════
 function abrirGuia(){
   if(!curMat) return;
-  document.getElementById('g-mat-s').textContent=`${curMat.nombre} · ${curMat.unidad}`;
-  document.getElementById('g-tema-t').textContent='Guía de estudio';
+  // Obtener índice del tema actual (el que está estudiando)
+  const temaIdx = Math.min(ST.progreso[curMat.id]?.temas||0, curMat.temas.length-1);
+  const temaGuias = GUIAS[curMat.id] || [];
+  const temaData  = temaGuias[temaIdx];
+  if(!temaData || !temaData.fichas || !temaData.fichas.length){
+    toast('🚧 Contenido en construcción — próximamente disponible');
+    return;
+  }
+  const temaNombre = curMat.temas[temaIdx] || 'Guía de estudio';
+  document.getElementById('g-mat-s').textContent=`${curMat.nombre} · Tema ${temaIdx+1} de ${curMat.temas.length}`;
+  document.getElementById('g-tema-t').textContent=temaNombre;
   const cont=document.getElementById('g-content');
   cont.innerHTML='<div style="height:10px"></div>';
-  const guia=GUIAS[curMat.id]||[];
-  guia.forEach(b=>{
+  temaData.fichas.forEach(b=>{
     if(b.tipo==='def'){
       cont.innerHTML+=`<div class="def-box"><h4>${b.preg}</h4><p>${b.resp}</p></div>`;
     } else if(b.tipo==='cod'){
-      let html='';
-      b.lineas.forEach(([t,tx])=>{ html+=`<span class="${t}">${tx.replace(/\n/g,'<br>')}</span>`; });
-      cont.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;padding:8px 12px 3px;text-transform:uppercase;letter-spacing:.5px">${b.titulo}</div><div class="code-box"><div class="cl">${html}</div></div>`;
+      let ch='';
+      b.lineas.forEach(([t,tx])=>{ ch+=`<span class="${t}">${tx.replace(/\n/g,'<br>')}</span>`; });
+      cont.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;padding:8px 12px 3px;text-transform:uppercase;letter-spacing:.5px">${b.titulo}</div><div class="code-box"><div class="cl">${ch}</div></div>`;
     } else if(b.tipo==='clave'){
       cont.innerHTML+=`<div class="key-box"><h4>💡 Punto clave</h4><p>${b.texto}</p></div>`;
     }
   });
-  // Marcar ficha como leída y dar puntos
-  const fichaKey=curMat.id+'_ficha';
+  // Puntos por ficha — una vez por tema
+  const fichaKey=`${curMat.id}_f${temaIdx}`;
   if(!ST.canjes.includes(fichaKey) && !tiempoAgotado()){
-    cont.innerHTML+=`<div class="ficha-check"><p>✅ Ficha leída — ¡ganaste puntos!</p><div class="fc-pts">+10 pts</div></div>`;
+    cont.innerHTML+=`<div class="ficha-check"><p>✅ ¡Ficha completada! Tema ${temaIdx+1}: ${temaNombre}</p><div class="fc-pts">+10 pts</div></div>`;
     ST.puntos+=10; ST.canjes.push(fichaKey);
-    ST.logros.unshift({t:`📖 Ficha ${curMat.nombre}`,pts:'+10',f:'Hoy'});
+    ST.logros.unshift({t:`📖 Ficha: ${temaNombre}`,pts:'+10',f:'Hoy'});
     save();
   } else if(tiempoAgotado()){
-    cont.innerHTML+=`<div class="key-box"><h4>⏸ Límite de estudio alcanzado</h4><p>Puedes seguir leyendo, pero los puntos de hoy se reanudanmañana.</p></div>`;
+    cont.innerHTML+=`<div class="key-box"><h4>⏸ Límite de estudio alcanzado</h4><p>Puedes seguir leyendo. Los puntos se reanudan mañana.</p></div>`;
+  } else {
+    cont.innerHTML+=`<div class="ficha-check" style="opacity:.6"><p>📖 Ficha ya completada — Tema ${temaIdx+1}</p><div class="fc-pts">+10 ✓</div></div>`;
   }
   cont.innerHTML+=`<div class="g-nav">
     <button onclick="navBack()">‹ Volver</button>
@@ -1106,20 +1326,31 @@ function abrirGuia(){
 function iniciarCuestionario(){
   activarMarcaAgua();
   if(!curMat){toast('⚠️ Selecciona una materia primero');return;}
-  if(!curMat.cuestionario?.length){toast('⚠️ No hay reactivos disponibles');return;}
   const matId=curMat.id;
-  const temaActual=ST.progreso[matId]?.temas||0;
+  const temaIdx=Math.min(ST.progreso[matId]?.temas||0, curMat.temas.length-1);
+  // Buscar reactivos: primero en el API, luego en GUIAS local como respaldo
+  const reactivosAPI = DATA.reactivosPorTema?.[matId]?.[temaIdx];
+  const reactivosLocal = GUIAS[matId]?.[temaIdx]?.reactivos;
+  const reactivosFinal = (reactivosAPI && reactivosAPI.length) ? reactivosAPI
+                       : (reactivosLocal && reactivosLocal.length) ? reactivosLocal
+                       : null;
+  if(!reactivosFinal){
+    toast('🚧 Cuestionario en construcción — próximamente disponible');
+    return;
+  }
+  const temaData = { reactivos: reactivosFinal };
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
-  const intentoNum=(ST.progreso[matId].intentos[temaActual]||0);
-  quiz={preguntas:[...curMat.cuestionario].sort(()=>Math.random()-.5),idx:0,correctas:0,respondida:false,intentoNum};
-  document.getElementById('q-sub').textContent=`${curMat.nombre}`;
+  const intentoNum=(ST.progreso[matId].intentos?.[temaIdx]||0);
+  const temaNombre=curMat.temas[temaIdx]||'Cuestionario';
+  quiz={preguntas:[...temaData.reactivos].sort(()=>Math.random()-.5),idx:0,correctas:0,respondida:false,intentoNum,temaIdx};
+  document.getElementById('q-sub').textContent=`${curMat.nombre} · Tema ${temaIdx+1}`;
   // Mostrar badge de intento
   const badge=document.getElementById('intento-badge');
   if(intentoNum===0){
-    badge.innerHTML='';
+    badge.innerHTML=`<div class="intentos-badge" style="background:var(--grb)"><span class="ib-txt" style="color:var(--grd)">1er intento — puntaje completo</span><span class="ib-pct" style="color:var(--grd)">100%</span></div>`;
   } else {
-    const pct=intentoNum===1?'60%':'30%';
-    badge.innerHTML=`<div class="intentos-badge"><span class="ib-txt">Intento ${intentoNum+1} — puntos reducidos al ${pct}</span><span class="ib-pct">${pct}</span></div>`;
+    const pctLabel=intentoNum===1?'60%':'30%';
+    badge.innerHTML=`<div class="intentos-badge"><span class="ib-txt">Intento ${intentoNum+1} · ${temaNombre} — puntos reducidos al ${pctLabel}</span><span class="ib-pct">${pctLabel}</span></div>`;
   }
   renderPregunta();
   navTo('v-quiz');
@@ -1168,14 +1399,16 @@ function sigPregunta(){ quiz.idx++; renderPregunta(); }
 function finalizarQuiz(){
   const total=quiz.preguntas.length;
   const matId=curMat.id;
-  const temaActual=ST.progreso[matId]?.temas||0;
+  // Usar el temaIdx que arrancó el cuestionario (guardado en quiz)
+  const temaActual = quiz.temaIdx ?? (ST.progreso[matId]?.temas||0);
   const pct=Math.round(quiz.correctas/total*100);
-  const aprobado=quiz.correctas>=4;
+  const aprobado=quiz.correctas>=4; // 4/5 = 80% mínimo para desbloquear
   const perfecto=quiz.correctas===total;
   const pts=calcularPuntosQuiz(quiz.correctas,total,matId,temaActual);
   ST.puntos+=pts;
-  // Registrar intento
+  // Registrar intento y avance
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
+  if(!ST.progreso[matId].intentos) ST.progreso[matId].intentos={};
   ST.progreso[matId].intentos[temaActual]=(ST.progreso[matId].intentos[temaActual]||0)+1;
   if(aprobado) marcarTemaAprobado(matId,temaActual);
   if(pts>0) ST.logros.unshift({t:`✏️ Cuestionario ${curMat.nombre} (${pct}%)`,pts:`+${pts}`,f:'Hoy'});
@@ -1199,8 +1432,12 @@ function finalizarQuiz(){
   circle.style.background=pct>=80?'var(--grb)':aprobado?'var(--nab)':'var(--erb)';
   // Mensaje desbloqueo
   const umsg=document.getElementById('res-unlock-msg');
+  const nombreTemaActual = curMat.temas[temaActual] || `Tema ${temaActual+1}`;
   if(aprobado && temaActual<(curMat.temas?.length||1)-1){
-    umsg.innerHTML=`<div class="res-unlock">🔓 ¡Siguiente tema desbloqueado!</div>`;
+    const siguiente = curMat.temas[temaActual+1] || `Tema ${temaActual+2}`;
+    umsg.innerHTML=`<div class="res-unlock">🔓 ¡Desbloqueado! Siguiente: ${siguiente}</div>`;
+  } else if(aprobado && temaActual>=(curMat.temas?.length||1)-1){
+    umsg.innerHTML=`<div class="res-unlock">🏆 ¡Completaste todos los temas de ${curMat.nombre}!</div>`;
   } else if(!aprobado){
     umsg.innerHTML=`<div class="res-locked">🔒 Necesitas 4/5 para desbloquear el siguiente tema</div>`;
   } else {
@@ -1242,7 +1479,7 @@ function renderAse(){
   // Docentes
   const lista=document.getElementById('docentes-list');
   const inscritas=ST.inscritas||[];
-  const ases=(DATA.asesorias||[]).filter(a=>inscritas.length===0||inscritas.includes(a.materia_id));
+  const ases=(DATA.asesorias||[]).filter(a=>(inscritas.length===0||inscritas.includes(a.materia_id))&&(a.disponible===true||String(a.disponible).toUpperCase()==='SI'));
   if(ases.length){
     const porProf={};
     ases.forEach(a=>{ if(!porProf[a.profesor]) porProf[a.profesor]=[]; porProf[a.profesor].push(a); });
@@ -1424,6 +1661,14 @@ function canjear(id){
   const r=DATA.recompensas.find(x=>x.id===id);
   if(!r||ST.canjes.includes(id)){toast('Ya canjeada');return;}
   if(ST.puntos<r.pts){toast(`⚠️ Necesitas ${r.pts-ST.puntos} pts más`);return;}
+  // Verificar que constancias solo se canjeen si hay unidad/módulo completo
+  if(r.tipo==='constancia_unidad'||r.tipo==='constancia_modulo'){
+    const hayCompleto=Object.values(ST.progreso).some(p=>{
+      const mat=DATA.materias.find(m=>ST.inscritas.includes(m.id));
+      return mat && (p.temas||0)>=mat.temas.length;
+    });
+    if(!hayCompleto){toast('⚠️ Completa una unidad primero');return;}
+  }
   ST.puntos-=r.pts; ST.canjes.push(id);
   if(r.tipo==='punto') ST.puntosCanje=(ST.puntosCanje||0)+1;
   ST.logros.unshift({t:`🎁 Canjeaste: ${r.n}`,pts:`-${r.pts}`,f:'Hoy'});
@@ -1447,65 +1692,49 @@ async function cargarDatosAPI(){
     const d=json.data;
     DATA.materias=(d.materias||[]).map(m=>({
       id:m.id,nombre:m.nombre,icono:m.icono,color:m.color,unidad:m.unidad,
-      temas:(d.temas&&d.temas[m.id])||[],
-      guia:GUIAS[m.id]||[],
-      cuestionario:(d.reactivos&&d.reactivos[m.id])||[]
+      temas:(d.temas&&d.temas[m.id])||[]
     }));
+    // Reactivos agrupados por tema {matId: {temaIdx: [reactivos]}}
+    DATA.reactivosPorTema = d.reactivos||{};
     DATA.recompensas=d.recompensas&&d.recompensas.length?d.recompensas:DATA.recompensas;
     DATA.asesorias=d.asesorias||[];
     DATA.config=d.configuracion||{};
-    try{ localStorage.setItem('sdgo_cache',JSON.stringify({ts:Date.now(),materias:DATA.materias,asesorias:DATA.asesorias})); }catch(e){}
+    try{ localStorage.setItem('sdgo_cache',JSON.stringify({
+      ts:Date.now(),materias:DATA.materias,asesorias:DATA.asesorias,
+      reactivosPorTema:DATA.reactivosPorTema
+    })); }catch(e){}
   }catch(e){
     console.warn('API no disponible:',e.message);
     try{
       const cache=JSON.parse(localStorage.getItem('sdgo_cache')||'null');
       if(cache&&cache.materias&&cache.materias.length){
         DATA.materias=cache.materias; DATA.asesorias=cache.asesorias||[];
+        DATA.reactivosPorTema=cache.reactivosPorTema||{};
       }
     }catch(ce){}
     if(!DATA.materias.length) usarDatosLocales();
   }
 }
 function usarDatosLocales(){
+  // Materias sin cuestionario hardcodeado — los reactivos vienen de GUIAS por tema
   DATA.materias=[
-    {id:'lp',nombre:'Lenguaje de Programación',icono:'💻',color:'#E8F4FF',unidad:'Unidad 2 — Estructuras de control',
-     temas:['Introducción a la programación','Variables y tipos de datos','Estructuras if / else','Ciclos for','Ciclos while','Arreglos y funciones'],
-     guia:GUIAS['lp']||[],
-     cuestionario:[
-      {p:'¿Cuántas veces itera el ciclo si contador inicia en 0 y la condición es contador < 3?',ops:['2 veces','3 veces','Infinitamente','Genera error'],c:1,exp:'Corre con 0,1,2. Al llegar a 3 la condición es falsa. Total: 3 iteraciones.',img:''},
-      {p:'¿Qué instrucción termina un ciclo while de inmediato?',ops:['stop','break','exit','return'],c:1,exp:'break termina el ciclo y el flujo continúa con el código posterior.',img:''},
-      {p:'¿Qué tipo de dato es: edadAlumno = 17?',ops:['String','Float','Integer','Boolean'],c:2,exp:'17 es entero sin decimales: tipo Integer.',img:''},
-      {p:'¿Diferencia entre for y while?',ops:['for es más rápido','for itera número definido; while mientras condición sea verdadera','while solo funciona con números','No hay diferencia'],c:1,exp:'for itera secuencia definida; while repite mientras condición sea verdadera.',img:''},
-      {p:'¿Qué imprime?\ni=10 / while i>0: i-=3 / print(i)',ops:['1','-2','0','Error'],c:1,exp:'i: 10,7,4,1,-2. Al llegar a -2 la condición i>0 es falsa. Imprime -2.',img:''},
-     ]},
-    {id:'ce',nombre:'Circuitos Electrónicos',icono:'🔌',color:'#FFF3DC',unidad:'Unidad 1 — Fundamentos de electricidad',
-     temas:['Conceptos básicos de electricidad','Ley de Ohm','Circuitos en serie','Circuitos en paralelo','Componentes básicos','Medición con multímetro'],
-     guia:GUIAS['ce']||[],
-     cuestionario:[
-      {p:'Si R=10Ω e I=2A ¿cuál es el voltaje?',ops:['5 V','12 V','20 V','8 V'],c:2,exp:'V = I × R = 2 × 10 = 20 V.',img:''},
-      {p:'¿En qué circuito la corriente es igual en todos los componentes?',ops:['Paralelo','Serie','Mixto','Abierto'],c:1,exp:'En serie los componentes están uno tras otro; la misma corriente pasa por todos.',img:''},
-      {p:'¿Qué instrumento mide voltaje, corriente y resistencia?',ops:['Osciloscopio','Generador','Multímetro','Fuente'],c:2,exp:'El multímetro mide voltaje, corriente y resistencia en un mismo dispositivo.',img:''},
-      {p:'¿Qué ley establece V = I × R?',ops:['Kirchhoff','Faraday','Ohm','Coulomb'],c:2,exp:'La Ley de Ohm relaciona voltaje, corriente y resistencia.',img:''},
-     ]},
-    {id:'clc',nombre:'Circuitos Lógicos Combinatorios',icono:'⚡',color:'#E6FAF0',unidad:'Unidad 1 — Álgebra de Boole y compuertas lógicas',
-     temas:['Sistema binario','Sistema hexadecimal','Conversión entre bases','Compuertas lógicas','Álgebra de Boole','Tablas de verdad'],
-     guia:GUIAS['clc']||[],
-     cuestionario:[
-      {p:'¿Cuál es el binario del decimal 13?',ops:['1011','1101','1110','1001'],c:1,exp:'13: 8+4+1=13. Binario: 1101.',img:''},
-      {p:'AND con A=1 y B=0 ¿cuál es la salida?',ops:['1','0','Indefinido','Depende'],c:1,exp:'AND produce 1 solo si TODAS son 1. B=0 entonces salida 0.',img:''},
-      {p:'¿Qué decimal es el binario 1010?',ops:['8','10','12','6'],c:1,exp:'1×8+0×4+1×2+0×1 = 10.',img:''},
-      {p:'OR con A=0 y B=0 ¿cuál es la salida?',ops:['1','0','2','Indefinido'],c:1,exp:'OR produce 1 si AL MENOS UNA es 1. Ambas 0, salida 0.',img:''},
-      {p:'¿Qué hace la compuerta NOT?',ops:['Suma lógica','Producto lógico','Inversión lógica','XOR'],c:2,exp:'NOT invierte: 0 a 1 y 1 a 0.',img:''},
-     ]},
-    {id:'ie',nombre:'Instrumentación Electrónica',icono:'📡',color:'#F0ECFF',unidad:'Unidad 1 — Sistemas de medición',
-     temas:['Introducción a la instrumentación','Sensores y transductores','Señales analógicas y digitales','Conversión A/D y D/A','Instrumentos de medición','Calibración'],
-     guia:GUIAS['ie']||[],
-     cuestionario:[
-      {p:'¿Qué tipo de señal varía de forma continua?',ops:['Digital','Analógica','Binaria','Pulsada'],c:1,exp:'Las señales analógicas varían continuamente en un rango.',img:''},
-      {p:'¿Cuál es la función de un transductor?',ops:['Amplificar señales','Convertir magnitud física en señal eléctrica','Almacenar energía','Filtrar ruido'],c:1,exp:'Convierte energía física en eléctrica para ser procesada.',img:''},
-      {p:'¿Qué hace un convertidor A/D?',ops:['Digital a analógico','Analógico a digital','Amplifica','Filtra'],c:1,exp:'Transforma señal analógica en valores digitales discretos.',img:''},
-      {p:'¿Qué es calibrar un instrumento?',ops:['Encenderlo','Comparar con patrón para ajustarlo','Limpiarlo','Cambiar baterías'],c:1,exp:'Calibrar es comparar con un patrón y corregir desviaciones.',img:''},
-     ]},
+    {id:'lp', nombre:'Lenguaje de Programación',   icono:'💻', color:'#E8F4FF',
+     unidad:'Unidad 2 — Estructuras de control',
+     temas:['Introducción a la programación','Variables y tipos de datos',
+            'Estructuras if / else','Ciclos for','Ciclos while','Arreglos y funciones']},
+    {id:'ce', nombre:'Circuitos Electrónicos',      icono:'🔌', color:'#FFF3DC',
+     unidad:'Unidad 1 — Fundamentos de electricidad',
+     temas:['Conceptos básicos de electricidad','Ley de Ohm','Circuitos en serie',
+            'Circuitos en paralelo','Componentes básicos','Medición con multímetro']},
+    {id:'clc',nombre:'Circuitos Lógicos Combinatorios',icono:'⚡',color:'#E6FAF0',
+     unidad:'Unidad 1 — Álgebra de Boole y compuertas lógicas',
+     temas:['Sistema binario','Sistema hexadecimal','Conversión entre bases',
+            'Compuertas lógicas','Álgebra de Boole','Tablas de verdad']},
+    {id:'ie', nombre:'Instrumentación Electrónica',  icono:'📡',color:'#F0ECFF',
+     unidad:'Unidad 1 — Sistemas de medición',
+     temas:['Introducción a la instrumentación','Sensores y transductores',
+            'Señales analógicas y digitales','Conversión A/D y D/A',
+            'Instrumentos de medición','Calibración']},
   ];
 }
 async function sincronizarProgreso(boleta){
@@ -1628,6 +1857,11 @@ function generarConstancia(tipo, datosExtra) {
 }
 
 function mostrarBannerConstancia(tipo, unidadNombre) {
+  // Solo mostrar si realmente está completo
+  if(tipo !== 'modulo' && curMat){
+    const p = ST.progreso[curMat.id] || {temas:0};
+    if((p.temas||0) < curMat.temas.length) return;
+  }
   const dash = document.getElementById('dash-scroll');
   if(!dash) return;
   const old = document.getElementById('banner-const');
@@ -1660,22 +1894,32 @@ function activarMarcaAgua() {
   const overlay = document.getElementById('wm-overlay');
   if (!overlay) return;
   const boleta = ST.boleta || '??????????';
-  const txt = boleta + ' · SDGo! CECyT9 IPN · ';
-  // Generar patrón SVG con el texto en diagonal
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='280' height='120' viewBox='0 0 280 120'>
-    <text x='-10' y='55'
-      font-family='monospace' font-size='12' font-weight='bold'
-      fill='rgba(123,17,53,0.20)'
-      transform='rotate(-28 140 60)'
-      letter-spacing='2'>${txt}</text>
-    <text x='-10' y='105'
-      font-family='monospace' font-size='12' font-weight='bold'
-      fill='rgba(123,17,53,0.20)'
-      transform='rotate(-28 140 60)'
-      letter-spacing='2'>${txt}</text>
+  // Texto corto para que no se corte al rotar
+  const txt = boleta + '  ·  SDGo!  ';
+  // SVG cuadrado para que el patrón repita sin cortes al rotar
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'>
+    <text x='110' y='90'
+      text-anchor='middle'
+      font-family='Courier New,monospace' font-size='13' font-weight='700'
+      fill='rgba(123,17,53,0.22)'
+      transform='rotate(-35 110 110)'
+      letter-spacing='3'>${txt}</text>
+    <text x='110' y='145'
+      text-anchor='middle'
+      font-family='Courier New,monospace' font-size='13' font-weight='700'
+      fill='rgba(123,17,53,0.22)'
+      transform='rotate(-35 110 110)'
+      letter-spacing='3'>${txt}</text>
+    <text x='110' y='200'
+      text-anchor='middle'
+      font-family='Courier New,monospace' font-size='13' font-weight='700'
+      fill='rgba(123,17,53,0.22)'
+      transform='rotate(-35 110 110)'
+      letter-spacing='3'>${txt}</text>
   </svg>`;
   const encoded = 'data:image/svg+xml,' + encodeURIComponent(svg);
   overlay.style.backgroundImage = 'url("' + encoded + '")';
+  overlay.style.backgroundSize = '220px 220px';
   overlay.classList.add('activo');
 }
 function desactivarMarcaAgua() {
