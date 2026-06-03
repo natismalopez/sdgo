@@ -195,14 +195,13 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .q-prog-row .qpb-f{background:var(--na);height:100%;border-radius:3px;transition:width .35s}
 .q-cnt{font-size:10px;color:var(--gu);font-weight:700;white-space:nowrap}
 .q-body{padding:14px 12px;position:relative;user-select:none;-webkit-user-select:none}
-/* Marca de agua — patrón SVG diagonal sobre toda la pantalla */
+/* Marca de agua — patrón SVG diagonal */
 #wm-overlay{
   position:fixed;inset:0;
   pointer-events:none;
   z-index:9999;
   display:none;
   background-repeat:repeat;
-  background-size:280px 120px;
 }
 #wm-overlay.activo{ display:block; }
 /* Aviso de captura */
@@ -593,140 +592,314 @@ const LIMITE_MIN = 45; // minutos de estudio por día (recomendación pedagógic
 // GUÍAS LOCALES
 // ═══════════════════════════════════════════════════════
 const GUIAS = {
-  // ── LENGUAJE DE PROGRAMACIÓN — 6 temas completos ────────
   lp:[
-    { // Tema 0: Introducción a la programación
+    { // Tema 0: Introducción a la programación en C
       fichas:[
-        {tipo:'def',preg:'¿Qué es un algoritmo?',resp:'Un algoritmo es una secuencia ordenada y finita de instrucciones que resuelve un problema específico. Todo programa de computadora parte de un algoritmo bien definido.'},
-        {tipo:'cod',titulo:'Ejemplo de algoritmo en pseudocódigo',lineas:[
-          ['cc','// Algoritmo: sumar dos números'],
-          ['k','INICIO\n'],
-          ['cw','  leer '],['cn','num1, num2\n'],
-          ['cn','  suma'],['cw',' = '],['cn','num1'],['cw',' + '],['cn','num2\n'],
-          ['cw','  escribir '],['cf','"Resultado: "'],['cw',' + '],['cn','suma\n'],
-          ['k','FIN']
-        ]},
-        {tipo:'clave',texto:'Un algoritmo debe ser finito (termina), preciso (pasos claros) y efectivo (resuelve el problema). Un diagrama de flujo lo representa visualmente con símbolos estándar.'}
-      ],
-      reactivos:[
-        {p:'¿Cuál es la característica principal de un algoritmo?',ops:['Es infinito','Es una secuencia ordenada y finita de instrucciones','Es solo para computadoras','Es un lenguaje de programación'],c:1,exp:'Un algoritmo es una secuencia ordenada, finita y efectiva de instrucciones para resolver un problema.',img:''},
-        {p:'¿Qué herramienta visual representa un algoritmo con símbolos gráficos?',ops:['Pseudocódigo','Código fuente','Diagrama de flujo','Tabla de verdad'],c:2,exp:'El diagrama de flujo usa símbolos estándar (óvalos, rectángulos, rombos) para representar el flujo de un algoritmo.',img:''},
-        {p:'¿Cuál de estas NO es una característica de un buen algoritmo?',ops:['Finito','Preciso','Ambiguo','Efectivo'],c:2,exp:'Un buen algoritmo debe ser finito, preciso y efectivo. La ambigüedad lo hace incorrecto porque genera instrucciones confusas.',img:''},
-        {p:'¿En qué orden se ejecutan las instrucciones de un programa por defecto?',ops:['Aleatoriamente','De la última a la primera','De forma secuencial, de arriba hacia abajo','El programador lo decide en cada caso'],c:2,exp:'La ejecución secuencial es el flujo por defecto: las instrucciones se ejecutan de arriba hacia abajo en orden.',img:''},
-        {p:'¿Qué representa el pseudocódigo?',ops:['Código listo para ejecutar en Python','Una descripción informal de un algoritmo en lenguaje natural','Un tipo de compilador','El resultado final de un programa'],c:1,exp:'El pseudocódigo describe los pasos de un algoritmo en lenguaje natural estructurado, sin seguir la sintaxis exacta de ningún lenguaje.',img:''}
-      ]
-    },
+        {tipo:'def',preg:'¿Qué es la programación en C?',
+         resp:'C es un lenguaje estructurado de propósito general. Todo programa parte de main(). Debes incluir stdio.h para usar printf y scanf. En C todo termina con punto y coma, y los bloques se delimitan con llaves {}.'},
+        {tipo:'formula',etiqueta:'Estructura mínima de un programa en C',
+         contenido:'#include <stdio.h>    // librería\n\nint main() {          // función principal\n    // tu código aquí\n    return 0;          // fin sin errores\n}',
+         nota:'Cada instrucción termina con ; · Los bloques se abren con { y se cierran con } · La indentación es convención, no obligatoria'},
+        {tipo:'cod',titulo:'Ejemplo 1 — Hola mundo en C',
+         lineas:[
+           ['cc','#include <stdio.h>   // librería para printf y scanf\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Hola, mundo!\\n"'],['cw',');  '],['cc','// imprime en pantalla\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';         '],['cc','// 0 = sin errores\n'],
+           ['cw','}']
+         ],
+         salida:'Hola, mundo!'},
+        {tipo:'cod2',titulo:'Ejemplo 2 — Variables y operación',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','a'],['cw',' = '],['cn','5'],['cw',', '],['cn','b'],['cw',' = '],['cn','3'],['cw',', '],['cn','suma'],['cw',';\n'],
+           ['cn','    suma'],['cw',' = '],['cn','a'],['cw',' + '],['cn','b'],['cw',';          '],['cc','// operación\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Resultado: %d\\n"'],['cw',', '],['cn','suma'],['cw',');\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'Resultado: 8'},
+        {tipo:'ejercicio',
+         enunciado:'Escribe un programa en C que calcule el área de un rectángulo (largo=8, ancho=5) y lo imprima.',
+         solucion:{
+           lineas:[
+             ['cc','#include <stdio.h>\n\n'],
+             ['k','int '],['cn','main'],['cw','() {\n'],
+             ['cw','    '],['k','int '],['cn','largo'],['cw',' = '],['cn','8'],['cw',', '],['cn','ancho'],['cw',' = '],['cn','5'],['cw',', '],['cn','area'],['cw',';\n'],
+             ['cn','    area'],['cw',' = '],['cn','largo'],['cw',' * '],['cn','ancho'],['cw',';\n'],
+             ['cw','    '],['cf','printf'],['cw','('],['cf','"Area: %d\\n"'],['cw',', '],['cn','area'],['cw',');\n'],
+             ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+             ['cw','}']
+           ],
+           salida:'Area: 40',
+           analisis:'Declara tres variables int. Multiplica largo por ancho. %d es el especificador para enteros en printf.'
+         }},
+        {tipo:'clave',texto:'Estructura mínima en C: #include <stdio.h> → int main() { } → return 0. printf usa especificadores: %d entero, %f flotante, %c carácter. scanf usa & antes del nombre de la variable.'}
+      ],reactivos:[]},
     { // Tema 1: Variables y tipos de datos
       fichas:[
-        {tipo:'def',preg:'¿Qué es una variable?',resp:'Una variable es un espacio de memoria con nombre que almacena información que puede cambiar durante la ejecución del programa. El tipo de dato define qué puede guardar y cuánto espacio ocupa.'},
-        {tipo:'cod',titulo:'Tipos de datos en Python',lineas:[
-          ['cc','# Entero — números sin decimales'],
-          ['cn','edad'],['cw',' = '],['cn','17\n'],
-          ['cc','# Flotante — números con decimales'],
-          ['cn','promedio'],['cw',' = '],['cn','9.5\n'],
-          ['cc','# Cadena — texto entre comillas'],
-          ['cn','nombre'],['cw',' = '],['cf','"Ana García"\n'],
-          ['cc','# Booleano — solo True o False'],
-          ['cn','aprobado'],['cw',' = '],['k','True']
-        ]},
-        {tipo:'clave',texto:'Python detecta el tipo automáticamente (tipado dinámico). Puedes verificar el tipo con type(variable). Los nombres de variables deben ser descriptivos y sin espacios.'}
-      ],
-      reactivos:[
-        {p:'¿Qué es una variable en programación?',ops:['Un valor que nunca cambia','Un espacio de memoria con nombre para guardar datos','Un tipo de error del programa','Un operador matemático'],c:1,exp:'Una variable es un espacio de memoria identificado por un nombre que puede cambiar su valor durante la ejecución.',img:''},
-        {p:'¿Qué tipo de dato corresponde a: promedio = 9.5?',ops:['int (entero)','str (cadena)','float (flotante)','bool (booleano)'],c:2,exp:'9.5 tiene decimales, por lo tanto es de tipo float (número de punto flotante).',img:''},
-        {p:'¿Qué tipo de dato corresponde a: aprobado = True?',ops:['int','str','float','bool'],c:3,exp:'True y False son los únicos valores posibles del tipo bool (booleano), que representa condiciones verdadero/falso.',img:''},
-        {p:'¿Cuál es un nombre de variable válido en Python?',ops:['2datos','mi variable','mi_dato','for'],c:2,exp:'mi_dato es válido. No puede empezar con número, no puede tener espacios y no puede ser una palabra reservada como for.',img:''},
-        {p:'¿Qué función de Python dice de qué tipo es una variable?',ops:['typeOf()','typeof()','type()','getType()'],c:2,exp:'type(variable) devuelve el tipo de dato. Ejemplo: type(3.14) devuelve <class "float">.',img:''}
-      ]
-    },
-    { // Tema 2: Estructuras if / else
+        {tipo:'def',preg:'¿Qué son las variables y tipos de datos en C?',
+         resp:'Una variable es un espacio en memoria con nombre. En C debes declarar el tipo antes de usarla. Tipos principales: int (enteros sin decimales), float (con decimales), char (un carácter entre comillas simples), double (mayor precisión que float).'},
+        {tipo:'formula',etiqueta:'Sintaxis',
+         contenido:'tipo  nombre = valor;\n\nint    edad     = 17;\nfloat  promedio = 9.5;\nchar   inicial  = \'C\';',
+         nota:'El tipo siempre va primero. El valor es opcional al declarar. Termina con punto y coma.'},
+        {tipo:'cod',titulo:'Ejemplo 1 — Tipos de datos y printf',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int    '],['cn','edad'],['cw','    = '],['cn','17'],['cw',';     '],['cc','// entero\n'],
+           ['cw','    '],['k','float  '],['cn','promedio'],['cw',' = '],['cn','9.5'],['cw',';   '],['cc','// decimal\n'],
+           ['cw','    '],['k','char   '],['cn','inicial'],['cw',' = '],['cf',"'C'"],['cw',';   '],['cc','// carácter\n\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Edad: %d\\n"'],['cw',',     '],['cn','edad'],['cw',');\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Promedio: %.1f\\n"'],['cw',', '],['cn','promedio'],['cw',');\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Inicial: %c\\n"'],['cw','  , '],['cn','inicial'],['cw',');\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'Edad: 17\nPromedio: 9.5\nInicial: C'},
+        {tipo:'cod2',titulo:'Ejemplo 2 — Leer datos con scanf',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','n1'],['cw',', '],['cn','n2'],['cw',', '],['cn','res'],['cw',';\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Dos números: "'],['cw',');\n'],
+           ['cw','    '],['cf','scanf'],['cw','('],['cf','"%d %d"'],['cw',', &'],['cn','n1'],['cw',', &'],['cn','n2'],['cw',');  '],['cc','// & = dirección\n'],
+           ['cn','    res'],['cw',' = '],['cn','n1'],['cw',' + '],['cn','n2'],['cw',';\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Suma: %d\\n"'],['cw',', '],['cn','res'],['cw',');\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'Dos números: 4 7\nSuma: 11'},
+        {tipo:'ejercicio',
+         enunciado:'Declara una variable float para calificación y una int para semestre. Asígnales valores e imprímelos.',
+         solucion:{
+           lineas:[
+             ['cc','#include <stdio.h>\n\n'],
+             ['k','int '],['cn','main'],['cw','() {\n'],
+             ['cw','    '],['k','float '],['cn','cal'],['cw',' = '],['cn','8.5'],['cw',';\n'],
+             ['cw','    '],['k','int   '],['cn','sem'],['cw',' = '],['cn','3'],['cw',';\n'],
+             ['cw','    '],['cf','printf'],['cw','('],['cf','"Calificacion: %.1f\\n"'],['cw',', '],['cn','cal'],['cw',');\n'],
+             ['cw','    '],['cf','printf'],['cw','('],['cf','"Semestre: %d\\n"'],['cw','  , '],['cn','sem'],['cw',');\n'],
+             ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+             ['cw','}']
+           ],
+           salida:'Calificacion: 8.5\nSemestre: 3',
+           analisis:'float para calificación porque puede tener decimales (%.1f). int para semestre porque es entero (%d). scanf necesita & antes de la variable.'
+         }},
+        {tipo:'clave',texto:'int para enteros, float para decimales, char para un carácter (comillas simples). scanf usa & para indicar dónde guardar el valor. %d para int, %.2f para float con 2 decimales, %c para char.'}
+      ],reactivos:[]},
+    { // Tema 2: Estructuras if/else
       fichas:[
-        {tipo:'def',preg:'¿Qué es una estructura condicional?',resp:'Una estructura condicional evalúa una expresión lógica y ejecuta un bloque de código si es verdadera (if) y otro diferente si es falsa (else). Permite que el programa tome decisiones.'},
-        {tipo:'cod',titulo:'if / elif / else en Python',lineas:[
-          ['cn','nota'],['cw',' = '],['cn','8.5\n\n'],
-          ['k','if '],['cn','nota'],['cw',' >= '],['cn','9'],['cw',': \n'],
-          ['cw','    '],['cf','print'],['cw','("Excelente")\n'],
-          ['k','elif '],['cn','nota'],['cw',' >= '],['cn','7'],['cw',':\n'],
-          ['cw','    '],['cf','print'],['cw','("Aprobado")  '],['cc','# ← ejecuta este\n'],
-          ['k','else'],['cw',':\n'],
-          ['cw','    '],['cf','print'],['cw','("Reprobado")']
-        ]},
-        {tipo:'clave',texto:'El bloque else es opcional. Se pueden encadenar múltiples condiciones con elif. Python usa indentación (espacios) para definir los bloques de código — es obligatoria y debe ser consistente.'}
-      ],
-      reactivos:[
-        {p:'if x > 10: print("mayor") — Si x = 10, ¿qué imprime el programa?',ops:['"mayor"','Nada — la condición es falsa','Error de sintaxis','"10"'],c:1,exp:'x=10 no es mayor que 10, es igual. La condición x>10 es False, por lo que no se ejecuta el print.',img:''},
-        {p:'¿Para qué sirve el bloque else?',ops:['Para repetir código','Para ejecutar código cuando la condición del if es falsa','Para declarar variables','Para terminar el programa'],c:1,exp:'else contiene el código que se ejecuta cuando la condición del if evalúa como False.',img:''},
-        {p:'nota=8. if nota>=9: A elif nota>=7: B else: C — ¿Qué se ejecuta?',ops:['Solo A','Solo B — porque 8 >= 7','Solo C','A y B'],c:1,exp:'nota=8 no cumple nota>=9 (falso), pero sí cumple nota>=7 (verdadero), por lo que se ejecuta B.',img:''},
-        {p:'¿Qué símbolo se usa en Python para comparar si dos valores son iguales?',ops:['=','!=','==','>='],c:2,exp:'== es el operador de comparación de igualdad. Un solo = es asignación (guardar un valor).',img:''},
-        {p:'¿Cuántos elif puede tener una estructura if en Python?',ops:['Solo uno','Máximo tres','Ninguno obligatoriamente — pueden ser los que se necesiten','Exactamente dos'],c:2,exp:'Se puede tener cualquier número de elif. No hay límite, aunque demasiados pueden hacer el código difícil de leer.',img:''}
-      ]
-    },
+        {tipo:'def',preg:'¿Qué son las estructuras condicionales en C?',
+         resp:'if ejecuta un bloque cuando la condición es verdadera (distinta de cero). else se ejecuta cuando es falsa. else if permite evaluar condiciones adicionales. Los operadores de comparación son: == (igual), != (diferente), >, <, >=, <=. El = asigna, el == compara.'},
+        {tipo:'formula',etiqueta:'Sintaxis',
+         contenido:'if (condicion) {\n    // si es verdadera\n} else if (otra) {\n    // segunda opción\n} else {\n    // si ninguna se cumplió\n}',
+         nota:'Operadores: == igual · != diferente · > mayor · < menor · >= mayor o igual · <= menor o igual'},
+        {tipo:'cod',titulo:'Ejemplo 1 — Calificación con if/else if/else',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','float '],['cn','cal'],['cw',' = '],['cn','8.5'],['cw',';\n\n'],
+           ['cw','    '],['k','if '],['cw','('],['cn','cal'],['cw',' >= '],['cn','9.0'],['cw',') {\n'],
+           ['cw','        '],['cf','printf'],['cw','('],['cf','"Excelente\\n"'],['cw',');\n'],
+           ['cw','    } '],['k','else if '],['cw','('],['cn','cal'],['cw',' >= '],['cn','7.0'],['cw',') {\n'],
+           ['cw','        '],['cf','printf'],['cw','('],['cf','"Aprobado\\n"'],['cw',');  '],['cc','// ← 8.5 >= 7.0\n'],
+           ['cw','    } '],['k','else'],['cw',' {\n'],
+           ['cw','        '],['cf','printf'],['cw','('],['cf','"Reprobado\\n"'],['cw',');\n'],
+           ['cw','    }\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'Aprobado'},
+        {tipo:'cod2',titulo:'Ejemplo 2 — Número positivo, negativo o cero',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','n'],['cw',' = '],['cn','-4'],['cw',';\n\n'],
+           ['cw','    '],['k','if '],['cw','('],['cn','n'],['cw',' > '],['cn','0'],['cw',')        '],['cf','printf'],['cw','('],['cf','"Positivo\\n"'],['cw',');\n'],
+           ['cw','    '],['k','else if '],['cw','('],['cn','n'],['cw',' < '],['cn','0'],['cw',')  '],['cf','printf'],['cw','('],['cf','"Negativo\\n"'],['cw',');  '],['cc','// ← se ejecuta\n'],
+           ['cw','    '],['k','else'],['cw','               '],['cf','printf'],['cw','('],['cf','"Cero\\n"'],['cw',');\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'Negativo'},
+        {tipo:'ejercicio',
+         enunciado:'Escribe un programa que determine si un número es par o impar usando el operador % (módulo: si num%2==0 es par).',
+         solucion:{
+           lineas:[
+             ['cc','#include <stdio.h>\n\n'],
+             ['k','int '],['cn','main'],['cw','() {\n'],
+             ['cw','    '],['k','int '],['cn','num'],['cw',' = '],['cn','7'],['cw',';\n\n'],
+             ['cw','    '],['k','if '],['cw','('],['cn','num'],['cw',' % '],['cn','2'],['cw',' == '],['cn','0'],['cw',')\n'],
+             ['cw','        '],['cf','printf'],['cw','('],['cf','"%d es par\\n"'],['cw',', '],['cn','num'],['cw',');\n'],
+             ['cw','    '],['k','else\n'],
+             ['cw','        '],['cf','printf'],['cw','('],['cf','"%d es impar\\n"'],['cw',', '],['cn','num'],['cw',');  '],['cc','// 7%2=1\n'],
+             ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+             ['cw','}']
+           ],
+           salida:'7 es impar',
+           analisis:'% devuelve el residuo de la división. 7%2=1 (impar). 8%2=0 (par). Se usa %d en printf para imprimir el valor de num junto con el texto.'
+         }},
+        {tipo:'clave',texto:'Nunca uses = dentro de un if, siempre ==. Las llaves {} son opcionales si el bloque tiene solo una instrucción, pero es buena práctica usarlas siempre. Los operadores lógicos en C son && (AND), || (OR), ! (NOT).'}
+      ],reactivos:[]},
     { // Tema 3: Ciclos for
       fichas:[
-        {tipo:'def',preg:'¿Qué es un ciclo for?',resp:'El ciclo for repite un bloque de código para cada elemento de una secuencia (lista, rango, texto). Se usa cuando se conoce de antemano el número de repeticiones o se quiere recorrer una colección.'},
-        {tipo:'cod',titulo:'for con range() en Python',lineas:[
-          ['cc','# range(fin) — del 0 al fin-1'],
-          ['k','for '],['cn','i'],['cw',' in '],['cf','range'],['cw','('],['cn','5'],['cw','):\n'],
-          ['cw','    '],['cf','print'],['cw','(i)  '],['cc','# imprime: 0 1 2 3 4\n\n'],
-          ['cc','# range(inicio, fin, paso)'],
-          ['k','for '],['cn','i'],['cw',' in '],['cf','range'],['cw','('],['cn','2'],['cw',', '],['cn','10'],['cw',', '],['cn','2'],['cw','):\n'],
-          ['cw','    '],['cf','print'],['cw','(i)  '],['cc','# imprime: 2 4 6 8']
-        ]},
-        {tipo:'clave',texto:'range(fin) empieza en 0. range(inicio, fin) el fin es exclusivo (no se incluye). range(inicio, fin, paso) controla de cuánto en cuánto avanza el contador. break termina el ciclo anticipadamente.'}
-      ],
-      reactivos:[
-        {p:'for i in range(4): ¿cuántas veces se ejecuta el ciclo?',ops:['3 veces','4 veces','5 veces','Depende del valor de i'],c:1,exp:'range(4) genera los valores 0,1,2,3 — cuatro iteraciones. El 4 no se incluye.',img:''},
-        {p:'range(2, 8, 2) genera los valores:',ops:['2, 4, 6, 8','2, 4, 6','0, 2, 4, 6','2, 3, 4, 5, 6, 7'],c:1,exp:'Empieza en 2, avanza de 2 en 2, y para antes de llegar a 8. Genera: 2, 4, 6.',img:''},
-        {p:'¿Cuándo conviene usar for en vez de while?',ops:['Cuando no se sabe cuántas veces repetir','Cuando el número de repeticiones es conocido o se recorre una colección','Cuando hay un error en el programa','Siempre — for es mejor que while'],c:1,exp:'for es ideal cuando el número de iteraciones es conocido o cuando se recorre una secuencia. while es para condiciones indefinidas.',img:''},
-        {p:'¿Qué instrucción termina un ciclo for antes de completarse?',ops:['stop','end','break','exit'],c:2,exp:'break interrumpe el ciclo inmediatamente y la ejecución continúa con el código que viene después del for.',img:''},
-        {p:'for i in range(1, 6): print(i) — ¿Cuál es el último valor que imprime?',ops:['6','5','4','1'],c:1,exp:'range(1,6) genera 1,2,3,4,5. El 6 no se incluye porque el fin es exclusivo.',img:''}
-      ]
-    },
+        {tipo:'def',preg:'¿Cómo funciona el ciclo for en C?',
+         resp:'for (inicialización; condición; actualización) — las tres partes van separadas por punto y coma. La inicialización se ejecuta una sola vez. La condición se verifica antes de cada vuelta. La actualización se ejecuta al final de cada vuelta. El ciclo para cuando la condición es falsa (igual a cero).'},
+        {tipo:'formula',etiqueta:'Sintaxis',
+         contenido:'for (inicio; condicion; actualizacion) {\n    // bloque a repetir\n}\n\n// Ejemplo:\nfor (i = 0; i < 10; i++) { ... }',
+         nota:'i++ incrementa en 1 · i-- decrementa · i+=2 incrementa en 2 · break termina el ciclo'},
+        {tipo:'cod',titulo:'Ejemplo 1 — Contador del 1 al 5',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','i'],['cw',';\n\n'],
+           ['cw','    '],['k','for '],['cw','('],['cn','i'],['cw',' = '],['cn','1'],['cw','; '],['cn','i'],['cw',' <= '],['cn','5'],['cw','; '],['cn','i'],['cw','++) {\n'],
+           ['cc','    //   ↑ inicio  ↑ condición   ↑ incremento\n'],
+           ['cw','        '],['cf','printf'],['cw','('],['cf','"%d\\n"'],['cw',', '],['cn','i'],['cw',');\n'],
+           ['cw','    }\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'1\n2\n3\n4\n5'},
+        {tipo:'cod2',titulo:'Ejemplo 2 — Suma acumulada del 1 al 10',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','i'],['cw',', '],['cn','suma'],['cw',' = '],['cn','0'],['cw',';\n\n'],
+           ['cw','    '],['k','for '],['cw','('],['cn','i'],['cw',' = '],['cn','1'],['cw','; '],['cn','i'],['cw',' <= '],['cn','10'],['cw','; '],['cn','i'],['cw','++) {\n'],
+           ['cw','        '],['cn','suma'],['cw',' += '],['cn','i'],['cw',';  '],['cc','// += acumula: 0+1, 1+2, 3+3...\n'],
+           ['cw','    }\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Suma 1 al 10: %d\\n"'],['cw',', '],['cn','suma'],['cw',');\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'Suma 1 al 10: 55'},
+        {tipo:'ejercicio',
+         enunciado:'Escribe un programa que imprima la tabla de multiplicar del 7 (del 7x1 al 7x10). Formato: "7 x 1 = 7".',
+         solucion:{
+           lineas:[
+             ['cc','#include <stdio.h>\n\n'],
+             ['k','int '],['cn','main'],['cw','() {\n'],
+             ['cw','    '],['k','int '],['cn','i'],['cw',';\n'],
+             ['cw','    '],['k','for '],['cw','('],['cn','i'],['cw',' = '],['cn','1'],['cw','; '],['cn','i'],['cw',' <= '],['cn','10'],['cw','; '],['cn','i'],['cw','++) {\n'],
+             ['cw','        '],['cf','printf'],['cw','('],['cf','"7 x %d = %d\\n"'],['cw',', '],['cn','i'],['cw',', '],['cn','7'],['cw','*'],['cn','i'],['cw',');\n'],
+             ['cw','    }\n'],
+             ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+             ['cw','}']
+           ],
+           salida:'7 x 1 = 7\n7 x 2 = 14\n...\n7 x 10 = 70',
+           analisis:'Dos especificadores %d en el mismo printf. El primero recibe i (el multiplicador) y el segundo recibe 7*i (el producto). La expresión 7*i se calcula directamente en printf.'
+         }},
+        {tipo:'clave',texto:'i++ es equivalente a i = i+1. i-- decrementa. i+=2 incrementa en 2. El cuerpo del for solo se ejecuta mientras la condición sea verdadera. break termina el ciclo anticipadamente. continue salta al siguiente ciclo.'}
+      ],reactivos:[]},
     { // Tema 4: Ciclos while
       fichas:[
-        {tipo:'def',preg:'¿Qué es un ciclo while?',resp:'Un ciclo while repite un bloque de código mientras una condición sea verdadera. Se usa cuando no se sabe de antemano cuántas veces se necesita repetir.'},
-        {tipo:'cod',titulo:'while en Python — ejemplo práctico',lineas:[
-          ['cn','contador'],['cw',' = '],['cn','0\n'],
-          ['k','while '],['cn','contador'],['cw',' < '],['cn','5'],['cw',':\n'],
-          ['cw','    '],['cf','print'],['cw','("Vuelta", '],['cn','contador'],['cw',')\n'],
-          ['cn','    contador'],['cw',' += '],['cn','1  '],['cc','# IMPORTANTE: modificar la variable\n\n'],
-          ['cc','# Resultado: Vuelta 0, Vuelta 1, Vuelta 2, Vuelta 3, Vuelta 4']
-        ]},
-        {tipo:'clave',texto:'Si la condición nunca llega a ser falsa, el ciclo es infinito y el programa se cuelga. Siempre modifica la variable de control dentro del ciclo. break termina el ciclo inmediatamente.'}
-      ],
-      reactivos:[
-        {p:'contador=0; while contador<3: contador+=1 — ¿Cuántas veces itera?',ops:['2 veces','3 veces','4 veces','Infinitamente'],c:1,exp:'contador toma los valores 0, 1, 2. Cuando llega a 3 la condición contador<3 es False. Total: 3 iteraciones.',img:''},
-        {p:'¿Qué instrucción termina un ciclo while de inmediato?',ops:['stop','break','exit','return'],c:1,exp:'break termina el ciclo y la ejecución continúa con el código posterior al bloque while.',img:''},
-        {p:'i=10; while i>0: i-=3; print(i) — ¿Qué imprime?',ops:['1','-2','0','Error'],c:1,exp:'i toma los valores: 10→7→4→1→-2. Cuando i=-2 la condición i>0 es False. El print está fuera del ciclo, imprime -2.',img:''},
-        {p:'¿Cuál es la diferencia principal entre for y while?',ops:['for es más rápido','for itera número definido; while repite mientras condición sea verdadera','while solo funciona con números','No hay diferencia práctica'],c:1,exp:'for itera sobre una secuencia conocida. while repite mientras se cumpla una condición que puede depender de eventos externos.',img:''},
-        {p:'¿Qué problema causa no modificar la variable de control en un while?',ops:['El programa termina inmediatamente','Se genera un ciclo infinito','La variable se reinicia sola','Se produce un error de sintaxis'],c:1,exp:'Si la variable de control no cambia, la condición siempre será verdadera y el ciclo nunca terminará (ciclo infinito).',img:''}
-      ]
-    },
+        {tipo:'def',preg:'¿Cuándo usar while en lugar de for en C?',
+         resp:'while se usa cuando el número de repeticiones no se conoce de antemano, o cuando la condición depende de factores externos (como entrada del usuario). La estructura es simple: while (condición) { bloque }. Es obligatorio modificar la variable de control dentro del bloque para evitar ciclos infinitos.'},
+        {tipo:'formula',etiqueta:'Sintaxis',
+         contenido:'while (condicion) {\n    // bloque a repetir\n    // MODIFICAR variable de control\n}\n\n// do-while (ejecuta al menos una vez):\ndo { ... } while (condicion);',
+         nota:'Diferencia con for: while cuando no sabes cuántas veces repetir. Siempre modifica la variable de control.'},
+        {tipo:'cod',titulo:'Ejemplo 1 — Contador con while',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','c'],['cw',' = '],['cn','0'],['cw',';            '],['cc','// variable de control\n\n'],
+           ['cw','    '],['k','while '],['cw','('],['cn','c'],['cw',' < '],['cn','5'],['cw',') {          '],['cc','// mientras c sea menor que 5\n'],
+           ['cw','        '],['cf','printf'],['cw','('],['cf','"%d\\n"'],['cw',', '],['cn','c'],['cw',');\n'],
+           ['cw','        '],['cn','c'],['cw','++;              '],['cc','// SIEMPRE modificar la variable\n'],
+           ['cw','    }\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'0\n1\n2\n3\n4'},
+        {tipo:'cod2',titulo:'Ejemplo 2 — Cuenta regresiva con while',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','n'],['cw',' = '],['cn','5'],['cw',';\n\n'],
+           ['cw','    '],['k','while '],['cw','('],['cn','n'],['cw',' >= '],['cn','0'],['cw',') {\n'],
+           ['cw','        '],['cf','printf'],['cw','('],['cf','"%d\\n"'],['cw',', '],['cn','n'],['cw',');\n'],
+           ['cw','        '],['cn','n'],['cw','--;  '],['cc','// decrementa\n'],
+           ['cw','    }\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"Despegue!\\n"'],['cw',');  '],['cc','// después del ciclo\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'5\n4\n3\n2\n1\n0\nDespegue!'},
+        {tipo:'ejercicio',
+         enunciado:'Escribe un programa con while que imprima los números pares del 2 al 20 (2, 4, 6, ... 20).',
+         solucion:{
+           lineas:[
+             ['cc','#include <stdio.h>\n\n'],
+             ['k','int '],['cn','main'],['cw','() {\n'],
+             ['cw','    '],['k','int '],['cn','par'],['cw',' = '],['cn','2'],['cw',';\n\n'],
+             ['cw','    '],['k','while '],['cw','('],['cn','par'],['cw',' <= '],['cn','20'],['cw',') {\n'],
+             ['cw','        '],['cf','printf'],['cw','('],['cf','"%d\\n"'],['cw',', '],['cn','par'],['cw',');\n'],
+             ['cw','        '],['cn','par'],['cw',' += '],['cn','2'],['cw',';  '],['cc','// salta de 2 en 2\n'],
+             ['cw','    }\n'],
+             ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+             ['cw','}']
+           ],
+           salida:'2\n4\n6\n8\n10\n12\n14\n16\n18\n20',
+           analisis:'par empieza en 2. par += 2 es equivalente a par = par + 2. Con <= 20 incluimos el 20. Si fuera < 20 el último valor sería 18.'
+         }},
+        {tipo:'clave',texto:'La diferencia clave entre for y while: for cuando sabes cuántas veces repetir; while cuando no. Si olvidas modificar la variable de control el programa se cuelga (ciclo infinito). do-while ejecuta el bloque al menos una vez antes de verificar la condición.'}
+      ],reactivos:[]},
     { // Tema 5: Arreglos y funciones
       fichas:[
-        {tipo:'def',preg:'¿Qué es una lista y qué es una función?',resp:'Una lista (arreglo) es una colección ordenada de elementos accesibles por índice. Una función es un bloque de código con nombre que realiza una tarea específica y puede reutilizarse.'},
-        {tipo:'cod',titulo:'Listas y funciones en Python',lineas:[
-          ['cc','# Lista — índices empiezan en 0'],
-          ['cn','notas'],['cw',' = ['],['cn','8.5'],['cw',', '],['cn','9'],['cw',', '],['cn','7.5'],['cw',', '],['cn','10'],['cw',']\n'],
-          ['cf','print'],['cw','(notas['],['cn','0'],['cw','])  '],['cc','# → 8.5 (primer elemento)\n'],
-          ['cn','notas'],['cw','.append('],['cn','9.5'],['cw',')  '],['cc','# agregar al final\n\n'],
-          ['cc','# Función — def + nombre + parámetros'],
-          ['k','def '],['cn','calcular_promedio'],['cw','(lista):\n'],
-          ['cw','    '],['k','return '],['cf','sum'],['cw','(lista) / '],['cf','len'],['cw','(lista)\n\n'],
-          ['cf','print'],['cw','(calcular_promedio(notas))  '],['cc','# → 8.9']
-        ]},
-        {tipo:'clave',texto:'Los índices de una lista empiezan en 0. len(lista) da el número de elementos. Las funciones reciben parámetros y devuelven un resultado con return. Evitan repetir código.'}
-      ],
-      reactivos:[
-        {p:'lista = [5, 10, 15, 20] — ¿Qué valor tiene lista[2]?',ops:['5','10','15','20'],c:2,exp:'El índice 0 es 5, el índice 1 es 10, el índice 2 es 15. Los índices empiezan en 0.',img:''},
-        {p:'¿Qué función devuelve la cantidad de elementos de una lista?',ops:['count()','size()','len()','length()'],c:2,exp:'len(lista) devuelve el número de elementos. Ejemplo: len([1,2,3]) → 3.',img:''},
-        {p:'def area(b, h): return (b * h) / 2 — area(6, 4) = ?',ops:['24','12','10','8'],c:1,exp:'area(6,4) = (6×4)/2 = 24/2 = 12. Es la fórmula del área de un triángulo.',img:''},
-        {p:'¿Para qué sirve la instrucción return en una función?',ops:['Imprimir en pantalla','Devolver un valor como resultado de la función','Declarar una variable','Terminar el programa'],c:1,exp:'return devuelve el resultado de la función al lugar donde fue llamada. Sin return, la función devuelve None.',img:''},
-        {p:'lista = [1, 2, 3]; lista.append(4) — ¿Cuántos elementos tiene ahora?',ops:['3','4','5','Error'],c:1,exp:'append() agrega un elemento al final de la lista. La lista tenía 3 elementos, ahora tiene 4: [1,2,3,4].',img:''}
-      ]
-    }
+        {tipo:'def',preg:'¿Qué son los arreglos y funciones en C?',
+         resp:'Un arreglo es una colección de variables del mismo tipo con índices que empiezan en 0. Se declara como: tipo nombre[tamaño]. Una función tiene tipo de retorno, nombre, parámetros y cuerpo. Permite reutilizar código. void se usa cuando no devuelve valor, int/float cuando sí devuelve.'},
+        {tipo:'formula',etiqueta:'Sintaxis',
+         contenido:'// Arreglo:\ntipo  nombre[tamaño] = {v1, v2, v3};\nint   notas[5]      = {8, 9, 7, 10, 6};\n\n// Función:\ntipo nombre(tipo param1, tipo param2) {\n    return valor;\n}',
+         nota:'Índices del arreglo empiezan en 0. notas[0]=primer elemento. Las funciones van antes de main() o se declara su prototipo.'},
+        {tipo:'cod',titulo:'Ejemplo 1 — Arreglo de notas',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['k','int '],['cn','notas'],['cw','['],['cn','5'],['cw','] = {'],['cn','8'],['cw',','],['cn','9'],['cw',','],['cn','7'],['cw',','],['cn','10'],['cw',','],['cn','6'],['cw','};\n'],
+           ['cw','    '],['k','int '],['cn','i'],['cw',';\n\n'],
+           ['cw','    '],['k','for '],['cw','('],['cn','i'],['cw',' = '],['cn','0'],['cw','; '],['cn','i'],['cw',' < '],['cn','5'],['cw','; '],['cn','i'],['cw','++) {\n'],
+           ['cw','        '],['cf','printf'],['cw','('],['cf','"Nota %d: %d\\n"'],['cw',', '],['cn','i'],['cw','+'],['cn','1'],['cw',', '],['cn','notas'],['cw','['],['cn','i'],['cw',']);\n'],
+           ['cw','    }\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'Nota 1: 8\nNota 2: 9\nNota 3: 7\nNota 4: 10\nNota 5: 6'},
+        {tipo:'cod2',titulo:'Ejemplo 2 — Función que suma dos números',
+         lineas:[
+           ['cc','#include <stdio.h>\n\n'],
+           ['k','int '],['cn','suma'],['cw','('],['k','int '],['cn','a'],['cw',', '],['k','int '],['cn','b'],['cw',') {  '],['cc','// tipo nombre(parámetros)\n'],
+           ['cw','    '],['k','return '],['cn','a'],['cw',' + '],['cn','b'],['cw',';\n'],
+           ['cw','}\n\n'],
+           ['k','int '],['cn','main'],['cw','() {\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"5+3 = %d\\n"'],['cw',', '],['cn','suma'],['cw','('],['cn','5'],['cw',','],['cn','3'],['cw','));  '],['cc','// llama la función\n'],
+           ['cw','    '],['cf','printf'],['cw','('],['cf','"10+7 = %d\\n"'],['cw',', '],['cn','suma'],['cw','('],['cn','10'],['cw',','],['cn','7'],['cw','));\n'],
+           ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+           ['cw','}']
+         ],
+         salida:'5+3 = 8\n10+7 = 17'},
+        {tipo:'ejercicio',
+         enunciado:'Escribe una función esPar(int n) que devuelva 1 si n es par o 0 si es impar. En main pruébala con 4 y 7.',
+         solucion:{
+           lineas:[
+             ['cc','#include <stdio.h>\n\n'],
+             ['k','int '],['cn','esPar'],['cw','('],['k','int '],['cn','n'],['cw',') {\n'],
+             ['cw','    '],['k','return '],['cn','n'],['cw',' % '],['cn','2'],['cw',' == '],['cn','0'],['cw',';  '],['cc','// 1 si par, 0 si impar\n'],
+             ['cw','}\n\n'],
+             ['k','int '],['cn','main'],['cw','() {\n'],
+             ['cw','    '],['cf','printf'],['cw','('],['cf','"4 par: %d\\n"'],['cw',', '],['cn','esPar'],['cw','('],['cn','4'],['cw','));\n'],
+             ['cw','    '],['cf','printf'],['cw','('],['cf','"7 par: %d\\n"'],['cw',', '],['cn','esPar'],['cw','('],['cn','7'],['cw','));\n'],
+             ['cw','    '],['k','return '],['cn','0'],['cw',';\n'],
+             ['cw','}']
+           ],
+           salida:'4 par: 1\n7 par: 0',
+           analisis:'La expresión n%2==0 se evalúa como 1 (verdadero) si hay residuo cero, o 0 (falso) si hay residuo. En C no existe bool, se usa int con 0=falso y cualquier otro valor=verdadero.'
+         }},
+        {tipo:'clave',texto:'notas[0] es el primer elemento, notas[4] el quinto de un arreglo de 5. Salirse del rango es un error grave en C. Las funciones deben declararse antes de main o usar un prototipo (declaración sin cuerpo). int suma(int a, int b); es un prototipo.'}
+      ],reactivos:[]}
   ],
-
   // ── CIRCUITOS ELECTRÓNICOS — Tema 0 de ejemplo ──────────
   ce:[
     { // Tema 0: Conceptos básicos de electricidad
@@ -826,7 +999,7 @@ let DATA = {
   materias:[],
   reactivosPorTema:{},
   recompensas:[
-    {id:'cita',n:'Cita de tutoría',s:'30 min con la docente (presencial o Meet)',ico:'🎓',pts:500,tipo:'cita',recurso:''},
+    {id:'cita',n:'Cita de tutoría',s:'30 min con la docente (presencial o Meet)',ico:'🎓',pts:150,tipo:'cita',recurso:''},
     {id:'punto',n:'Punto extra en calificación',s:'Se registra ante la docente (tope: 4 por semestre)',ico:'⭐',pts:1000,tipo:'punto',recurso:''},
     {id:'const_u',n:'Constancia de Unidad',s:'PDF automático al completar una unidad',ico:'📜',pts:0,tipo:'pdf',recurso:'gratis'},
     {id:'const_m',n:'Constancia de Módulo',s:'PDF automático al completar el módulo completo',ico:'🏆',pts:0,tipo:'pdf',recurso:'gratis'},
@@ -993,6 +1166,21 @@ function marcarTemaAprobado(matId, temaIdx){
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
   ST.progreso[matId].temasAprobados[temaIdx]=true;
   ST.progreso[matId].temas=Object.keys(ST.progreso[matId].temasAprobados).length;
+  // Enviar progreso al Sheets
+  const mat=DATA.materias.find(m=>m.id===matId);
+  enviarProgreso({
+    boleta:ST.boleta, grupo:ST.grupo, materia_id:matId,
+    tema_idx:temaIdx,
+    tema_nombre:mat?mat.temas[temaIdx]:'',
+    completado:true,
+    calificacion: ST.progreso[matId]?.ultimaCal || 0
+  });
+}
+
+async function enviarProgreso(p){
+  try{ await fetch(API_URL,{method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({accion:'progreso',...p})}); }catch(e){}
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1085,21 +1273,49 @@ async function doLogin(){
   if(!validarGrupo(g)){  showErr('li-err-grupo','li-grupo');   ok=false; } else clearErr('li-err-grupo','li-grupo');
   if(!ok) return;
   const btn=document.getElementById('btn-login');
-  btn.textContent='Sincronizando…'; btn.disabled=true;
+  btn.textContent='Verificando…'; btn.disabled=true;
+  // Validar boleta contra hoja Alumnos en Sheets
+  try{
+    const res=await Promise.race([
+      fetch(`${API_URL}?accion=alumno&boleta=${encodeURIComponent(b)}`),
+      new Promise((_,r)=>setTimeout(()=>r('timeout'),8000))
+    ]);
+    if(res!=='timeout'){
+      const json=await res.json();
+      if(json.ok && json.data){
+        const alumno=json.data;
+        if(!alumno.encontrado){
+          // Alumno no registrado
+          btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
+          const errEl=document.getElementById('li-err-boleta');
+          errEl.textContent='En esta etapa de prueba, SDGo! solo está disponible para alumnos inscritos. Verifica tu boleta o contacta a tu docente.';
+          errEl.classList.add('show');
+          return;
+        }
+        // Guardar nombre del alumno desde Sheets
+        const nombreCompleto=[alumno.nombre, alumno.apellido_p, alumno.apellido_m].filter(Boolean).join(' ');
+        if(nombreCompleto) ST.nombre=nombreCompleto;
+        // Si el Sheets tiene materias asignadas y el alumno no tiene localmente, usarlas
+        if(alumno.materiasInscritas&&alumno.materiasInscritas.length&&(!ST.inscritas||!ST.inscritas.length)){
+          ST.inscritas=alumno.materiasInscritas;
+        }
+      }
+    }
+  }catch(e){ console.warn('Validación alumno:', e.message); }
   ST.boleta=b; ST.grupo=g;
   loadAlumno(b);
-  // Registrar primer login del día si no existe
-  const hoyLogin = fechaHoy();
-  if(ST.fechaHoy !== hoyLogin || !ST.primerLoginHoy){
-    ST.fechaHoy = hoyLogin;
-    ST.primerLoginHoy = ST.primerLoginHoy || Date.now();
-    if(ST.fechaHoy !== hoyLogin) ST.tiempoHoy = 0;
+  if(ST.nombre) { /* mantener nombre del Sheets */ } 
+  const hoyLogin=fechaHoy();
+  if(ST.fechaHoy!==hoyLogin||!ST.primerLoginHoy){
+    ST.fechaHoy=hoyLogin;
+    ST.primerLoginHoy=ST.primerLoginHoy||Date.now();
+    if(ST.fechaHoy!==hoyLogin) ST.tiempoHoy=0;
   }
   save();
+  btn.textContent='Cargando…'; 
   await sincronizarProgreso(b);
   btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
-  actualizarRacha();
-  iniciarTimer();
+  actualizarRacha(); iniciarTimer();
   if(!ST.inscritas||!ST.inscritas.length){ renderSel(); navTo('v-sel'); }
   else { renderDash(); navRoot('v-dash'); }
 }
@@ -1143,6 +1359,21 @@ function clearErr(eid,iid){ document.getElementById(eid).classList.remove('show'
 // ═══════════════════════════════════════════════════════
 // CERRAR SESIÓN
 // ═══════════════════════════════════════════════════════
+function autoeval(temaIdx, resultado, btn){
+  // Marcar botón seleccionado
+  btn.parentElement.querySelectorAll('.ae-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  // Guardar en localStorage
+  if(!ST.autoevals) ST.autoevals={};
+  const key=`${curMat?.id||''}_t${temaIdx}`;
+  ST.autoevals[key]=resultado;
+  save();
+  // Enviar al Sheets (sin bloquear UI)
+  try{ fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({accion:'autoeval',boleta:ST.boleta,grupo:ST.grupo,
+      materia_id:curMat?.id,tema_idx:temaIdx,resultado})}); }catch(e){}
+}
+
 function cerrarSesion(){
   detenerTimer();
   ST.boleta=''; ST.grupo=''; ST.nombre=''; ST.curp=''; ST.email='';
@@ -1201,7 +1432,8 @@ function confirmarSel(){
 function renderDash(){
   const nombre=ST.nombre||`Grupo ${ST.grupo}`;
   document.getElementById('db-saludo').textContent=`Hola, ${nombre.split(' ')[0]}`;
-  document.getElementById('db-name').textContent=`${ST.boleta} · ${ST.grupo}`;
+  const nombreMostrar = ST.nombre ? ST.nombre.split(' ')[0] : ST.boleta;
+  document.getElementById('db-name').textContent=`${nombreMostrar} · ${ST.grupo}`;
   const inscritas=DATA.materias.filter(m=>ST.inscritas.includes(m.id));
   let total=0,comp=0;
   inscritas.forEach(m=>{total+=(m.temas?.length||0);comp+=(ST.progreso[m.id]?.temas||0);});
@@ -1281,7 +1513,17 @@ function abrirGuia(){
   const temaGuias = GUIAS[curMat.id] || [];
   const temaData  = temaGuias[temaIdx];
   if(!temaData || !temaData.fichas || !temaData.fichas.length){
-    toast('🚧 Contenido en construcción — próximamente disponible');
+    // Mostrar pantalla de construcción en lugar de toast
+    document.getElementById('g-mat-s').textContent=`${curMat.nombre}`;
+    document.getElementById('g-tema-t').textContent=temaNombre;
+    const cont=document.getElementById('g-content');
+    cont.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;gap:16px;text-align:center">
+      <div style="font-size:48px">🚧</div>
+      <div style="font-size:16px;font-weight:700;color:var(--nv)">Contenido en construcción</div>
+      <div style="font-size:13px;color:var(--ts);line-height:1.6">El tema <strong>${temaNombre}</strong> estará disponible próximamente.<br>Por ahora practica los temas disponibles.</div>
+      <button class="btn btn-s" onclick="navBack()" style="margin-top:8px">‹ Regresar</button>
+    </div>`;
+    navTo('v-guia');
     return;
   }
   const temaNombre = curMat.temas[temaIdx] || 'Guía de estudio';
@@ -1289,15 +1531,63 @@ function abrirGuia(){
   document.getElementById('g-tema-t').textContent=temaNombre;
   const cont=document.getElementById('g-content');
   cont.innerHTML='<div style="height:10px"></div>';
-  temaData.fichas.forEach(b=>{
+  temaData.fichas.forEach((b,bi)=>{
     if(b.tipo==='def'){
       cont.innerHTML+=`<div class="def-box"><h4>${b.preg}</h4><p>${b.resp}</p></div>`;
-    } else if(b.tipo==='cod'){
+    } else if(b.tipo==='cod'||b.tipo==='cod2'){
       let ch='';
       b.lineas.forEach(([t,tx])=>{ ch+=`<span class="${t}">${tx.replace(/\n/g,'<br>')}</span>`; });
-      cont.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;padding:8px 12px 3px;text-transform:uppercase;letter-spacing:.5px">${b.titulo}</div><div class="code-box"><div class="cl">${ch}</div></div>`;
+      const salidaHtml = b.salida
+        ? `<div class="cod-salida"><div class="cod-salida-lbl">Salida en pantalla</div><pre>${b.salida}</pre></div>`
+        : '';
+      cont.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;padding:8px 12px 3px;text-transform:uppercase;letter-spacing:.5px">${b.titulo}</div><div class="code-box" style="border-radius:var(--rad-s) var(--rad-s) 0 0;margin-bottom:0"><div class="cl">${ch}</div></div>${salidaHtml}`;
     } else if(b.tipo==='clave'){
       cont.innerHTML+=`<div class="key-box"><h4>💡 Punto clave</h4><p>${b.texto}</p></div>`;
+    } else if(b.tipo==='formula'){
+      // Bloque flexible: Sintaxis / Fórmula / Instrucción / Expresión — según la materia
+      const nota = b.nota ? `<div class="formula-nota">${b.nota}</div>` : '';
+      cont.innerHTML+=`<div class="formula-box">
+        <div class="formula-lbl">${b.etiqueta||'Sintaxis'}</div>
+        <div class="formula-txt">${b.contenido}</div>
+        ${nota}
+      </div>`;
+    } else if(b.tipo==='imagen'){
+      // Imagen desde URL — con caption y explicación opcionales
+      const cap  = b.caption     ? `<div class="img-box-cap">${b.caption}</div>` : '';
+      const expl = b.explicacion ? `<div class="img-box-expl">${b.explicacion}</div>` : '';
+      const sim  = b.simulador   ? `<a href="${b.simulador}" target="_blank" class="img-box-link">🔗 Abrir simulador interactivo</a>` : '';
+      cont.innerHTML+=`<div class="img-box">
+        ${b.titulo?`<div class="img-box-lbl">${b.titulo}</div>`:''}
+        <img src="${b.url}" alt="${b.caption||'Diagrama'}" loading="lazy" onerror="this.parentElement.style.display='none'">
+        ${cap}${expl}${sim}
+      </div>`;
+    } else if(b.tipo==='ejercicio'){
+      const solId='sol-'+bi;
+      const sol = b.solucion || '';
+      let solCode=''; 
+      if(sol.lineas){
+        sol.lineas.forEach(([t,tx])=>{ solCode+=`<span class="${t}">${tx.replace(/\n/g,'<br>')}</span>`; });
+      }
+      const salidaSol = sol.salida?`<div class="cod-salida"><div class="cod-salida-lbl">Salida</div><pre>${sol.salida}</pre></div>`:'';
+      cont.innerHTML+=`<div class="ej-box">
+        <h4>✏️ Practica tú mismo</h4>
+        <p class="ej-enunciado">${b.enunciado}</p>
+        <a href="https://www.onlinegdb.com/online_c_compiler" target="_blank" class="btn-compiler">💻 Abrir compilador en línea</a>
+        <br>
+        <button class="btn-sol" onclick="document.getElementById('${solId}').classList.toggle('show');this.textContent=this.textContent.includes('▼')?'Ocultar solución ▲':'Ver solución ▼'">Ver solución ▼</button>
+        <div class="sol-box" id="${solId}">
+          <div style="font-size:10px;color:var(--ts);font-weight:700;padding:4px 0 3px;text-transform:uppercase;letter-spacing:.5px">Solución propuesta</div>
+          ${solCode?`<div class="code-box" style="margin:0 0 0"><div class="cl">${solCode}</div></div>`:''}
+          ${salidaSol}
+          ${sol.analisis?`<div class="sol-analisis">📝 ${sol.analisis}</div>`:''}
+        </div>
+        <div class="autoeval">
+          <p>¿Cómo te fue?</p>
+          <button class="ae-btn" onclick="autoeval('${temaIdx}','solo',this)">✅ Lo logré solo</button>
+          <button class="ae-btn" onclick="autoeval('${temaIdx}','ayuda',this)">🤔 Necesité ayuda</button>
+          <button class="ae-btn" onclick="autoeval('${temaIdx}','no',this)">❌ No lo intenté</button>
+        </div>
+      </div>`;
     }
   });
   // Puntos por ficha — una vez por tema
@@ -1312,6 +1602,12 @@ function abrirGuia(){
   } else {
     cont.innerHTML+=`<div class="ficha-check" style="opacity:.6"><p>📖 Ficha ya completada — Tema ${temaIdx+1}</p><div class="fc-pts">+10 ✓</div></div>`;
   }
+  // Agregar botón de descarga PDF si hay URL disponible
+  const pdfUrl = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.pdf_url || '';
+  const btnPdf = pdfUrl
+    ? `<a href="${pdfUrl}" target="_blank" class="btn-ficha-pdf">📥 Descargar ficha PDF</a>`
+    : `<button class="btn-ficha-pdf" onclick="generarFichaPDFApp('${temaIdx}','${temaNombre}')">📥 Descargar ficha PDF</button>`;
+  cont.innerHTML+=`<div style="padding:0 12px 6px">${btnPdf}</div>`;
   cont.innerHTML+=`<div class="g-nav">
     <button onclick="navBack()">‹ Volver</button>
     <button class="g-main" onclick="iniciarCuestionario()">Practicar ✏️</button>
@@ -1406,6 +1702,8 @@ function finalizarQuiz(){
   const perfecto=quiz.correctas===total;
   const pts=calcularPuntosQuiz(quiz.correctas,total,matId,temaActual);
   ST.puntos+=pts;
+  if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
+  ST.progreso[matId].ultimaCal = pct; // guardar para enviarProgreso
   // Registrar intento y avance
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
   if(!ST.progreso[matId].intentos) ST.progreso[matId].intentos={};
@@ -1416,7 +1714,7 @@ function finalizarQuiz(){
   save();
   // Enviar a Sheets
   desactivarMarcaAgua();
-  enviarResultado({boleta:ST.boleta,nombre:ST.nombre||ST.boleta,grupo:ST.grupo,materia_id:matId,materia_nombre:curMat.nombre,calificacion:pct,correctas:quiz.correctas,total,puntos:pts,modo:'inscrito'});
+  enviarResultado({boleta:ST.boleta,nombre:ST.nombre||ST.boleta,grupo:ST.grupo,materia_id:matId,materia_nombre:curMat.nombre,calificacion:pct,correctas:quiz.correctas,total,puntos:pts,tema_idx:temaActual,modo:'inscrito'});
   // Pantalla resultado
   const titulo=pct>=80?'¡Excelente trabajo!':aprobado?'¡Buen avance!':'Sigue practicando';
   const desc=pct>=80?'Dominas este tema.':aprobado?'Aprobaste. Refuerza los fallados.':'No alcanzaste 4/5. Revisa la guía e intenta de nuevo.';
@@ -1499,7 +1797,7 @@ function renderAse(){
   }
   // Sección de solicitud
   const sec=document.getElementById('cita-section');
-  if(ST.puntos>=500){
+  if(ST.puntos>=150){
     // Obtener slots disponibles
     const slotsDisp=(DATA.asesorias||[]).filter(a=>(inscritas.length===0||inscritas.includes(a.materia_id))&&(a.disponible===true||String(a.disponible).toUpperCase()==='SI'));
     const slotsHTML=slotsDisp.map((s,i)=>{
@@ -1696,12 +1994,15 @@ async function cargarDatosAPI(){
     }));
     // Reactivos agrupados por tema {matId: {temaIdx: [reactivos]}}
     DATA.reactivosPorTema = d.reactivos||{};
+    // Fichas del Sheets {matId: {temaIdx: {pdf_url, bloques:[...]}}}
+    DATA.fichasPorTema = d.fichas||{};
     DATA.recompensas=d.recompensas&&d.recompensas.length?d.recompensas:DATA.recompensas;
     DATA.asesorias=d.asesorias||[];
     DATA.config=d.configuracion||{};
     try{ localStorage.setItem('sdgo_cache',JSON.stringify({
       ts:Date.now(),materias:DATA.materias,asesorias:DATA.asesorias,
-      reactivosPorTema:DATA.reactivosPorTema
+      reactivosPorTema:DATA.reactivosPorTema,
+      fichasPorTema:DATA.fichasPorTema
     })); }catch(e){}
   }catch(e){
     console.warn('API no disponible:',e.message);
@@ -1710,6 +2011,7 @@ async function cargarDatosAPI(){
       if(cache&&cache.materias&&cache.materias.length){
         DATA.materias=cache.materias; DATA.asesorias=cache.asesorias||[];
         DATA.reactivosPorTema=cache.reactivosPorTema||{};
+        DATA.fichasPorTema=cache.fichasPorTema||{};
       }
     }catch(ce){}
     if(!DATA.materias.length) usarDatosLocales();
@@ -1894,32 +2196,26 @@ function activarMarcaAgua() {
   const overlay = document.getElementById('wm-overlay');
   if (!overlay) return;
   const boleta = ST.boleta || '??????????';
-  // Texto corto para que no se corte al rotar
-  const txt = boleta + '  ·  SDGo!  ';
-  // SVG cuadrado para que el patrón repita sin cortes al rotar
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'>
-    <text x='110' y='90'
-      text-anchor='middle'
-      font-family='Courier New,monospace' font-size='13' font-weight='700'
-      fill='rgba(123,17,53,0.22)'
-      transform='rotate(-35 110 110)'
-      letter-spacing='3'>${txt}</text>
-    <text x='110' y='145'
-      text-anchor='middle'
-      font-family='Courier New,monospace' font-size='13' font-weight='700'
-      fill='rgba(123,17,53,0.22)'
-      transform='rotate(-35 110 110)'
-      letter-spacing='3'>${txt}</text>
-    <text x='110' y='200'
-      text-anchor='middle'
-      font-family='Courier New,monospace' font-size='13' font-weight='700'
-      fill='rgba(123,17,53,0.22)'
-      transform='rotate(-35 110 110)'
-      letter-spacing='3'>${txt}</text>
+  // SVG grande para que el patrón repita sin cortes
+  const w=400, h=400;
+  const txt = boleta + ' · SDGo! CECyT9 · ';
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
+    <text x='${w/2}' y='120' text-anchor='middle'
+      font-family='Courier New,monospace' font-size='14' font-weight='700'
+      fill='rgba(123,17,53,0.28)' transform='rotate(-30 ${w/2} ${h/2})'
+      letter-spacing='4'>${txt}</text>
+    <text x='${w/2}' y='220' text-anchor='middle'
+      font-family='Courier New,monospace' font-size='14' font-weight='700'
+      fill='rgba(123,17,53,0.28)' transform='rotate(-30 ${w/2} ${h/2})'
+      letter-spacing='4'>${txt}</text>
+    <text x='${w/2}' y='320' text-anchor='middle'
+      font-family='Courier New,monospace' font-size='14' font-weight='700'
+      fill='rgba(123,17,53,0.28)' transform='rotate(-30 ${w/2} ${h/2})'
+      letter-spacing='4'>${txt}</text>
   </svg>`;
   const encoded = 'data:image/svg+xml,' + encodeURIComponent(svg);
   overlay.style.backgroundImage = 'url("' + encoded + '")';
-  overlay.style.backgroundSize = '220px 220px';
+  overlay.style.backgroundSize = '400px 400px';
   overlay.classList.add('activo');
 }
 function desactivarMarcaAgua() {
