@@ -309,6 +309,9 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .cod-salida{background:#06102B;border-radius:0 0 var(--rad-s) var(--rad-s);margin:0 12px 12px;padding:9px 13px;border-top:1px solid rgba(255,255,255,.08)}
 .cod-salida-lbl{font-size:9px;color:#6E7F9E;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
 .cod-salida pre{font-family:var(--mono);font-size:11.5px;color:#7CE38B;white-space:pre-wrap;line-height:1.6;margin:0}
+/* Dentro de la solución, el código y su salida deben verse igual que en los ejemplos */
+.sol-box .code-box{border-radius:var(--rad-s) var(--rad-s) 0 0;margin:0}
+.sol-box .cod-salida{margin:0;border-radius:0 0 var(--rad-s) var(--rad-s)}
 
 /* Bloque fórmula / sintaxis */
 .formula-box{background:var(--gub);border:1px solid rgba(123,17,53,.18);border-radius:var(--rad-s);margin:6px 12px 12px;padding:11px 13px}
@@ -406,7 +409,10 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
   <div class="db-hdr">
     <div class="db-hello">
       <span id="db-saludo">Bienvenido</span>
-      <button onclick="cerrarSesion()" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.5);font-size:10px;padding:2px 9px;border-radius:12px;cursor:pointer;font-family:var(--fnt)">Salir</button>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button onclick="refrescarContenido()" title="Buscar actualizaciones" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.7);font-size:12px;padding:2px 9px;border-radius:12px;cursor:pointer;font-family:var(--fnt)">↻</button>
+        <button onclick="cerrarSesion()" style="background:rgba(255,255,255,.12);border:none;color:rgba(255,255,255,.5);font-size:10px;padding:2px 9px;border-radius:12px;cursor:pointer;font-family:var(--fnt)">Salir</button>
+      </div>
     </div>
     <div class="db-name" id="db-name">—</div>
     <div class="db-chip"><span id="db-prog-lbl">Progreso: 0%</span></div>
@@ -550,7 +556,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
       <div class="niv-lbl">Tus puntos</div>
       <div class="niv-val" id="ase-pts-val">0 puntos</div>
       <div class="niv-row"><div class="npb"><div class="pb-fill" id="ase-pb" style="width:0%;background:var(--na)"></div></div><div class="niv-pts" id="ase-pts-lbl">0 pts</div></div>
-      <div class="niv-hint" id="ase-hint">Acumula 500 pts para solicitar una cita</div>
+      <div class="niv-hint" id="ase-hint">Acumula puntos para solicitar una cita</div>
     </div>
     <div class="sec-t">Docente disponible</div>
     <div id="docentes-list"></div>
@@ -1032,6 +1038,7 @@ let ST = {
   tiempoHoy:0, fechaHoy:'',
   sesionInicio:null, validado:false, inscritasSheet:null,
   materiasPadron:[], materiasPadronCache:null,
+  promedios:{}, promedioGlobal:0,
   puntosCanje:0, // puntos extra canjeados este semestre
   semestre:'2026-1'
 };
@@ -1053,7 +1060,8 @@ function save(){
       rachaActual:ST.rachaActual, ultimoDia:ST.ultimoDia,
       tiempoHoy:ST.tiempoHoy, fechaHoy:ST.fechaHoy,
       puntosCanje:ST.puntosCanje, autoevals:ST.autoevals||{},
-      materiasPadronCache:ST.materiasPadronCache||ST.materiasPadron||[]
+      materiasPadronCache:ST.materiasPadronCache||ST.materiasPadron||[],
+      promedios:ST.promedios||{}, promedioGlobal:ST.promedioGlobal||0
     }));
   }catch(e){}
 }
@@ -1074,6 +1082,7 @@ function loadAlumno(boleta){
       ST.rachaActual=d.rachaActual||0; ST.ultimoDia=d.ultimoDia||'';
       ST.puntosCanje=d.puntosCanje||0; ST.autoevals=d.autoevals||{};
       ST.materiasPadronCache=d.materiasPadronCache||null;
+      ST.promedios=d.promedios||{}; ST.promedioGlobal=d.promedioGlobal||0;
       // Tiempo de estudio: solo se conserva si es del mismo día
       const hoy=fechaHoy();
       ST.fechaHoy=hoy;
@@ -1208,15 +1217,7 @@ function marcarTemaAprobado(matId, temaIdx){
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
   ST.progreso[matId].temasAprobados[temaIdx]=true;
   ST.progreso[matId].temas=Object.keys(ST.progreso[matId].temasAprobados).length;
-  // Enviar progreso al Sheets
-  const mat=DATA.materias.find(m=>m.id===matId);
-  enviarProgreso({
-    boleta:ST.boleta, grupo:ST.grupo, materia_id:matId,
-    tema_idx:temaIdx,
-    tema_nombre:mat?mat.temas[temaIdx]:'',
-    completado:true,
-    calificacion: ST.progreso[matId]?.ultimaCal || 0
-  });
+  // El envío a Sheets se hace UNA sola vez desde finalizarQuiz (evita doble registro).
 }
 
 async function enviarProgreso(p){
@@ -1337,7 +1338,7 @@ async function doLogin(){
     const grupoSheet=String(alumno.grupo||'').toUpperCase().trim();
     if(grupoSheet && grupoSheet!==g){
       btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
-      errEl.textContent=`La boleta ${b} está registrada en el grupo ${grupoSheet}, no en ${g}.`;
+      errEl.textContent='La boleta no corresponde al grupo indicado. Verifica tu grupo.';
       errEl.classList.add('show');
       return;
     }
@@ -1547,13 +1548,14 @@ function renderDash(){
     const p=ST.progreso[m.id]?.temas||0;
     const tot=m.temas?.length||1;
     const pctM=Math.round(p/tot*100);
+    const promM=(ST.promedios&&ST.promedios[m.id])||0;
     const fill=pctM===100?'var(--gr)':pctM>0?'var(--na)':'var(--bor)';
     const badge=pctM===100?'<span class="badge bg-g">Completo ✓</span>':pctM>0?'<span class="badge bg-o">En proceso</span>':'<span class="badge bg-gr">Pendiente</span>';
     list.innerHTML+=`<div class="mat-card" onclick="abrirMateria('${m.id}')">
       <div class="mic" style="background:${m.color}">${m.icono}</div>
       <div style="flex:1;min-width:0">
         <div class="mn">${m.nombre}</div>
-        <div class="ms">${p} de ${tot} temas · ${ST.puntos} pts</div>
+        <div class="ms">${p} de ${tot} temas${promM>0?` · Promedio: ${promM}`:''}</div>
         <div class="mpb"><div style="width:${pctM}%;background:${fill}"></div></div>
       </div>${badge}
     </div>`;
@@ -1862,10 +1864,16 @@ function finalizarQuiz(){
   }catch(e){ console.warn('finalizarQuiz (UI):', e.message); }
   navTo('v-res');
 
-  // ── Envíos a Sheets e insignias (en segundo plano, no bloquean) ──
+  // ── Envío ÚNICO a Sheets (actualiza Progreso detallado + resumen en Resultados) ──
   try{
     verificarInsignias();
-    enviarResultado({boleta:ST.boleta,nombre:ST.nombre||ST.boleta,grupo:ST.grupo,materia_id:matId,materia_nombre:curMat.nombre,calificacion:pct,correctas:correctas,total,puntos:pts,tema_idx:temaActual,modo:'inscrito'});
+    enviarProgreso({
+      boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo,
+      materia_id:matId, materia_nombre:curMat.nombre,
+      tema_idx:temaActual, tema_nombre:(curMat.temas&&curMat.temas[temaActual])||`Tema ${temaActual+1}`,
+      calificacion:pct, correctas:correctas, total:total,
+      completado:aprobado, puntos:pts
+    });
   }catch(e){ console.warn('finalizarQuiz (envío):', e.message); }
 }
 
@@ -1893,12 +1901,19 @@ function renderIns(){
 // ═══════════════════════════════════════════════════════
 // ASESORÍAS
 // ═══════════════════════════════════════════════════════
+// Puntos necesarios para solicitar una cita. Configurable desde la hoja
+// Configuracion (campo puntos_cita); si no existe, 150 por defecto.
+function umbralCita(){
+  const v = Number(DATA.config && DATA.config.puntos_cita);
+  return (v && v>0) ? v : 150;
+}
 function renderAse(){
+  const UMBRAL = umbralCita();
   document.getElementById('ase-pts-val').textContent=`${ST.puntos} puntos`;
-  const pctPts=Math.min(100,Math.round(ST.puntos/500*100));
+  const pctPts=Math.min(100,Math.round(ST.puntos/UMBRAL*100));
   document.getElementById('ase-pb').style.width=pctPts+'%';
   document.getElementById('ase-pts-lbl').textContent=ST.puntos+' pts';
-  document.getElementById('ase-hint').textContent=ST.puntos>=500?'¡Puedes solicitar una cita!':`${500-ST.puntos} pts más para solicitar cita`;
+  document.getElementById('ase-hint').textContent=ST.puntos>=UMBRAL?'¡Puedes solicitar una cita!':`${UMBRAL-ST.puntos} pts más para solicitar cita`;
   // Docentes
   const lista=document.getElementById('docentes-list');
   const inscritas=ST.inscritas||[];
@@ -1922,7 +1937,7 @@ function renderAse(){
   }
   // Sección de solicitud
   const sec=document.getElementById('cita-section');
-  if(ST.puntos>=150){
+  if(ST.puntos>=UMBRAL){
     // Obtener slots disponibles
     const slotsDisp=(DATA.asesorias||[]).filter(a=>(inscritas.length===0||inscritas.includes(a.materia_id))&&(a.disponible===true||String(a.disponible).toUpperCase()==='SI'));
     const slotsHTML=slotsDisp.map((s,i)=>{
@@ -1948,10 +1963,10 @@ function renderAse(){
         <div id="mod-meet" onclick="selMod('Google Meet')" style="flex:1;padding:9px;background:var(--bg2);border:2px solid var(--bor);border-radius:var(--rad-s);text-align:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--ts)">💻 Google Meet</div>
       </div>
       <button class="btn btn-gu" id="btn-cita" onclick="solicitarCita()">Enviar solicitud ›</button>
-      <p style="font-size:10px;color:var(--ts);text-align:center;margin-top:6px">Costo: 500 pts · Recibirás confirmación por correo</p>
+      <p style="font-size:10px;color:var(--ts);text-align:center;margin-top:6px">Requisito: ${UMBRAL} pts · Recibirás confirmación por correo</p>
     </div>`;
   } else {
-    sec.innerHTML=`<div class="card card-p" style="margin:0 12px 9px"><div style="font-size:12px;color:var(--ts);text-align:center;padding:4px">Acumula <strong style="color:var(--gu)">${500-ST.puntos} pts más</strong> para solicitar una cita de tutoría.</div></div>`;
+    sec.innerHTML=`<div class="card card-p" style="margin:0 12px 9px"><div style="font-size:12px;color:var(--ts);text-align:center;padding:4px">Acumula <strong style="color:var(--gu)">${UMBRAL-ST.puntos} pts más</strong> para solicitar una cita de tutoría.</div></div>`;
   }
 }
 let modCita='';
@@ -2015,8 +2030,9 @@ async function solicitarCita(){
   if(!modCita){toast('⚠️ Elige la modalidad (Presencial o Meet)');return;}
   const btn=document.getElementById('btn-cita');
   btn.textContent='Enviando…'; btn.disabled=true;
-  ST.puntos-=500; ST.puntosCanje=(ST.puntosCanje||0)+500;
-  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.hora}`,pts:'-500',f:'Hoy'});
+  const COSTO=umbralCita();
+  ST.puntos-=COSTO; ST.puntosCanje=(ST.puntosCanje||0)+COSTO;
+  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy'});
   save();
   try{
     await enviarCita({
@@ -2030,7 +2046,7 @@ async function solicitarCita(){
       hora:         slotCita.hora,
       lugar:        slotCita.lugar,
       fecha_iso:    slotCita.fechaISO||'',
-      puntos_alumno:ST.puntos+500,
+      puntos_alumno:ST.puntos+COSTO,
       email_alumno: ST.email||''
     });
     toast('✅ Cita solicitada. Recibirás confirmación por correo.');
@@ -2107,7 +2123,7 @@ function canjearGratis(id){
 // ═══════════════════════════════════════════════════════
 async function cargarDatosAPI(){
   try{
-    document.getElementById('load-msg').textContent='Cargando contenido…';
+    { const lm=document.getElementById('load-msg'); if(lm) lm.textContent='Cargando contenido…'; }
     const res=await Promise.race([fetch(API_URL),new Promise((_,r)=>setTimeout(()=>r('timeout'),7000))]);
     if(res==='timeout') throw new Error('timeout');
     const json=await res.json();
@@ -2121,7 +2137,18 @@ async function cargarDatosAPI(){
     DATA.reactivosPorTema = d.reactivos||{};
     // Fichas del Sheets {matId: {temaIdx: {pdf_url, bloques:[...]}}}
     DATA.fichasPorTema = d.fichas||{};
-    DATA.recompensas=d.recompensas&&d.recompensas.length?d.recompensas:DATA.recompensas;
+    // Normalizar recompensas del Sheet (nombre/desc/icono) al formato que usa la app (n/s/ico)
+    if(d.recompensas && d.recompensas.length){
+      DATA.recompensas = d.recompensas.map(r=>({
+        id: r.id,
+        n:   r.n   || r.nombre || '',
+        s:   r.s   || r.desc   || r.descripcion || '',
+        ico: r.ico || r.icono  || '🎁',
+        pts: Number(r.pts)||0,
+        tipo: r.tipo || '',
+        recurso: r.recurso || ''
+      }));
+    }
     DATA.asesorias=d.asesorias||[];
     DATA.config=d.configuracion||{};
     try{ localStorage.setItem('sdgo_cache',JSON.stringify({
@@ -2142,6 +2169,23 @@ async function cargarDatosAPI(){
     if(!DATA.materias.length) usarDatosLocales();
   }
 }
+// Refresco manual: vuelve a leer el contenido del Sheet y re-renderiza la vista
+// actual, y pide al Service Worker que busque versión nueva del código.
+async function refrescarContenido(){
+  toast('Buscando actualizaciones…');
+  try{ await cargarDatosAPI(); }catch(e){ console.warn('Refrescar:',e.message); }
+  try{ if(ST.boleta) await sincronizarProgreso(ST.boleta); }catch(e){}
+  const v=document.querySelector('.view.active')?.id;
+  if(v==='v-dash') renderDash();
+  else if(v==='v-ase') renderAse();
+  else if(v==='v-log') renderLog();
+  else if(v==='v-sel') renderSel();
+  if(navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+    navigator.serviceWorker.getRegistration().then(r=>{ if(r) r.update(); }).catch(()=>{});
+  }
+  toast('✅ Contenido actualizado');
+}
+
 function usarDatosLocales(){
   // Materias sin cuestionario hardcodeado — los reactivos vienen de GUIAS por tema
   DATA.materias=[
@@ -2184,6 +2228,8 @@ async function sincronizarProgreso(boleta){
       };
     });
     if((d.puntos||0)>ST.puntos) ST.puntos=d.puntos;
+    if(d.promedios) ST.promedios=d.promedios;
+    if(typeof d.promedioGlobal==='number') ST.promedioGlobal=d.promedioGlobal;
     if(d.logros&&d.logros.length>=ST.logros.length) ST.logros=d.logros;
     save();
   }catch(e){ console.warn('Sync:',e.message); }
@@ -2332,7 +2378,7 @@ function activarMarcaAgua() {
   const boleta = ST.boleta || '??????????';
   // Patrón uniforme y sin costuras: exactamente una frase por mosaico,
   // en fuente monoespaciada para que el ancho del tile calce con el texto.
-  const phrase = 'SDGo!69 · ' + boleta + '   ';
+  const phrase = 'SDGo! - CECyT 9 · ' + boleta + '   ';
   const F  = 13;                 // tamaño de fuente
   const cw = F * 0.6;            // ancho por carácter (Courier New ≈ 0.6em)
   const tw = Math.round(phrase.length * cw);   // 1 frase = 1 tile → repite parejo
@@ -2448,7 +2494,15 @@ document.addEventListener('visibilitychange', function() {
 });
 
 // ═══════════════════════════════════════════════════════
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  // Cuando un Service Worker NUEVO toma el control, recargar una sola vez
+  // para que el alumno reciba la última versión sin limpiar caché a mano.
+  let _swRecargado=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(_swRecargado) return; _swRecargado=true; location.reload();
+  });
+}
 initApp();
 </script>
 </body>
