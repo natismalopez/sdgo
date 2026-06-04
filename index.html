@@ -397,7 +397,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
   <div class="scroll nonav" id="sel-list" style="padding-top:10px"></div>
   <div class="sel-footer">
     <button class="btn btn-gu" id="btn-sel" onclick="confirmarSel()">Confirmar e ingresar ›</button>
-    <div class="sel-footer-note">Podrás cambiar tus materias después</div>
+    <div class="sel-footer-note">Podrás inscribir más unidades después</div>
   </div>
 </div>
 
@@ -1031,6 +1031,7 @@ let ST = {
   rachaActual:0, ultimoDia:'',
   tiempoHoy:0, fechaHoy:'',
   sesionInicio:null, validado:false, inscritasSheet:null,
+  materiasPadron:[], materiasPadronCache:null,
   puntosCanje:0, // puntos extra canjeados este semestre
   semestre:'2026-1'
 };
@@ -1051,7 +1052,8 @@ function save(){
       canjes:ST.canjes, inscritas:ST.inscritas, insignias:ST.insignias,
       rachaActual:ST.rachaActual, ultimoDia:ST.ultimoDia,
       tiempoHoy:ST.tiempoHoy, fechaHoy:ST.fechaHoy,
-      puntosCanje:ST.puntosCanje, autoevals:ST.autoevals||{}
+      puntosCanje:ST.puntosCanje, autoevals:ST.autoevals||{},
+      materiasPadronCache:ST.materiasPadronCache||ST.materiasPadron||[]
     }));
   }catch(e){}
 }
@@ -1071,6 +1073,7 @@ function loadAlumno(boleta){
       ST.inscritas=d.inscritas||[]; ST.insignias=d.insignias||[];
       ST.rachaActual=d.rachaActual||0; ST.ultimoDia=d.ultimoDia||'';
       ST.puntosCanje=d.puntosCanje||0; ST.autoevals=d.autoevals||{};
+      ST.materiasPadronCache=d.materiasPadronCache||null;
       // Tiempo de estudio: solo se conserva si es del mismo día
       const hoy=fechaHoy();
       ST.fechaHoy=hoy;
@@ -1338,12 +1341,11 @@ async function doLogin(){
       errEl.classList.add('show');
       return;
     }
-    // Boleta válida → tomar nombre y materias desde Sheets
+    // Boleta válida → tomar nombre, padrón y materias-SDGo desde Sheets
     ST.nombre=[alumno.nombre, alumno.apellido_p, alumno.apellido_m].filter(Boolean).join(' ').trim();
     ST.validado=true;
-    if(alumno.materiasInscritas && alumno.materiasInscritas.length){
-      ST.inscritasSheet=alumno.materiasInscritas;
-    }
+    ST.materiasPadron = alumno.materiasPadron || alumno.materiasInscritas || [];
+    ST.inscritasSheet = alumno.materiasSDGo || [];
   } else {
     // CASO B — no hubo respuesta de la API (sin conexión / servidor caído)
     if(!yaValidado){
@@ -1360,10 +1362,13 @@ async function doLogin(){
   ST.boleta=b; ST.grupo=g;
   const primeraVez = !localStorage.getItem('sdgo_'+b);
   loadAlumno(b);
-  // Si Sheets trae materias y el alumno aún no eligió localmente, usarlas (registro automático)
-  if(ST.inscritasSheet && ST.inscritasSheet.length && (!ST.inscritas || !ST.inscritas.length)){
-    ST.inscritas=[...ST.inscritasSheet];
+  // Inscritas a SDGo! = lo del Sheet (fuente de verdad) unido a lo local
+  if(ST.inscritasSheet && ST.inscritasSheet.length){
+    ST.inscritas = [...new Set([...(ST.inscritas||[]), ...ST.inscritasSheet])];
   }
+  // El padrón se conserva si el Sheet no lo trajo (reingreso offline)
+  if((!ST.materiasPadron || !ST.materiasPadron.length) && ST.materiasPadronCache) ST.materiasPadron=ST.materiasPadronCache;
+  ST.materiasPadronCache = ST.materiasPadron;
   ST.grupo=g; // el grupo escrito (ya validado contra Sheets)
   ST.validado=true; // confirmado por API (CASO A) o reingreso ya validado (CASO B)
   save();
@@ -1405,6 +1410,7 @@ function cerrarSesion(){
   ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0;
   ST.tiempoHoy=0; ST.sesionInicio=null; ST.validado=false;
   ST.autoevals={}; ST.inscritasSheet=null;
+  ST.materiasPadron=[]; ST.materiasPadronCache=null;
   curMat=null; navStack=[];
   document.getElementById('li-boleta').value='';
   document.getElementById('li-grupo').value='';
@@ -1415,20 +1421,50 @@ function cerrarSesion(){
 // SELECCIÓN DE MATERIAS
 // ═══════════════════════════════════════════════════════
 let selTemp=[];
+function opcionesPadron(){
+  // Universo de materias que el alumno puede inscribir en SDGo! (su padrón)
+  let ids = ST.materiasPadron && ST.materiasPadron.length ? ST.materiasPadron
+          : (ST.materiasPadronCache && ST.materiasPadronCache.length ? ST.materiasPadronCache : null);
+  let lista = ids ? DATA.materias.filter(m=>ids.includes(m.id)) : DATA.materias.slice();
+  // Asegurar que las ya inscritas siempre aparezcan aunque el padrón no las traiga
+  (ST.inscritas||[]).forEach(id=>{ if(!lista.find(m=>m.id===id)){ const m=DATA.materias.find(x=>x.id===id); if(m) lista.push(m); } });
+  return lista;
+}
 function renderSel(){
-  selTemp=[...ST.inscritas];
+  selTemp=[]; // solo se AGREGAN materias nuevas (las inscritas no se tocan)
+  const yaInscrito = ST.inscritas && ST.inscritas.length;
+  document.querySelector('#v-sel .sel-hdr h1').textContent = yaInscrito ? 'Unidades inscritas' : 'Elige tus materias';
+  document.querySelector('#v-sel .sel-hdr p').textContent  = yaInscrito
+    ? 'Estas son tus unidades en SDGo!. Puedes inscribir más de tu carga del semestre.'
+    : 'Selecciona la(s) unidad(es) de aprendizaje en las que usarás SDGo!.';
   const list=document.getElementById('sel-list');
   list.innerHTML='';
-  DATA.materias.forEach(m=>{
-    const on=selTemp.includes(m.id);
-    list.innerHTML+=`<div class="mat-sel ${on?'on':''}" id="ms-${m.id}" onclick="toggleSel('${m.id}')">
-      <div class="chk">${on?'✓':''}</div>
-      <div class="mic" style="background:${m.color}">${m.icono}</div>
-      <div><div style="font-size:13px;font-weight:700;color:var(--nv)">${m.nombre}</div>
-      <div style="font-size:10px;color:var(--ts)">${m.unidad}</div>
-      <div style="font-size:9px;color:var(--ts);margin-top:3px">${m.temas?.length||0} temas · ${contarReactivosTotal(m.id)} reactivos</div></div>
-    </div>`;
+  const opciones=opcionesPadron();
+  opciones.forEach(m=>{
+    const inscrita=(ST.inscritas||[]).includes(m.id);
+    if(inscrita){
+      list.innerHTML+=`<div class="mat-sel on" style="opacity:.85;cursor:default">
+        <div class="chk">✓</div>
+        <div class="mic" style="background:${m.color}">${m.icono}</div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--nv)">${m.nombre}</div>
+        <div style="font-size:10px;color:var(--ts)">${m.unidad}</div>
+        <div style="font-size:9px;color:var(--gr);font-weight:700;margin-top:3px">● Inscrita</div></div>
+      </div>`;
+    } else {
+      list.innerHTML+=`<div class="mat-sel" id="ms-${m.id}" onclick="toggleSel('${m.id}')">
+        <div class="chk"></div>
+        <div class="mic" style="background:${m.color}">${m.icono}</div>
+        <div><div style="font-size:13px;font-weight:700;color:var(--nv)">${m.nombre}</div>
+        <div style="font-size:10px;color:var(--ts)">${m.unidad}</div>
+        <div style="font-size:9px;color:var(--ts);margin-top:3px">${m.temas?.length||0} temas · ${contarReactivosTotal(m.id)} reactivos</div></div>
+      </div>`;
+    }
   });
+  // Si ya está inscrito en todas sus materias del padrón, avisar
+  const porInscribir=opciones.filter(m=>!(ST.inscritas||[]).includes(m.id));
+  if(yaInscrito && !porInscribir.length){
+    list.innerHTML+=`<div style="text-align:center;padding:16px;font-size:12px;color:var(--ts)">Ya estás inscrito en todas tus unidades disponibles.</div>`;
+  }
   updateSelCnt();
 }
 function toggleSel(id){
@@ -1442,14 +1478,35 @@ function toggleSel(id){
 }
 function updateSelCnt(){
   const n=selTemp.length;
-  document.getElementById('sel-cnt').textContent=n===0?'Ninguna seleccionada':`${n} materia${n>1?'s':''} seleccionada${n>1?'s':''}`;
-  document.getElementById('btn-sel').disabled=n===0;
+  const yaInscrito = ST.inscritas && ST.inscritas.length;
+  const cntEl=document.getElementById('sel-cnt');
+  const btn=document.getElementById('btn-sel');
+  if(yaInscrito){
+    cntEl.textContent = n===0 ? 'Sin cambios' : `+${n} por agregar`;
+    btn.textContent = n===0 ? 'Listo ›' : `Agregar ${n} e ingresar ›`;
+    btn.disabled = false; // ya tiene materias: siempre puede continuar
+  } else {
+    cntEl.textContent = n===0 ? 'Ninguna seleccionada' : `${n} materia${n>1?'s':''} seleccionada${n>1?'s':''}`;
+    btn.textContent = 'Confirmar e ingresar ›';
+    btn.disabled = n===0; // primer ingreso: obligatorio elegir al menos una
+  }
 }
-function confirmarSel(){
-  if(!selTemp.length){toast('⚠️ Selecciona al menos una materia');return;}
-  ST.inscritas=[...selTemp]; save();
-  toast(`✅ ${selTemp.length} materia${selTemp.length>1?'s':''} guardada${selTemp.length>1?'s':''}`);
+async function confirmarSel(){
+  const yaInscrito = ST.inscritas && ST.inscritas.length;
+  if(!yaInscrito && !selTemp.length){ toast('⚠️ Selecciona al menos una materia'); return; }
+  const nuevas=[...selTemp];
+  if(nuevas.length){
+    ST.inscritas=[...new Set([...(ST.inscritas||[]), ...nuevas])];
+    save();
+    enviarInscripcion(nuevas); // guardar en Alumnos_SDGo (no bloquea)
+    toast(`✅ ${nuevas.length} unidad${nuevas.length>1?'es':''} inscrita${nuevas.length>1?'s':''}`);
+  }
   renderDash(); navRoot('v-dash');
+}
+async function enviarInscripcion(materias){
+  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({accion:'inscripcion',boleta:ST.boleta,grupo:ST.grupo,materias})}); }
+  catch(e){ console.warn('Inscripcion:',e.message); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1501,7 +1558,10 @@ function renderDash(){
       </div>${badge}
     </div>`;
   });
-  list.innerHTML+=`<div style="text-align:center;padding:4px 0 10px"><button onclick="abrirSel()" style="background:none;border:none;font-size:12px;color:var(--ts);cursor:pointer;font-family:var(--fnt);text-decoration:underline">+ Agregar o quitar materias</button></div>`;
+  const porInscribir = opcionesPadron().filter(m=>!(ST.inscritas||[]).includes(m.id));
+  if(porInscribir.length){
+    list.innerHTML+=`<div style="text-align:center;padding:4px 0 10px"><button onclick="abrirSel()" style="background:none;border:none;font-size:12px;color:var(--ts);cursor:pointer;font-family:var(--fnt);text-decoration:underline">+ Inscribir más unidades (${porInscribir.length})</button></div>`;
+  }
 }
 function abrirSel(){ renderSel(); navTo('v-sel'); }
 
@@ -1551,8 +1611,10 @@ function abrirGuia(temaIdxParam){
     ? (ST.progreso[curMat.id]?.temas||0)
     : Number(temaIdxParam);
   temaIdx = Math.min(Math.max(temaIdx,0), curMat.temas.length-1);
-  // No permitir abrir un tema bloqueado
-  if(!temaDesbloqueado(curMat.id, temaIdx)){
+  // Permitir SIEMPRE la ficha del tema actual y de los anteriores (necesitas leerla
+  // antes de aprobar su cuestionario). Solo bloquear saltar a un tema FUTURO sin desbloquear.
+  const temaActualMat = Math.min(ST.progreso[curMat.id]?.temas||0, curMat.temas.length-1);
+  if(temaIdx > temaActualMat && !temaDesbloqueado(curMat.id, temaIdx)){
     toast('🔒 Aprueba el tema anterior para desbloquear este'); return;
   }
   const temaNombre = curMat.temas[temaIdx] || 'Guía de estudio';
@@ -1686,7 +1748,15 @@ function iniciarCuestionario(){
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
   const intentoNum=(ST.progreso[matId].intentos?.[temaIdx]||0);
   const temaNombre=curMat.temas[temaIdx]||'Cuestionario';
-  quiz={preguntas:[...temaData.reactivos].sort(()=>Math.random()-.5),idx:0,correctas:0,respondida:false,intentoNum,temaIdx};
+  // Sanear reactivos: respuesta correcta como número 0-3, exactamente 4 opciones en texto
+  const limpios = temaData.reactivos.map(r=>{
+    let ops = Array.isArray(r.ops) ? r.ops.slice(0,4).map(o=>String(o??'')) : [];
+    while(ops.length<4) ops.push('—');
+    let c = Number(r.c);
+    if(!Number.isInteger(c) || c<0 || c>3) c=0;
+    return { p:String(r.p??''), ops, c, exp:String(r.exp??''), img:r.img||'', cap:r.cap||'' };
+  });
+  quiz={preguntas:[...limpios].sort(()=>Math.random()-.5),idx:0,correctas:0,respondida:false,intentoNum,temaIdx};
   document.getElementById('q-sub').textContent=`${curMat.nombre} · Tema ${temaIdx+1}`;
   // Mostrar badge de intento
   const badge=document.getElementById('intento-badge');
@@ -1741,55 +1811,62 @@ function responder(idx){
 }
 function sigPregunta(){ quiz.idx++; renderPregunta(); }
 function finalizarQuiz(){
-  const total=quiz.preguntas.length;
+  if(!quiz || !curMat){ navRoot('v-dash'); return; }
+  // Quitar cualquier cubierta anti-captura que pudiera tapar el resultado
+  const _cover=document.getElementById('quiz-cover'); if(_cover) _cover.style.display='none';
+  const total=quiz.preguntas.length||0;
   const matId=curMat.id;
-  // Usar el temaIdx que arrancó el cuestionario (guardado en quiz)
   const temaActual = quiz.temaIdx ?? (ST.progreso[matId]?.temas||0);
-  const pct=Math.round(quiz.correctas/total*100);
-  const aprobado=quiz.correctas>=4; // 4/5 = 80% mínimo para desbloquear
-  const perfecto=quiz.correctas===total;
-  const pts=calcularPuntosQuiz(quiz.correctas,total,matId,temaActual);
-  ST.puntos+=pts;
-  if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
-  ST.progreso[matId].ultimaCal = pct; // guardar para enviarProgreso
-  // Registrar intento y avance
-  if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
-  if(!ST.progreso[matId].intentos) ST.progreso[matId].intentos={};
-  ST.progreso[matId].intentos[temaActual]=(ST.progreso[matId].intentos[temaActual]||0)+1;
-  if(aprobado) marcarTemaAprobado(matId,temaActual);
-  if(pts>0) ST.logros.unshift({t:`✏️ Cuestionario ${curMat.nombre} (${pct}%)`,pts:`+${pts}`,f:'Hoy'});
-  verificarInsignias();
-  save();
-  // Enviar a Sheets
+  const correctas=quiz.correctas||0;
+  const pct=total?Math.round(correctas/total*100):0;
+  const aprobado=correctas>=4; // 4/5 mínimo
+  let pts=0;
+
+  // ── Efectos de estado (no deben impedir que se muestre el resultado) ──
+  try{
+    pts=calcularPuntosQuiz(correctas,total,matId,temaActual);
+    ST.puntos+=pts;
+    if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
+    ST.progreso[matId].ultimaCal = pct;
+    if(!ST.progreso[matId].intentos) ST.progreso[matId].intentos={};
+    ST.progreso[matId].intentos[temaActual]=(ST.progreso[matId].intentos[temaActual]||0)+1;
+    if(aprobado) marcarTemaAprobado(matId,temaActual); // ← desbloquea el siguiente tema
+    if(pts>0) ST.logros.unshift({t:`✏️ Cuestionario ${curMat.nombre} (${pct}%)`,pts:`+${pts}`,f:'Hoy'});
+    save();
+  }catch(e){ console.warn('finalizarQuiz (estado):', e.message); }
+
+  // ── Apagar marca de agua y navegar SIEMPRE al resultado ──
   desactivarMarcaAgua();
-  enviarResultado({boleta:ST.boleta,nombre:ST.nombre||ST.boleta,grupo:ST.grupo,materia_id:matId,materia_nombre:curMat.nombre,calificacion:pct,correctas:quiz.correctas,total,puntos:pts,tema_idx:temaActual,modo:'inscrito'});
-  // Pantalla resultado
-  const titulo=pct>=80?'¡Excelente trabajo!':aprobado?'¡Buen avance!':'Sigue practicando';
-  const desc=pct>=80?'Dominas este tema.':aprobado?'Aprobaste. Refuerza los fallados.':'No alcanzaste 4/5. Revisa la guía e intenta de nuevo.';
-  document.getElementById('res-pct').textContent=pct+'%';
-  document.getElementById('res-titulo').textContent=titulo;
-  document.getElementById('res-desc').textContent=desc;
-  document.getElementById('rs-ok').textContent=quiz.correctas;
-  document.getElementById('rs-bad').textContent=total-quiz.correctas;
-  document.getElementById('rs-tot').textContent=total;
-  document.getElementById('res-pts-v').textContent=pts>0?'+'+pts:(tiempoAgotado()?'Límite diario':'Sin puntos');
-  const circle=document.getElementById('res-circle');
-  circle.style.borderColor=pct>=80?'var(--gr)':aprobado?'var(--na)':'var(--er)';
-  circle.style.background=pct>=80?'var(--grb)':aprobado?'var(--nab)':'var(--erb)';
-  // Mensaje desbloqueo
-  const umsg=document.getElementById('res-unlock-msg');
-  const nombreTemaActual = curMat.temas[temaActual] || `Tema ${temaActual+1}`;
-  if(aprobado && temaActual<(curMat.temas?.length||1)-1){
-    const siguiente = curMat.temas[temaActual+1] || `Tema ${temaActual+2}`;
-    umsg.innerHTML=`<div class="res-unlock">🔓 ¡Desbloqueado! Siguiente: ${siguiente}</div>`;
-  } else if(aprobado && temaActual>=(curMat.temas?.length||1)-1){
-    umsg.innerHTML=`<div class="res-unlock">🏆 ¡Completaste todos los temas de ${curMat.nombre}!</div>`;
-  } else if(!aprobado){
-    umsg.innerHTML=`<div class="res-locked">🔒 Necesitas 4/5 para desbloquear el siguiente tema</div>`;
-  } else {
-    umsg.innerHTML='';
-  }
+  try{
+    const titulo=pct>=80?'¡Excelente trabajo!':aprobado?'¡Buen avance!':'Sigue practicando';
+    const desc=pct>=80?'Dominas este tema.':aprobado?'Aprobaste. Refuerza los fallados.':'No alcanzaste 4/5. Revisa la guía e intenta de nuevo.';
+    document.getElementById('res-pct').textContent=pct+'%';
+    document.getElementById('res-titulo').textContent=titulo;
+    document.getElementById('res-desc').textContent=desc;
+    document.getElementById('rs-ok').textContent=correctas;
+    document.getElementById('rs-bad').textContent=total-correctas;
+    document.getElementById('rs-tot').textContent=total;
+    document.getElementById('res-pts-v').textContent=pts>0?'+'+pts:(tiempoAgotado()?'Límite diario':'Sin puntos');
+    const circle=document.getElementById('res-circle');
+    circle.style.borderColor=pct>=80?'var(--gr)':aprobado?'var(--na)':'var(--er)';
+    circle.style.background=pct>=80?'var(--grb)':aprobado?'var(--nab)':'var(--erb)';
+    const umsg=document.getElementById('res-unlock-msg');
+    if(aprobado && temaActual<(curMat.temas?.length||1)-1){
+      const siguiente = curMat.temas[temaActual+1] || `Tema ${temaActual+2}`;
+      umsg.innerHTML=`<div class="res-unlock">🔓 ¡Desbloqueado! Siguiente: ${siguiente}</div>`;
+    } else if(aprobado && temaActual>=(curMat.temas?.length||1)-1){
+      umsg.innerHTML=`<div class="res-unlock">🏆 ¡Completaste todos los temas de ${curMat.nombre}!</div>`;
+    } else if(!aprobado){
+      umsg.innerHTML=`<div class="res-locked">🔒 Necesitas 4/5 para desbloquear el siguiente tema</div>`;
+    } else { umsg.innerHTML=''; }
+  }catch(e){ console.warn('finalizarQuiz (UI):', e.message); }
   navTo('v-res');
+
+  // ── Envíos a Sheets e insignias (en segundo plano, no bloquean) ──
+  try{
+    verificarInsignias();
+    enviarResultado({boleta:ST.boleta,nombre:ST.nombre||ST.boleta,grupo:ST.grupo,materia_id:matId,materia_nombre:curMat.nombre,calificacion:pct,correctas:correctas,total,puntos:pts,tema_idx:temaActual,modo:'inscrito'});
+  }catch(e){ console.warn('finalizarQuiz (envío):', e.message); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2095,7 +2172,16 @@ async function sincronizarProgreso(boleta){
     if(!json.ok||!json.data) return;
     const d=json.data;
     if(d.progreso) Object.entries(d.progreso).forEach(([mid,prog])=>{
-      if(!ST.progreso[mid]||prog.temas>(ST.progreso[mid].temas||0)) ST.progreso[mid]=prog;
+      const cur = ST.progreso[mid] || {temas:0,intentos:{},temasAprobados:{}};
+      // El servidor es la fuente de verdad de qué temas están aprobados
+      const ta = Object.assign({}, cur.temasAprobados||{}, prog.temasAprobados||{});
+      const nAprob = Object.keys(ta).length;
+      ST.progreso[mid] = {
+        temas: Math.max(cur.temas||0, prog.temas||0, nAprob),
+        temasAprobados: ta,
+        intentos: cur.intentos||{},
+        ultimaCal: cur.ultimaCal||0
+      };
     });
     if((d.puntos||0)>ST.puntos) ST.puntos=d.puntos;
     if(d.logros&&d.logros.length>=ST.logros.length) ST.logros=d.logros;
@@ -2244,26 +2330,22 @@ function activarMarcaAgua() {
   const overlay = document.getElementById('wm-overlay');
   if (!overlay) return;
   const boleta = ST.boleta || '??????????';
-  // SVG grande para que el patrón repita sin cortes
-  const w=400, h=400;
-  const txt = boleta + ' · SDGo! CECyT9 · ';
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>
-    <text x='${w/2}' y='120' text-anchor='middle'
-      font-family='Courier New,monospace' font-size='14' font-weight='700'
-      fill='rgba(123,17,53,0.28)' transform='rotate(-30 ${w/2} ${h/2})'
-      letter-spacing='4'>${txt}</text>
-    <text x='${w/2}' y='220' text-anchor='middle'
-      font-family='Courier New,monospace' font-size='14' font-weight='700'
-      fill='rgba(123,17,53,0.28)' transform='rotate(-30 ${w/2} ${h/2})'
-      letter-spacing='4'>${txt}</text>
-    <text x='${w/2}' y='320' text-anchor='middle'
-      font-family='Courier New,monospace' font-size='14' font-weight='700'
-      fill='rgba(123,17,53,0.28)' transform='rotate(-30 ${w/2} ${h/2})'
-      letter-spacing='4'>${txt}</text>
-  </svg>`;
+  // Patrón uniforme y sin costuras: exactamente una frase por mosaico,
+  // en fuente monoespaciada para que el ancho del tile calce con el texto.
+  const phrase = 'SDGo!69 · ' + boleta + '   ';
+  const F  = 13;                 // tamaño de fuente
+  const cw = F * 0.6;            // ancho por carácter (Courier New ≈ 0.6em)
+  const tw = Math.round(phrase.length * cw);   // 1 frase = 1 tile → repite parejo
+  const th = 30;                 // separación vertical entre filas
+  const svg =
+   `<svg xmlns='http://www.w3.org/2000/svg' width='${tw}' height='${th}'>`+
+   `<text x='0' y='${th - 10}' font-family='Courier New,monospace' `+
+   `font-size='${F}' font-weight='700' fill='rgba(123,17,53,0.15)' `+
+   `xml:space='preserve'>${phrase}</text></svg>`;
   const encoded = 'data:image/svg+xml,' + encodeURIComponent(svg);
   overlay.style.backgroundImage = 'url("' + encoded + '")';
-  overlay.style.backgroundSize = '400px 400px';
+  overlay.style.backgroundSize = tw + 'px ' + th + 'px';
+  overlay.style.backgroundRepeat = 'repeat';
   overlay.classList.add('activo');
 }
 function desactivarMarcaAgua() {
