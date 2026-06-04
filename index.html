@@ -303,6 +303,50 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .racha-ico{font-size:28px;flex-shrink:0}
 .racha-n{font-size:14px;font-weight:800;color:var(--nv)}
 .racha-s{font-size:11px;color:rgba(13,27,75,.65)}
+
+/* ─── GUÍA · FICHAS (bloques de estudio) ──────── */
+/* Salida de consola debajo de un bloque de código */
+.cod-salida{background:#06102B;border-radius:0 0 var(--rad-s) var(--rad-s);margin:0 12px 12px;padding:9px 13px;border-top:1px solid rgba(255,255,255,.08)}
+.cod-salida-lbl{font-size:9px;color:#6E7F9E;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.cod-salida pre{font-family:var(--mono);font-size:11.5px;color:#7CE38B;white-space:pre-wrap;line-height:1.6;margin:0}
+
+/* Bloque fórmula / sintaxis */
+.formula-box{background:var(--gub);border:1px solid rgba(123,17,53,.18);border-radius:var(--rad-s);margin:6px 12px 12px;padding:11px 13px}
+.formula-lbl{font-size:9px;color:var(--gu);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.formula-txt{font-family:var(--mono);font-size:12px;color:var(--nv);white-space:pre-wrap;line-height:1.7}
+.formula-nota{font-size:10.5px;color:var(--ts);line-height:1.5;margin-top:8px;padding-top:8px;border-top:.5px dashed var(--bor)}
+
+/* Imagen / diagrama */
+.img-box{margin:6px 12px 12px;border:.5px solid var(--bor);border-radius:var(--rad);overflow:hidden;background:#fff}
+.img-box-lbl{font-size:9px;color:var(--ts);font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:9px 13px 4px}
+.img-box img{width:100%;display:block;max-height:240px;object-fit:contain;background:var(--bg2)}
+.img-box-cap{font-size:11px;color:var(--ts);padding:8px 13px;line-height:1.5;border-top:.5px solid var(--bor)}
+.img-box-expl{font-size:11px;color:var(--tx);padding:0 13px 10px;line-height:1.6}
+.img-box-link{display:inline-block;margin:0 13px 11px;font-size:11px;color:var(--na);font-weight:600;text-decoration:none}
+
+/* Ejercicio · "Practica tú mismo" */
+.ej-box{background:#fff;border:.5px solid var(--bor);border-left:3px solid var(--na);border-radius:0 var(--rad) var(--rad) 0;margin:10px 12px 12px;padding:13px 14px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.ej-box h4{font-size:13px;font-weight:700;color:var(--nv);margin-bottom:6px}
+.ej-enunciado{font-size:12px;color:var(--tx);line-height:1.6;margin-bottom:11px}
+.btn-compiler{display:inline-flex;align-items:center;gap:6px;background:var(--nv);color:#fff;text-decoration:none;font-size:11.5px;font-weight:600;padding:9px 14px;border-radius:var(--rad-s)}
+.btn-sol{display:inline-block;margin-top:10px;background:transparent;border:1.5px solid var(--bor);color:var(--gu);font-family:var(--fnt);font-size:11.5px;font-weight:600;padding:8px 14px;border-radius:var(--rad-s);cursor:pointer}
+.btn-sol:active{transform:scale(.98)}
+/* La solución arranca OCULTA; solo se muestra al pulsar "Ver solución" */
+.sol-box{display:none;margin-top:11px;padding-top:11px;border-top:.5px dashed var(--bor)}
+.sol-box.show{display:block;animation:solIn .2s ease}
+@keyframes solIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.sol-analisis{font-size:11px;color:var(--ts);line-height:1.6;margin-top:8px;background:var(--bg2);border-radius:var(--rad-s);padding:9px 11px}
+
+/* Autoevaluación */
+.autoeval{margin-top:13px;padding-top:12px;border-top:.5px solid var(--bor)}
+.autoeval p{font-size:11.5px;font-weight:700;color:var(--nv);margin-bottom:8px}
+.ae-btn{display:block;width:100%;text-align:left;background:var(--bg2);border:1.5px solid var(--bor);color:var(--tx);font-family:var(--fnt);font-size:11.5px;font-weight:600;padding:9px 12px;border-radius:var(--rad-s);cursor:pointer;margin-bottom:7px}
+.ae-btn:active{transform:scale(.99)}
+.ae-btn.sel{border-color:var(--na);background:var(--nab);color:#A85000}
+
+/* Botón descargar ficha en PDF */
+.btn-ficha-pdf{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:var(--gu);color:#fff;text-decoration:none;font-family:var(--fnt);font-size:13px;font-weight:700;padding:12px;border:none;border-radius:var(--rad-s);cursor:pointer;box-shadow:0 3px 10px rgba(123,17,53,.22)}
+.btn-ficha-pdf:active{transform:scale(.98);opacity:.92}
 </style>
 </head>
 <body>
@@ -338,38 +382,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
         <div class="err-msg" id="li-err-grupo">Formato inválido — Usa: 1IM1 a 6IV10</div>
       </div>
       <button class="btn btn-p" id="btn-login" onclick="doLogin()">Entrar a SDGo! ›</button>
-      <p class="sp-note" style="margin-top:6px"><span style="color:rgba(255,255,255,.7);cursor:pointer;text-decoration:underline" onclick="switchTab('reg')">¿Primera vez? Crea tu perfil aquí</span></p>
-    </div>
-    <!-- REGISTRO -->
-    <div class="sp-form" id="form-reg" style="display:none">
-      <div class="sp-sec-title">Datos de identificación</div>
-      <div class="ig">
-        <label class="lbl">Nombre completo</label>
-        <input class="inp" id="re-nombre" type="text" placeholder="Como aparece en tu credencial">
-        <div class="err-msg" id="re-err-nombre">Ingresa tu nombre completo</div>
-      </div>
-      <div class="ig">
-        <label class="lbl">Boleta (10 dígitos)</label>
-        <input class="inp" id="re-boleta" type="number" inputmode="numeric" placeholder="Ej. 2024630001">
-        <div class="err-msg" id="re-err-boleta">La boleta debe tener exactamente 10 dígitos</div>
-      </div>
-      <div class="ig">
-        <label class="lbl">CURP (18 caracteres)</label>
-        <input class="inp" id="re-curp" type="text" placeholder="Ej. LOSL001215HDFPZR01" maxlength="18" style="text-transform:uppercase">
-        <div class="err-msg" id="re-err-curp">CURP inválida — verifica el formato</div>
-      </div>
-      <div class="ig">
-        <label class="lbl">Grupo</label>
-        <input class="inp" id="re-grupo" type="text" placeholder="Ej. 3IM2" style="text-transform:uppercase">
-        <div class="err-msg" id="re-err-grupo">Formato inválido — Usa: 1IM1 a 6IV10</div>
-      </div>
-      <div class="ig">
-        <label class="lbl">Correo Gmail (para notificaciones)</label>
-        <input class="inp" id="re-email" type="email" placeholder="tu_correo@gmail.com">
-        <div class="err-msg" id="re-err-email">Ingresa un correo válido</div>
-      </div>
-      <button class="btn btn-p" id="btn-reg" onclick="doRegistro()">Crear mi perfil ›</button>
-      <p class="sp-note">Tus datos se guardan de forma segura · Solo para uso académico</p>
+      <p class="sp-note" style="margin-top:8px">Tu perfil se crea automáticamente con tu boleta la primera vez que ingresas.<br>Solo para uso académico · CECyT 9 IPN</p>
     </div>
   </div>
 </div>
@@ -1014,10 +1027,10 @@ let DATA = {
 let ST = {
   boleta:'', curp:'', nombre:'', email:'', grupo:'',
   puntos:0, logros:[], progreso:{}, canjes:[], inscritas:[],
-  insignias:[],
+  insignias:[], autoevals:{},
   rachaActual:0, ultimoDia:'',
   tiempoHoy:0, fechaHoy:'',
-  sesionInicio:null,
+  sesionInicio:null, validado:false, inscritasSheet:null,
   puntosCanje:0, // puntos extra canjeados este semestre
   semestre:'2026-1'
 };
@@ -1032,12 +1045,13 @@ function save(){
   if(!ST.boleta) return;
   try{
     localStorage.setItem('sdgo_'+ST.boleta, JSON.stringify({
+      nombre:ST.nombre, grupo:ST.grupo, email:ST.email, curp:ST.curp,
+      validado:ST.validado||false,
       puntos:ST.puntos, logros:ST.logros, progreso:ST.progreso,
       canjes:ST.canjes, inscritas:ST.inscritas, insignias:ST.insignias,
       rachaActual:ST.rachaActual, ultimoDia:ST.ultimoDia,
       tiempoHoy:ST.tiempoHoy, fechaHoy:ST.fechaHoy,
-      puntosCanje:ST.puntosCanje,
-      primerLoginHoy: ST.primerLoginHoy||null
+      puntosCanje:ST.puntosCanje, autoevals:ST.autoevals||{}
     }));
   }catch(e){}
 }
@@ -1046,25 +1060,31 @@ function loadAlumno(boleta){
     const s=localStorage.getItem('sdgo_'+boleta);
     if(s){
       const d=JSON.parse(s);
+      // Identidad (no se sobreescribe si ya viene de Sheets en esta sesión)
+      if(!ST.nombre && d.nombre) ST.nombre=d.nombre;
+      if(!ST.grupo  && d.grupo)  ST.grupo=d.grupo;
+      if(!ST.email  && d.email)  ST.email=d.email;
+      if(!ST.curp   && d.curp)   ST.curp=d.curp;
+      ST.validado=d.validado||false;
       ST.puntos=d.puntos||0; ST.logros=d.logros||[];
       ST.progreso=d.progreso||{}; ST.canjes=d.canjes||[];
       ST.inscritas=d.inscritas||[]; ST.insignias=d.insignias||[];
       ST.rachaActual=d.rachaActual||0; ST.ultimoDia=d.ultimoDia||'';
-      ST.puntosCanje=d.puntosCanje||0;
+      ST.puntosCanje=d.puntosCanje||0; ST.autoevals=d.autoevals||{};
+      // Tiempo de estudio: solo se conserva si es del mismo día
       const hoy=fechaHoy();
       ST.fechaHoy=hoy;
       ST.tiempoHoy=(d.fechaHoy===hoy)?(d.tiempoHoy||0):0;
-      // Restaurar primerLoginHoy solo si es el mismo día
-      ST.primerLoginHoy=(d.fechaHoy===hoy && d.primerLoginHoy)?d.primerLoginHoy:null;
     } else {
+      ST.validado=false;
       ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
-      ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0;
+      ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0; ST.autoevals={};
       ST.ultimoDia=''; ST.tiempoHoy=0; ST.fechaHoy=fechaHoy();
       ST.puntosCanje=0;
     }
   }catch(e){
     ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
-    ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0;
+    ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0; ST.autoevals={};
     ST.tiempoHoy=0; ST.fechaHoy=fechaHoy(); ST.puntosCanje=0;
   }
 }
@@ -1074,24 +1094,47 @@ function fechaHoy(){
 
 // ═══════════════════════════════════════════════════════
 // TEMPORIZADOR DE ESTUDIO DIARIO
+// Mide MINUTOS ACTIVOS reales (mientras la app está abierta),
+// no el reloj de pared desde el primer login. Se reinicia por día.
 // ═══════════════════════════════════════════════════════
+function rolloverDia(){
+  // Si cambió el día, reinicia el contador de tiempo
+  const hoy=fechaHoy();
+  if(ST.fechaHoy!==hoy){
+    ST.fechaHoy=hoy;
+    ST.tiempoHoy=0;
+    if(ST.sesionInicio) ST.sesionInicio=Date.now();
+  }
+}
+function commitSesion(){
+  // Pasa los minutos completos de la sesión activa al acumulado del día
+  if(!ST.sesionInicio) return;
+  const ahora=Date.now();
+  const mins=Math.floor((ahora-ST.sesionInicio)/60000);
+  if(mins>=1){
+    ST.tiempoHoy=Math.min((ST.tiempoHoy||0)+mins, LIMITE_MIN+120);
+    ST.sesionInicio=ahora-((ahora-ST.sesionInicio)%60000); // conserva el resto < 1 min
+  }
+}
 function iniciarTimer(){
+  rolloverDia();
   if(timerInterval) return;
   ST.sesionInicio=Date.now();
   timerInterval=setInterval(tickTimer,60000); // cada minuto
 }
 function detenerTimer(){
   if(!timerInterval) return;
-  const mins=Math.floor((Date.now()-ST.sesionInicio)/60000);
-  ST.tiempoHoy=Math.min(ST.tiempoHoy+mins, LIMITE_MIN+60);
+  rolloverDia();
+  commitSesion();
   ST.sesionInicio=null;
   clearInterval(timerInterval); timerInterval=null;
   save();
 }
 function tickTimer(){
-  const mins=Math.floor((Date.now()-ST.sesionInicio)/60000);
-  const total=ST.tiempoHoy+mins;
-  actualizarTimerUI(total);
+  rolloverDia();
+  commitSesion();
+  save();
+  actualizarTimerUI(tiempoHoyTotal());
 }
 function actualizarTimerUI(min){
   const el=document.getElementById('timer-val');
@@ -1102,19 +1145,15 @@ function actualizarTimerUI(min){
   else if(min>=LIMITE_MIN*0.8){ el.className='timer-val warn'; }
 }
 function tiempoAgotado(){
-  const mins=tiempoHoyTotal();
-  return mins>=LIMITE_MIN;
+  return tiempoHoyTotal()>=LIMITE_MIN;
 }
 function tiempoHoyTotal(){
-  const hoy = fechaHoy();
-  // Si es otro día, el tiempo es 0
-  if(ST.fechaHoy !== hoy) return 0;
-  // Si hay timestamp de inicio del día, calcular tiempo transcurrido real
-  if(ST.primerLoginHoy){
-    const transcurrido = Math.floor((Date.now() - ST.primerLoginHoy) / 60000);
-    return Math.min(transcurrido, LIMITE_MIN + 60);
+  rolloverDia();
+  let total=ST.tiempoHoy||0;
+  if(ST.sesionInicio){
+    total+=Math.floor((Date.now()-ST.sesionInicio)/60000);
   }
-  return ST.tiempoHoy;
+  return Math.min(total, LIMITE_MIN+120);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1179,8 +1218,8 @@ function marcarTemaAprobado(matId, temaIdx){
 
 async function enviarProgreso(p){
   try{ await fetch(API_URL,{method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({accion:'progreso',...p})}); }catch(e){}
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({accion:'progreso',...p})}); }catch(e){ console.warn('Progreso:',e.message); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1252,17 +1291,6 @@ function validarCURP(c){ return /^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[A-Z0-9][0-9]$/.te
 function validarEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
 // ═══════════════════════════════════════════════════════
-// TABS LOGIN / REGISTRO
-// ═══════════════════════════════════════════════════════
-function switchTab(t){
-  // Tabs eliminados — solo controlar visibilidad de formularios
-  const fl=document.getElementById('form-login');
-  const fr=document.getElementById('form-reg');
-  if(fl) fl.style.display=t==='login'?'block':'none';
-  if(fr) fr.style.display=t==='reg'?'block':'none';
-}
-
-// ═══════════════════════════════════════════════════════
 // LOGIN
 // ═══════════════════════════════════════════════════════
 async function doLogin(){
@@ -1273,8 +1301,16 @@ async function doLogin(){
   if(!validarGrupo(g)){  showErr('li-err-grupo','li-grupo');   ok=false; } else clearErr('li-err-grupo','li-grupo');
   if(!ok) return;
   const btn=document.getElementById('btn-login');
+  const errEl=document.getElementById('li-err-boleta');
+  const errTxtDefault='La boleta debe tener exactamente 10 dígitos';
   btn.textContent='Verificando…'; btn.disabled=true;
-  // Validar boleta contra hoja Alumnos en Sheets
+
+  // ¿Ya fue validado este alumno en este dispositivo? (para permitir reingreso sin conexión)
+  let yaValidado=false;
+  try{ const prev=JSON.parse(localStorage.getItem('sdgo_'+b)||'null'); yaValidado=!!(prev&&prev.validado); }catch(e){}
+
+  // Validar boleta + grupo contra la hoja Alumnos en Sheets
+  let alumno=null, apiRespondio=false;
   try{
     const res=await Promise.race([
       fetch(`${API_URL}?accion=alumno&boleta=${encodeURIComponent(b)}`),
@@ -1282,77 +1318,65 @@ async function doLogin(){
     ]);
     if(res!=='timeout'){
       const json=await res.json();
-      if(json.ok && json.data){
-        const alumno=json.data;
-        if(!alumno.encontrado){
-          // Alumno no registrado
-          btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
-          const errEl=document.getElementById('li-err-boleta');
-          errEl.textContent='En esta etapa de prueba, SDGo! solo está disponible para alumnos inscritos. Verifica tu boleta o contacta a tu docente.';
-          errEl.classList.add('show');
-          return;
-        }
-        // Guardar nombre del alumno desde Sheets
-        const nombreCompleto=[alumno.nombre, alumno.apellido_p, alumno.apellido_m].filter(Boolean).join(' ');
-        if(nombreCompleto) ST.nombre=nombreCompleto;
-        // Si el Sheets tiene materias asignadas y el alumno no tiene localmente, usarlas
-        if(alumno.materiasInscritas&&alumno.materiasInscritas.length&&(!ST.inscritas||!ST.inscritas.length)){
-          ST.inscritas=alumno.materiasInscritas;
-        }
-      }
+      if(json && json.ok && json.data){ apiRespondio=true; alumno=json.data; }
     }
   }catch(e){ console.warn('Validación alumno:', e.message); }
-  ST.boleta=b; ST.grupo=g;
-  loadAlumno(b);
-  if(ST.nombre) { /* mantener nombre del Sheets */ } 
-  const hoyLogin=fechaHoy();
-  if(ST.fechaHoy!==hoyLogin||!ST.primerLoginHoy){
-    ST.fechaHoy=hoyLogin;
-    ST.primerLoginHoy=ST.primerLoginHoy||Date.now();
-    if(ST.fechaHoy!==hoyLogin) ST.tiempoHoy=0;
+
+  // CASO A — la API respondió: aplicar validación estricta
+  if(apiRespondio){
+    if(!alumno.encontrado){
+      btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
+      errEl.textContent='Esta boleta no está inscrita en SDGo!. Verifica el número o contacta a tu docente.';
+      errEl.classList.add('show');
+      return;
+    }
+    // Validar que el grupo coincida con el registrado
+    const grupoSheet=String(alumno.grupo||'').toUpperCase().trim();
+    if(grupoSheet && grupoSheet!==g){
+      btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
+      errEl.textContent=`La boleta ${b} está registrada en el grupo ${grupoSheet}, no en ${g}.`;
+      errEl.classList.add('show');
+      return;
+    }
+    // Boleta válida → tomar nombre y materias desde Sheets
+    ST.nombre=[alumno.nombre, alumno.apellido_p, alumno.apellido_m].filter(Boolean).join(' ').trim();
+    ST.validado=true;
+    if(alumno.materiasInscritas && alumno.materiasInscritas.length){
+      ST.inscritasSheet=alumno.materiasInscritas;
+    }
+  } else {
+    // CASO B — no hubo respuesta de la API (sin conexión / servidor caído)
+    if(!yaValidado){
+      btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
+      errEl.textContent='No pudimos validar tu boleta (sin conexión). Conéctate a internet la primera vez que ingreses.';
+      errEl.classList.add('show');
+      return;
+    }
+    // Alumno ya validado antes en este dispositivo → permitir reingreso
   }
+
+  // — Ingreso autorizado —
+  errEl.classList.remove('show'); errEl.textContent=errTxtDefault;
+  ST.boleta=b; ST.grupo=g;
+  const primeraVez = !localStorage.getItem('sdgo_'+b);
+  loadAlumno(b);
+  // Si Sheets trae materias y el alumno aún no eligió localmente, usarlas (registro automático)
+  if(ST.inscritasSheet && ST.inscritasSheet.length && (!ST.inscritas || !ST.inscritas.length)){
+    ST.inscritas=[...ST.inscritasSheet];
+  }
+  ST.grupo=g; // el grupo escrito (ya validado contra Sheets)
+  ST.validado=true; // confirmado por API (CASO A) o reingreso ya validado (CASO B)
   save();
-  btn.textContent='Cargando…'; 
+  btn.textContent='Cargando…';
   await sincronizarProgreso(b);
   btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
   actualizarRacha(); iniciarTimer();
+  if(primeraVez && ST.nombre) toast(`¡Bienvenido, ${ST.nombre.split(' ')[0]}!`);
   if(!ST.inscritas||!ST.inscritas.length){ renderSel(); navTo('v-sel'); }
   else { renderDash(); navRoot('v-dash'); }
 }
 
 // ═══════════════════════════════════════════════════════
-// REGISTRO
-// ═══════════════════════════════════════════════════════
-async function doRegistro(){
-  const nombre=document.getElementById('re-nombre').value.trim();
-  const b=document.getElementById('re-boleta').value.trim();
-  const curp=document.getElementById('re-curp').value.trim().toUpperCase();
-  const g=document.getElementById('re-grupo').value.trim().toUpperCase();
-  const email=document.getElementById('re-email').value.trim();
-  let ok=true;
-  if(!nombre){ showErr('re-err-nombre','re-nombre'); ok=false; } else clearErr('re-err-nombre','re-nombre');
-  if(!validarBoleta(b)){ showErr('re-err-boleta','re-boleta'); ok=false; } else clearErr('re-err-boleta','re-boleta');
-  if(!validarCURP(curp)){ showErr('re-err-curp','re-curp'); ok=false; } else clearErr('re-err-curp','re-curp');
-  if(!validarGrupo(g)){ showErr('re-err-grupo','re-grupo'); ok=false; } else clearErr('re-err-grupo','re-grupo');
-  if(!validarEmail(email)){ showErr('re-err-email','re-email'); ok=false; } else clearErr('re-err-email','re-email');
-  if(!ok) return;
-  const btn=document.getElementById('btn-reg');
-  btn.textContent='Creando perfil…'; btn.disabled=true;
-  ST.boleta=b; ST.grupo=g; ST.nombre=nombre; ST.curp=curp; ST.email=email;
-  loadAlumno(b);
-  ST.nombre=nombre; ST.curp=curp; ST.email=email;
-  const hoyReg = fechaHoy();
-  ST.fechaHoy = hoyReg;
-  ST.primerLoginHoy = ST.primerLoginHoy || Date.now();
-  save();
-  await sincronizarProgreso(b);
-  btn.textContent='Crear mi perfil ›'; btn.disabled=false;
-  actualizarRacha();
-  iniciarTimer();
-  toast(`¡Bienvenido, ${nombre.split(' ')[0]}!`);
-  if(!ST.inscritas||!ST.inscritas.length){ renderSel(); navTo('v-sel'); }
-  else { renderDash(); navRoot('v-dash'); }
-}
 function showErr(eid,iid){ document.getElementById(eid).classList.add('show'); document.getElementById(iid).classList.add('inp-err'); }
 function clearErr(eid,iid){ document.getElementById(eid).classList.remove('show'); document.getElementById(iid).classList.remove('inp-err'); }
 
@@ -1369,9 +1393,9 @@ function autoeval(temaIdx, resultado, btn){
   ST.autoevals[key]=resultado;
   save();
   // Enviar al Sheets (sin bloquear UI)
-  try{ fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+  try{ fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({accion:'autoeval',boleta:ST.boleta,grupo:ST.grupo,
-      materia_id:curMat?.id,tema_idx:temaIdx,resultado})}); }catch(e){}
+      materia_id:curMat?.id,tema_idx:Number(temaIdx),resultado})}); }catch(e){ console.warn('Autoeval:',e.message); }
 }
 
 function cerrarSesion(){
@@ -1379,7 +1403,9 @@ function cerrarSesion(){
   ST.boleta=''; ST.grupo=''; ST.nombre=''; ST.curp=''; ST.email='';
   ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
   ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0;
-  ST.tiempoHoy=0; curMat=null; navStack=[];
+  ST.tiempoHoy=0; ST.sesionInicio=null; ST.validado=false;
+  ST.autoevals={}; ST.inscritasSheet=null;
+  curMat=null; navStack=[];
   document.getElementById('li-boleta').value='';
   document.getElementById('li-grupo').value='';
   showView('v-splash');
@@ -1400,7 +1426,7 @@ function renderSel(){
       <div class="mic" style="background:${m.color}">${m.icono}</div>
       <div><div style="font-size:13px;font-weight:700;color:var(--nv)">${m.nombre}</div>
       <div style="font-size:10px;color:var(--ts)">${m.unidad}</div>
-      <div style="font-size:9px;color:var(--ts);margin-top:3px">${m.temas?.length||0} temas · ${m.cuestionario?.length||0} reactivos</div></div>
+      <div style="font-size:9px;color:var(--ts);margin-top:3px">${m.temas?.length||0} temas · ${contarReactivosTotal(m.id)} reactivos</div></div>
     </div>`;
   });
   updateSelCnt();
@@ -1487,7 +1513,7 @@ function abrirMateria(id){
   if(!curMat) return;
   document.getElementById('mat-t').textContent=curMat.nombre;
   document.getElementById('mat-s').textContent=curMat.unidad;
-  document.getElementById('quiz-sub').textContent=`${curMat.cuestionario?.length||0} reactivos · Necesitas 4/5 para avanzar`;
+  document.getElementById('quiz-sub').textContent=`${contarReactivosTotal(id)} reactivos · Necesitas 4/5 para avanzar`;
   const p=ST.progreso[id]?.temas||0;
   const pct=Math.round(p/(curMat.temas?.length||1)*100);
   document.getElementById('mat-pct').textContent=pct+'%';
@@ -1498,18 +1524,38 @@ function abrirMateria(id){
     const desbloq=temaDesbloqueado(id,i);
     const col=aprobado?'var(--gr)':desbloq?'var(--na)':'var(--bor)';
     const ico=aprobado?'✅':desbloq?'':'🔒';
-    list.innerHTML+=`<div class="tema-row"><span class="tema-nm">${i+1}. ${t}</span><div style="display:flex;align-items:center;gap:5px"><span class="lock-ico">${ico}</span><div class="tdot" style="background:${col}"></div></div></div>`;
+    // Los temas desbloqueados (en proceso o completados) se pueden abrir para releer su ficha
+    const clickable=desbloq;
+    const onclick=clickable?` onclick="abrirGuia(${i})" style="cursor:pointer"`:'';
+    const hint=aprobado?'<span style="font-size:9px;color:var(--na);font-weight:600">Releer ›</span>':(desbloq?'<span style="font-size:9px;color:var(--ts)">Abrir ›</span>':'');
+    list.innerHTML+=`<div class="tema-row"${onclick}><span class="tema-nm">${i+1}. ${t}</span><div style="display:flex;align-items:center;gap:6px">${hint}<span class="lock-ico">${ico}</span><div class="tdot" style="background:${col}"></div></div></div>`;
   });
   navTo('v-mat');
+}
+// Cuenta los reactivos disponibles de una materia (API > GUIAS local)
+function contarReactivosTotal(matId){
+  let n=0;
+  const api=DATA.reactivosPorTema?.[matId];
+  if(api){ Object.values(api).forEach(arr=>{ if(Array.isArray(arr)) n+=arr.length; }); }
+  if(n===0){ const g=GUIAS[matId]||[]; g.forEach(t=>{ if(t&&Array.isArray(t.reactivos)) n+=t.reactivos.length; }); }
+  return n;
 }
 
 // ═══════════════════════════════════════════════════════
 // GUÍA
 // ═══════════════════════════════════════════════════════
-function abrirGuia(){
+function abrirGuia(temaIdxParam){
   if(!curMat) return;
-  // Obtener índice del tema actual (el que está estudiando)
-  const temaIdx = Math.min(ST.progreso[curMat.id]?.temas||0, curMat.temas.length-1);
+  // Obtener índice del tema: el solicitado (revisita) o el que está estudiando
+  let temaIdx = (temaIdxParam===undefined || temaIdxParam===null)
+    ? (ST.progreso[curMat.id]?.temas||0)
+    : Number(temaIdxParam);
+  temaIdx = Math.min(Math.max(temaIdx,0), curMat.temas.length-1);
+  // No permitir abrir un tema bloqueado
+  if(!temaDesbloqueado(curMat.id, temaIdx)){
+    toast('🔒 Aprueba el tema anterior para desbloquear este'); return;
+  }
+  const temaNombre = curMat.temas[temaIdx] || 'Guía de estudio';
   const temaGuias = GUIAS[curMat.id] || [];
   const temaData  = temaGuias[temaIdx];
   if(!temaData || !temaData.fichas || !temaData.fichas.length){
@@ -1526,7 +1572,6 @@ function abrirGuia(){
     navTo('v-guia');
     return;
   }
-  const temaNombre = curMat.temas[temaIdx] || 'Guía de estudio';
   document.getElementById('g-mat-s').textContent=`${curMat.nombre} · Tema ${temaIdx+1} de ${curMat.temas.length}`;
   document.getElementById('g-tema-t').textContent=temaNombre;
   const cont=document.getElementById('g-content');
@@ -1602,11 +1647,14 @@ function abrirGuia(){
   } else {
     cont.innerHTML+=`<div class="ficha-check" style="opacity:.6"><p>📖 Ficha ya completada — Tema ${temaIdx+1}</p><div class="fc-pts">+10 ✓</div></div>`;
   }
-  // Agregar botón de descarga PDF si hay URL disponible
-  const pdfUrl = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.pdf_url || '';
-  const btnPdf = pdfUrl
-    ? `<a href="${pdfUrl}" target="_blank" class="btn-ficha-pdf">📥 Descargar ficha PDF</a>`
-    : `<button class="btn-ficha-pdf" onclick="generarFichaPDFApp('${temaIdx}','${temaNombre}')">📥 Descargar ficha PDF</button>`;
+  // Botón de descarga PDF — cadena de respaldos:
+  // 1) pdf_url del Sheet  2) PDF en la carpeta fichas/ del repo  3) generación en el dispositivo
+  const pdfUrlSheet = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.pdf_url || '';
+  const pdfUrlLocal = `fichas/ficha-${curMat.id}-t${temaIdx}.pdf`;
+  const pdfUrl = pdfUrlSheet || pdfUrlLocal;
+  const btnPdf = `<a href="${pdfUrl}" target="_blank" rel="noopener" class="btn-ficha-pdf"
+       download="SDGo_${curMat.id}_tema${temaIdx+1}.pdf"
+       onerror="this.style.display='none'">📥 Descargar ficha en PDF</a>`;
   cont.innerHTML+=`<div style="padding:0 12px 6px">${btnPdf}</div>`;
   cont.innerHTML+=`<div class="g-nav">
     <button onclick="navBack()">‹ Volver</button>
@@ -1620,7 +1668,6 @@ function abrirGuia(){
 // CUESTIONARIO
 // ═══════════════════════════════════════════════════════
 function iniciarCuestionario(){
-  activarMarcaAgua();
   if(!curMat){toast('⚠️ Selecciona una materia primero');return;}
   const matId=curMat.id;
   const temaIdx=Math.min(ST.progreso[matId]?.temas||0, curMat.temas.length-1);
@@ -1634,6 +1681,7 @@ function iniciarCuestionario(){
     toast('🚧 Cuestionario en construcción — próximamente disponible');
     return;
   }
+  activarMarcaAgua();
   const temaData = { reactivos: reactivosFinal };
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
   const intentoNum=(ST.progreso[matId].intentos?.[temaIdx]||0);
@@ -2055,10 +2103,10 @@ async function sincronizarProgreso(boleta){
   }catch(e){ console.warn('Sync:',e.message); }
 }
 async function enviarResultado(p){
-  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'resultado',...p})}); }catch(e){}
+  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion:'resultado',...p})}); }catch(e){ console.warn('Resultado:',e.message); }
 }
 async function enviarCita(p){
-  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accion:'cita',...p})}); }catch(e){}
+  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion:'cita',...p})}); }catch(e){ console.warn('Cita:',e.message); }
 }
 
 // ═══════════════════════════════════════════════════════
