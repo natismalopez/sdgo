@@ -422,9 +422,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
       <span class="timer-val" id="timer-val">0 / 45 min</span>
     </div>
     <div class="pb-bg" style="margin-top:4px;height:5px"><div class="pb-fill" id="timer-pb" style="width:0%;background:var(--na)"></div></div>
-    <div style="text-align:right;margin-top:5px">
-      <button onclick="terminarSesionHoy()" style="background:none;border:none;color:rgba(255,255,255,.65);font-size:10px;cursor:pointer;font-family:var(--fnt);text-decoration:underline">Terminar sesión de hoy</button>
-    </div>
   </div>
   <div class="scroll" id="dash-scroll">
     <div class="mot"><strong id="mot-t">¡Empieza hoy!</strong><span id="mot-s">Elige una materia para comenzar.</span></div>
@@ -470,6 +467,9 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
       <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ts)"><div class="tdot" style="background:var(--gr)"></div>Completado</div>
       <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ts)"><div class="tdot" style="background:var(--na)"></div>En proceso</div>
       <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ts)"><div class="tdot" style="background:var(--bor)"></div>Bloqueado</div>
+    </div>
+    <div style="text-align:center;padding:2px 13px 16px">
+      <button onclick="terminarSesionHoy()" style="background:var(--gub);border:none;color:var(--gu);font-size:11px;font-weight:700;padding:8px 16px;border-radius:16px;cursor:pointer;font-family:var(--fnt)">⏱ Terminar sesión de hoy</button>
     </div>
   </div>
 </div>
@@ -1199,6 +1199,7 @@ function terminarSesionHoy(){
     ? '✅ ¡Completaste tu tiempo recomendado de hoy! Excelente concentración.'
     : '💡 Recuerda: lo recomendado son 45 minutos de estudio concentrado en una sola sesión. ¡Nos vemos en la próxima!';
   alert(msg);
+  navRoot('v-dash');   // regresa al inicio (donde puede elegir otra unidad)
 }
 function tiempoAgotado(){
   return tiempoHoyTotal()>=LIMITE_MIN;
