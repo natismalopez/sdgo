@@ -1037,7 +1037,7 @@ let DATA = {
 // ═══════════════════════════════════════════════════════
 let ST = {
   boleta:'', curp:'', nombre:'', email:'', grupo:'',
-  puntos:0, logros:[], progreso:{}, canjes:[], certificados:{}, inscritas:[],
+  puntos:0, puntosPorMateria:{}, logros:[], progreso:{}, canjes:[], certificados:{}, inscritas:[],
   insignias:[], autoevals:{},
   rachaActual:0, ultimoDia:'',
   tiempoHoy:0, fechaHoy:'', avisosTiempo:{},
@@ -1061,7 +1061,7 @@ function save(){
       nombre:ST.nombre, grupo:ST.grupo, email:ST.email, curp:ST.curp,
       validado:ST.validado||false,
       puntos:ST.puntos, logros:ST.logros, progreso:ST.progreso,
-      canjes:ST.canjes, certificados:ST.certificados||{}, inscritas:ST.inscritas, insignias:ST.insignias,
+      canjes:ST.canjes, certificados:ST.certificados||{}, puntosPorMateria:ST.puntosPorMateria||{}, inscritas:ST.inscritas, insignias:ST.insignias,
       rachaActual:ST.rachaActual, ultimoDia:ST.ultimoDia,
       tiempoHoy:ST.tiempoHoy, fechaHoy:ST.fechaHoy, avisosTiempo:ST.avisosTiempo||{},
       puntosCanje:ST.puntosCanje, autoevals:ST.autoevals||{},
@@ -1081,8 +1081,8 @@ function loadAlumno(boleta){
       if(!ST.email  && d.email)  ST.email=d.email;
       if(!ST.curp   && d.curp)   ST.curp=d.curp;
       ST.validado=d.validado||false;
-      ST.puntos=d.puntos||0; ST.logros=d.logros||[];
-      ST.progreso=d.progreso||{}; ST.canjes=d.canjes||[]; ST.certificados=d.certificados||{};
+      ST.puntos=d.puntos||0; ST.puntosPorMateria=d.puntosPorMateria||{}; ST.logros=d.logros||[];
+      ST.progreso=d.progreso||{}; ST.canjes=d.canjes||[]; ST.certificados=d.certificados||{}; ST.puntosPorMateria=ST.puntosPorMateria||d.puntosPorMateria||{};
       ST.inscritas=d.inscritas||[]; ST.insignias=d.insignias||[];
       ST.rachaActual=d.rachaActual||0; ST.ultimoDia=d.ultimoDia||'';
       ST.puntosCanje=d.puntosCanje||0; ST.autoevals=d.autoevals||{};
@@ -1695,6 +1695,50 @@ function contarReactivosTotal(matId){
 // ═══════════════════════════════════════════════════════
 // GUÍA
 // ═══════════════════════════════════════════════════════
+// Resaltado automático de código C (para fichas cargadas desde el Sheet en texto plano)
+function hlC(src){
+  let s=escCod(src);
+  const stash=[];
+  const enc=n=>String(n).replace(/\d/g,d=>'abcdefghij'[d]);
+  const keep=h=>{ stash.push(h); return `\u0000${enc(stash.length-1)}\u0000`; };
+  s=s.replace(/\/\/[^\n]*/g, m=>keep(`<span class="cc">${m}</span>`));            // comentarios
+  s=s.replace(/"[^"\n]*"|'[^'\n]*'/g, m=>keep(`<span class="cf">${m}</span>`));    // cadenas
+  s=s.replace(/#[a-zA-Z]+/g, m=>keep(`<span class="cf">${m}</span>`));             // preprocesador
+  s=s.replace(/\b(int|float|char|double|void|return|if|else|for|while|do|switch|case|break|continue|struct|const|unsigned|long|short|sizeof|typedef|enum)\b/g,'<span class="k">$1</span>');
+  s=s.replace(/\b(printf|scanf|main|gets|puts|fgets|strlen|strcpy|strcmp|malloc|free)\b/g,'<span class="cf">$1</span>');
+  s=s.replace(/\b\d+\.?\d*\b/g, m=>`<span class="cn">${m}</span>`);                 // números
+  s=s.replace(/\u0000([a-j]+)\u0000/g, (_,c)=>stash[parseInt(c.replace(/[a-j]/g,d=>'abcdefghij'.indexOf(d)),10)]); // restaurar
+  return s.replace(/\n/g,'<br>');
+}
+// Render de fichas provenientes de la hoja Fichas (Google Sheets)
+function renderFichasDesdeSheet(bloques, cont){
+  bloques.forEach((b,bi)=>{
+    const t=String(b.tipo||'').toLowerCase();
+    if(t==='def'){
+      cont.innerHTML+=`<div class="def-box"><h4>${escCod(b.campo1)}</h4><p>${escCod(b.campo2)}</p></div>`;
+    } else if(t==='formula'||t==='sintaxis'){
+      const nota=b.campo3?`<div class="formula-nota">${escCod(b.campo3)}</div>`:'';
+      cont.innerHTML+=`<div class="formula-box"><div class="formula-lbl">${escCod(b.campo1)||'Sintaxis'}</div><div class="formula-txt">${hlC(b.campo2)}</div>${nota}</div>`;
+    } else if(t==='codigo'||t==='cod'||t==='cod2'){
+      const salida=b.campo3?`<div class="cod-salida"><div class="cod-salida-lbl">Salida en pantalla</div><pre>${escCod(b.campo3)}</pre></div>`:'';
+      cont.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;padding:8px 12px 3px;text-transform:uppercase;letter-spacing:.5px">${escCod(b.campo1)}</div><div class="code-box" style="border-radius:var(--rad-s) var(--rad-s) 0 0;margin-bottom:0"><div class="cl">${hlC(b.campo2)}</div></div>${salida}`;
+    } else if(t==='clave'){
+      cont.innerHTML+=`<div class="key-box"><h4>💡 Punto clave</h4><p>${escCod(b.campo2||b.campo1)}</p></div>`;
+    } else if(t==='imagen'){
+      const cap=b.campo3?`<div class="img-box-cap">${escCod(b.campo3)}</div>`:'';
+      const expl=b.campo4?`<div class="img-box-expl">${escCod(b.campo4)}</div>`:'';
+      const sim=b.campo5?`<a href="${b.campo5}" target="_blank" class="img-box-link">🔗 Abrir simulador interactivo</a>`:'';
+      cont.innerHTML+=`<div class="img-box">${b.campo1?`<div class="img-box-lbl">${escCod(b.campo1)}</div>`:''}<img src="${b.campo2}" alt="${escCod(b.campo3)||'Diagrama'}" loading="lazy" onerror="this.parentElement.style.display='none'">${cap}${expl}${sim}</div>`;
+    } else if(t==='ejercicio'){
+      const solId='shsol-'+bi;
+      const salidaSol=b.campo3?`<div class="cod-salida"><div class="cod-salida-lbl">Salida</div><pre>${escCod(b.campo3)}</pre></div>`:'';
+      cont.innerHTML+=`<div class="ej-box"><h4>✏️ Practica tú mismo</h4><p class="ej-enunciado">${escCod(b.campo1)}</p>
+        <a href="https://www.onlinegdb.com/online_c_compiler" target="_blank" class="btn-compiler">💻 Abrir compilador en línea</a><br>
+        <button class="btn-sol" onclick="document.getElementById('${solId}').classList.toggle('show');this.textContent=this.textContent.includes('▼')?'Ocultar solución ▲':'Ver solución ▼'">Ver solución ▼</button>
+        <div class="sol-box" id="${solId}"><div style="font-size:10px;color:var(--ts);font-weight:700;padding:4px 0 3px;text-transform:uppercase;letter-spacing:.5px">Solución propuesta</div>${b.campo2?`<div class="code-box" style="margin:0"><div class="cl">${hlC(b.campo2)}</div></div>`:''}${salidaSol}</div></div>`;
+    }
+  });
+}
 // Escapa HTML dentro del código de las fichas (evita que <stdio.h> desaparezca
 // y permite seleccionar/copiar el código correctamente)
 function escCod(s){
@@ -1715,6 +1759,21 @@ function abrirGuia(temaIdxParam){
     toast('🔒 Aprueba el tema anterior para desbloquear este'); return;
   }
   const temaNombre = curMat.temas[temaIdx] || 'Guía de estudio';
+  // Sub-paso B — si la hoja Fichas (Google Sheets) tiene bloques para este tema, úsalos.
+  const sheetBloques = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.bloques;
+  if(Array.isArray(sheetBloques) && sheetBloques.length){
+    document.getElementById('g-mat-s').textContent=`${curMat.nombre} · Tema ${temaIdx+1} de ${curMat.temas.length}`;
+    document.getElementById('g-tema-t').textContent=temaNombre;
+    const cont=document.getElementById('g-content');
+    cont.innerHTML='<div style="height:10px"></div>';
+    renderFichasDesdeSheet(sheetBloques, cont);
+    const pdfUrlSheet = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.pdf_url || '';
+    const pdfUrl = pdfUrlSheet || `fichas/ficha-${curMat.id}-t${temaIdx}.pdf`;
+    cont.innerHTML+=`<div style="padding:0 12px 6px"><a href="${pdfUrl}" target="_blank" rel="noopener" class="btn-ficha-pdf" download="SDGo_${curMat.id}_tema${temaIdx+1}.pdf">📥 Descargar ficha en PDF</a></div>`;
+    cont.innerHTML+=`<div class="g-nav"><button onclick="navBack()">‹ Volver</button><button class="g-main" onclick="iniciarCuestionario()">Practicar ✏️</button><button onclick="navRoot('v-dash')">Inicio</button></div>`;
+    navTo('v-guia');
+    return;
+  }
   const temaGuias = GUIAS[curMat.id] || [];
   const temaData  = temaGuias[temaIdx];
   if(!temaData || !temaData.fichas || !temaData.fichas.length){
@@ -2031,11 +2090,6 @@ function umbralCita(){
 }
 function renderAse(){
   const UMBRAL = umbralCita();
-  document.getElementById('ase-pts-val').textContent=`${ST.puntos} puntos`;
-  const pctPts=Math.min(100,Math.round(ST.puntos/UMBRAL*100));
-  document.getElementById('ase-pb').style.width=pctPts+'%';
-  document.getElementById('ase-pts-lbl').textContent=ST.puntos+' pts';
-  document.getElementById('ase-hint').textContent=ST.puntos>=UMBRAL?'¡Puedes solicitar una cita!':`${UMBRAL-ST.puntos} pts más para solicitar cita`;
   const inscritas=ST.inscritas||[];
   // Materia en contexto de la cita: la elegida, o la que está estudiando, o la única inscrita
   let matSel='';
@@ -2044,6 +2098,14 @@ function renderAse(){
   else if(curMat && inscritas.includes(curMat.id)) matSel=curMat.id;
   else if(inscritas.length===1) matSel=inscritas[0];
   const necesitaSelector = !matSel && inscritas.length>1;
+  // Puntos que cuentan: los de la materia en contexto (bolsa por materia)
+  const ptsCtx = matSel ? puntosMateria(matSel) : 0;
+  document.getElementById('ase-pts-val').textContent=`${ptsCtx} puntos`;
+  const pctPts=Math.min(100,Math.round(ptsCtx/UMBRAL*100));
+  document.getElementById('ase-pb').style.width=pctPts+'%';
+  document.getElementById('ase-pts-lbl').textContent=ptsCtx+' pts';
+  document.getElementById('ase-hint').textContent = !matSel ? 'Elige la unidad de tu cita'
+    : (ptsCtx>=UMBRAL?'¡Puedes solicitar una cita!':`${UMBRAL-ptsCtx} pts más en esta unidad`);
   const nombreMat=(mid)=>{ const m=(DATA.materias||[]).find(x=>x.id===mid); return m?m.nombre:mid; };
   // Filtro de slots: disponibles y (si hay materia en contexto) solo de esa materia
   const disponible=a=>(a.disponible===true||String(a.disponible).toUpperCase()==='SI');
@@ -2075,7 +2137,7 @@ function renderAse(){
       <p style="font-size:11px;color:var(--ts);margin-bottom:10px">Elige la unidad de aprendizaje en la que quieres tu cita.</p>${botones}</div>`;
     return;
   }
-  if(ST.puntos>=UMBRAL){
+  if(ptsCtx>=UMBRAL){
     const slotsDisp=(DATA.asesorias||[]).filter(a=>disponible(a)&&enMateria(a));
     const cambiar = inscritas.length>1 ? `<button onclick="cambiarMatCita()" style="background:none;border:none;color:var(--gu);font-size:10px;text-decoration:underline;cursor:pointer;font-family:var(--fnt)">cambiar</button>` : '';
     const cabMat = matSel ? `<div style="font-size:11px;color:var(--ts);margin-bottom:8px">Unidad: <strong style="color:var(--nv)">${nombreMat(matSel)}</strong> ${cambiar}</div>` : '';
@@ -2090,7 +2152,7 @@ function renderAse(){
     sec.innerHTML=`<div class="cita-form">
       <h3>Solicitar cita de tutoría</h3>
       ${cabMat}
-      <div class="req-tag">✅ ${ST.puntos} pts — Requisito cumplido</div>
+      <div class="req-tag">✅ ${ptsCtx} pts — Requisito cumplido</div>
       <p style="font-size:11px;color:var(--ts);margin-bottom:8px">Selecciona un horario disponible. Las citas requieren <strong>72 horas de anticipación</strong>.</p>
       <div id="slots-lista">${slotsHTML}</div>
       <div id="slot-seleccionado" style="display:none;background:var(--gub);border:.5px solid var(--gu);border-radius:var(--rad-s);padding:10px;margin-bottom:8px">
@@ -2100,13 +2162,13 @@ function renderAse(){
       <div style="font-size:10px;color:var(--ts);margin-bottom:6px;font-weight:600">Modalidad:</div>
       <div style="display:flex;gap:8px;margin-bottom:10px">
         <div id="mod-pres" onclick="selMod('Presencial')" style="flex:1;padding:9px;background:var(--bg2);border:2px solid var(--bor);border-radius:var(--rad-s);text-align:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--ts)">🏫 Presencial</div>
-        <div id="mod-meet" onclick="selMod('Google Meet')" style="flex:1;padding:9px;background:var(--bg2);border:2px solid var(--bor);border-radius:var(--rad-s);text-align:center;cursor:pointer;font-size:11px;font-weight:600;color:var(--ts)">💻 Google Meet</div>
+        <div id="mod-meet" title="Disponible próximamente" style="flex:1;padding:9px;background:var(--bg2);border:2px solid var(--bor);border-radius:var(--rad-s);text-align:center;font-size:11px;font-weight:600;color:var(--bor);opacity:.6;cursor:not-allowed">💻 Google Meet<div style="font-size:8px;font-weight:700;color:var(--na);margin-top:1px">PRÓXIMAMENTE</div></div>
       </div>
       <button class="btn btn-gu" id="btn-cita" onclick="solicitarCita()">Enviar solicitud ›</button>
       <p style="font-size:10px;color:var(--ts);text-align:center;margin-top:6px">Requisito: ${UMBRAL} pts · Recibirás confirmación por correo</p>
     </div>`;
   } else {
-    sec.innerHTML=`<div class="card card-p" style="margin:0 12px 9px"><div style="font-size:12px;color:var(--ts);text-align:center;padding:4px">Acumula <strong style="color:var(--gu)">${UMBRAL-ST.puntos} pts más</strong> para solicitar una cita de tutoría.</div></div>`;
+    sec.innerHTML=`<div class="card card-p" style="margin:0 12px 9px"><div style="font-size:12px;color:var(--ts);text-align:center;padding:4px">Acumula <strong style="color:var(--gu)">${UMBRAL-ptsCtx} pts más</strong> en ${matSel?nombreMat(matSel):"esta unidad"} para tu cita.</div></div>`;
   }
 }
 function elegirMatCita(mid){ citaMatFilter=mid; citaForcePick=false; renderAse(); }
@@ -2161,40 +2223,51 @@ function selSlot(idx,dia,hora,lugar,fechaLabel,matId,matNombre){
 }
 
 function selMod(m){
+  if(m==='Google Meet'){ toast('💻 Google Meet estará disponible próximamente'); return; }
   modCita=m;
   const activo='var(--gu)'; const inact='var(--bor)';
   document.getElementById('mod-pres').style.borderColor=m==='Presencial'?activo:inact;
   document.getElementById('mod-pres').style.color=m==='Presencial'?'var(--gu)':'var(--ts)';
-  document.getElementById('mod-meet').style.borderColor=m==='Google Meet'?activo:inact;
-  document.getElementById('mod-meet').style.color=m==='Google Meet'?'var(--gu)':'var(--ts)';
 }
 
 async function solicitarCita(){
   if(!slotCita.dia){toast('⚠️ Selecciona un horario disponible');return;}
-  if(!modCita){toast('⚠️ Elige la modalidad (Presencial o Meet)');return;}
+  if(!modCita){toast('⚠️ Toca "Presencial" para elegir la modalidad');return;}
+  const COSTO=umbralCita();
+  const matCita = slotCita.materia_id||curMat?.id||'';
+  if(puntosMateria(matCita) < COSTO){ toast(`⚠️ Necesitas ${COSTO} pts en esa materia`); return; }
+  // Red de seguridad: la cita necesita un correo para confirmarse. Si por algo no lo tiene,
+  // se lo pedimos aquí mismo (Gmail), lo guardamos y seguimos sin salir del flujo.
+  if(!ST.email){
+    const email=pedirGmail('Para confirmarte la cita necesitamos tu correo Gmail:');
+    if(!email){ toast('⚠️ Necesitas registrar tu correo para agendar la cita'); return; }
+    ST.email=email; save();
+    fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({accion:'correo',boleta:ST.boleta,email:email})}).catch(e=>console.warn('Correo:',e.message));
+  }
   const btn=document.getElementById('btn-cita');
   btn.textContent='Enviando…'; btn.disabled=true;
-  const COSTO=umbralCita();
-  ST.puntos-=COSTO; ST.puntosCanje=(ST.puntosCanje||0)+COSTO;
-  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy'});
-  registrarCanje(`Cita asesoría ${slotCita.materia_nombre||slotCita.materia_id||''}`.trim(), COSTO);
+  descontarPuntos(matCita, COSTO); ST.puntosCanje=(ST.puntosCanje||0)+COSTO;
+  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.fecha||slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy'});
+  registrarCanje(`Cita asesoría ${slotCita.materia_nombre||matCita||''}`.trim(), COSTO, matCita);
   save();
   try{
     await enviarCita({
       boleta:       ST.boleta,
       nombre_alumno:ST.nombre||ST.boleta,
       grupo:        ST.grupo,
-      materia_id:   slotCita.materia_id||curMat?.id||'',
+      materia_id:   matCita,
       materia_nombre:slotCita.materia_nombre||curMat?.nombre||'',
       modalidad:    modCita,
       dia:          slotCita.dia,
       hora:         slotCita.hora,
+      fecha:        slotCita.fecha||'',
       lugar:        slotCita.lugar,
       fecha_iso:    slotCita.fechaISO||'',
-      puntos_alumno:ST.puntos+COSTO,
+      puntos_alumno:puntosMateria(matCita)+COSTO,
       email_alumno: ST.email||''
     });
-    toast('✅ Cita solicitada. Recibirás confirmación por correo.');
+    toast(`✅ Cita solicitada. Revisa tu correo ${ST.email||''} (y la carpeta de spam) para la confirmación.`);
   }catch(e){
     toast('✅ Solicitud registrada. La docente confirmará en 72 hrs.');
   }
@@ -2259,10 +2332,11 @@ function canjear(id){
   // RF6 — Asesoría: NO se cobra aquí. Lleva a agendar; el costo se cobra al confirmar
   // la cita (así no hay doble cargo ni queda bloqueada la pantalla de asesorías).
   if(r.tipo==='asesoria'){
-    const u=umbralCita();
-    if(ST.puntos<u){ toast(`⚠️ Necesitas ${u-ST.puntos} pts más para una cita`); return; }
+    const inscritas=ST.inscritas||[];
+    citaMatFilter = (curMat && inscritas.includes(curMat.id)) ? curMat.id : '';
+    citaForcePick = !citaMatFilter && inscritas.length>1;
     toast('🎓 Vamos a agendar tu asesoría');
-    setTimeout(()=>navRoot('v-ase'),500);
+    setTimeout(()=>navRoot('v-ase'),400);
     return;
   }
   // RF — Punto de participación: certificado por materia (con los temas cubiertos)
@@ -2298,10 +2372,22 @@ function canjear(id){
 }
 // Opción A — registra un gasto de puntos en el servidor (hoja Canjes) para que el
 // saldo sea real al volver a entrar (puntos = ganados − canjeados).
-async function registrarCanje(concepto, pts){
+async function registrarCanje(concepto, pts, materiaId){
   try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({accion:'canje',boleta:ST.boleta,concepto:concepto||'',puntos:Number(pts)||0})}); }
+    body:JSON.stringify({accion:'canje',boleta:ST.boleta,materia_id:materiaId||'',concepto:concepto||'',puntos:Number(pts)||0})}); }
   catch(e){ console.warn('Canje:',e.message); }
+}
+// Puntos NETOS de una materia (bolsa por materia). Si el servidor aún no los manda,
+// cae al saldo global como respaldo.
+function puntosMateria(mid){
+  if(ST.puntosPorMateria && ST.puntosPorMateria[mid]!=null) return ST.puntosPorMateria[mid];
+  return 0;
+}
+// Descuenta puntos de una materia (y del total global, que es la suma)
+function descontarPuntos(mid, pts){
+  ST.puntosPorMateria=ST.puntosPorMateria||{};
+  ST.puntosPorMateria[mid]=Math.max(0,(ST.puntosPorMateria[mid]||0)-pts);
+  ST.puntos=Math.max(0,(ST.puntos||0)-pts);
 }
 
 // ── Punto de participación: certificado por materia ──────────────────
@@ -2326,16 +2412,16 @@ function generarCertificado(matId, r){
   if(!mat){ toast('Materia no encontrada'); return; }
   // Si ya tiene certificado de esa materia, solo reábrelo (consultable, sin recobrar)
   if(ST.certificados && ST.certificados[matId]){ mostrarCertificado(matId); return; }
-  if(ST.puntos < r.pts){ toast(`⚠️ Necesitas ${r.pts-ST.puntos} pts más`); return; }
+  if(puntosMateria(matId) < r.pts){ toast(`⚠️ Necesitas ${r.pts-puntosMateria(matId)} pts más en ${mat.nombre}`); return; }
   const aprob=ST.progreso[matId]?.temasAprobados||{};
   const temas=(mat.temas||[]).filter((t,i)=>aprob[i]);
   const f=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
-  ST.puntos-=r.pts;
+  descontarPuntos(matId, r.pts);
   ST.certificados=ST.certificados||{};
   ST.certificados[matId]={fecha:f, temas, materia:mat.nombre, boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo};
   ST.canjes.push('cert:'+matId);
   ST.logros.unshift({t:`🏆 Certificado de participación: ${mat.nombre}`,pts:`-${r.pts}`,f:'Hoy'});
-  registrarCanje(`Certificado participación ${mat.nombre}`, r.pts);
+  registrarCanje(`Certificado participación ${mat.nombre}`, r.pts, matId);
   enviarCertificadoCorreo(matId);
   save(); renderLog();
   mostrarCertificado(matId);
@@ -2495,6 +2581,7 @@ async function sincronizarProgreso(boleta){
     });
     // Opción A — el servidor manda el saldo NETO (ganados − canjeados); es la fuente de verdad
     if(d.puntos!=null) ST.puntos=d.puntos;
+    if(d.puntosPorMateria) ST.puntosPorMateria=d.puntosPorMateria;
     if(d.promedios) ST.promedios=d.promedios;
     if(typeof d.promedioGlobal==='number') ST.promedioGlobal=d.promedioGlobal;
     if(d.logros&&d.logros.length>=ST.logros.length) ST.logros=d.logros;

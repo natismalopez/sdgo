@@ -1,7 +1,7 @@
-// SDGo! Service Worker — v12
+// SDGo! Service Worker — v16
 // Estrategia: network-first para el HTML (para que las versiones nuevas lleguen
 // solas al recargar, sin que el alumno limpie caché) y la API siempre por red.
-const CACHE = 'sdgo-v12';
+const CACHE = 'sdgo-v16';
 const ASSETS = ['./index.html','./manifest.json'];
 
 self.addEventListener('install', e => {
