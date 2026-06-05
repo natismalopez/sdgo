@@ -173,7 +173,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .def-box p{font-size:12px;color:var(--ts);line-height:1.6}
 .code-box{background:#0A1535;border-radius:var(--rad-s);margin:4px 12px 8px;padding:11px 13px;overflow-x:auto}
 .cl{font-family:var(--mono);font-size:12px;line-height:1.9}
-.ck{color:#79C0FF}.cf{color:#D2A8FF}.cc{color:#6E7F9E}.cn{color:#FFA657}.cw{color:#CDD9E5}
+.ck{color:#79C0FF}.k{color:#79C0FF;font-weight:500}.cf{color:#D2A8FF}.cc{color:#8B9BB4}.cn{color:#FFA657}.cw{color:#E6EDF5}
 .key-box{background:var(--nab);border-radius:var(--rad-s);margin:4px 12px 8px;padding:10px 12px;border:.5px solid rgba(227,115,34,.25)}
 .key-box h4{font-size:11px;font-weight:700;color:#A85000;margin-bottom:3px}
 .key-box p{font-size:11px;color:var(--ts);line-height:1.5}
@@ -1037,7 +1037,7 @@ let DATA = {
 // ═══════════════════════════════════════════════════════
 let ST = {
   boleta:'', curp:'', nombre:'', email:'', grupo:'',
-  puntos:0, logros:[], progreso:{}, canjes:[], inscritas:[],
+  puntos:0, logros:[], progreso:{}, canjes:[], certificados:{}, inscritas:[],
   insignias:[], autoevals:{},
   rachaActual:0, ultimoDia:'',
   tiempoHoy:0, fechaHoy:'', avisosTiempo:{},
@@ -1061,7 +1061,7 @@ function save(){
       nombre:ST.nombre, grupo:ST.grupo, email:ST.email, curp:ST.curp,
       validado:ST.validado||false,
       puntos:ST.puntos, logros:ST.logros, progreso:ST.progreso,
-      canjes:ST.canjes, inscritas:ST.inscritas, insignias:ST.insignias,
+      canjes:ST.canjes, certificados:ST.certificados||{}, inscritas:ST.inscritas, insignias:ST.insignias,
       rachaActual:ST.rachaActual, ultimoDia:ST.ultimoDia,
       tiempoHoy:ST.tiempoHoy, fechaHoy:ST.fechaHoy, avisosTiempo:ST.avisosTiempo||{},
       puntosCanje:ST.puntosCanje, autoevals:ST.autoevals||{},
@@ -1082,7 +1082,7 @@ function loadAlumno(boleta){
       if(!ST.curp   && d.curp)   ST.curp=d.curp;
       ST.validado=d.validado||false;
       ST.puntos=d.puntos||0; ST.logros=d.logros||[];
-      ST.progreso=d.progreso||{}; ST.canjes=d.canjes||[];
+      ST.progreso=d.progreso||{}; ST.canjes=d.canjes||[]; ST.certificados=d.certificados||{};
       ST.inscritas=d.inscritas||[]; ST.insignias=d.insignias||[];
       ST.rachaActual=d.rachaActual||0; ST.ultimoDia=d.ultimoDia||'';
       ST.puntosCanje=d.puntosCanje||0; ST.autoevals=d.autoevals||{};
@@ -1189,12 +1189,16 @@ function actualizarTimerUI(min){
     toast('💪 Vas a la mitad de tu sesión, sigue concentrado');
   }
 }
-// RF8 — cierre voluntario de sesión con mini-resumen
+// RF8 — cierre voluntario de sesión con mini-resumen y recomendación
 function terminarSesionHoy(){
   const min=tiempoHoyTotal();
-  detenerTimer();
   const nTemas=Object.values(ST.progreso||{}).reduce((a,p)=>a+Object.keys(p.temasAprobados||{}).length,0);
-  toast(`✅ Sesión cerrada · ${min} min estudiados · ${nTemas} temas · ${ST.puntos} pts`);
+  detenerTimer();
+  let msg=`Resumen de tu sesión de hoy\n\n⏱  ${min} min estudiados\n📚  ${nTemas} temas aprobados\n⭐  ${ST.puntos} pts\n\n`;
+  msg += (min>=LIMITE_MIN)
+    ? '✅ ¡Completaste tu tiempo recomendado de hoy! Excelente concentración.'
+    : '💡 Recuerda: lo recomendado son 45 minutos de estudio concentrado en una sola sesión. ¡Nos vemos en la próxima!';
+  alert(msg);
 }
 function tiempoAgotado(){
   return tiempoHoyTotal()>=LIMITE_MIN;
@@ -1691,6 +1695,12 @@ function contarReactivosTotal(matId){
 // ═══════════════════════════════════════════════════════
 // GUÍA
 // ═══════════════════════════════════════════════════════
+// Escapa HTML dentro del código de las fichas (evita que <stdio.h> desaparezca
+// y permite seleccionar/copiar el código correctamente)
+function escCod(s){
+  return String(s==null?'':s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 function abrirGuia(temaIdxParam){
   if(!curMat) return;
   // Obtener índice del tema: el solicitado (revisita) o el que está estudiando
@@ -1730,9 +1740,9 @@ function abrirGuia(temaIdxParam){
       cont.innerHTML+=`<div class="def-box"><h4>${b.preg}</h4><p>${b.resp}</p></div>`;
     } else if(b.tipo==='cod'||b.tipo==='cod2'){
       let ch='';
-      b.lineas.forEach(([t,tx])=>{ ch+=`<span class="${t}">${tx.replace(/\n/g,'<br>')}</span>`; });
+      b.lineas.forEach(([t,tx])=>{ ch+=`<span class="${t}">${escCod(tx).replace(/\n/g,'<br>')}</span>`; });
       const salidaHtml = b.salida
-        ? `<div class="cod-salida"><div class="cod-salida-lbl">Salida en pantalla</div><pre>${b.salida}</pre></div>`
+        ? `<div class="cod-salida"><div class="cod-salida-lbl">Salida en pantalla</div><pre>${escCod(b.salida)}</pre></div>`
         : '';
       cont.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;padding:8px 12px 3px;text-transform:uppercase;letter-spacing:.5px">${b.titulo}</div><div class="code-box" style="border-radius:var(--rad-s) var(--rad-s) 0 0;margin-bottom:0"><div class="cl">${ch}</div></div>${salidaHtml}`;
     } else if(b.tipo==='clave'){
@@ -1760,9 +1770,9 @@ function abrirGuia(temaIdxParam){
       const sol = b.solucion || '';
       let solCode=''; 
       if(sol.lineas){
-        sol.lineas.forEach(([t,tx])=>{ solCode+=`<span class="${t}">${tx.replace(/\n/g,'<br>')}</span>`; });
+        sol.lineas.forEach(([t,tx])=>{ solCode+=`<span class="${t}">${escCod(tx).replace(/\n/g,'<br>')}</span>`; });
       }
-      const salidaSol = sol.salida?`<div class="cod-salida"><div class="cod-salida-lbl">Salida</div><pre>${sol.salida}</pre></div>`:'';
+      const salidaSol = sol.salida?`<div class="cod-salida"><div class="cod-salida-lbl">Salida</div><pre>${escCod(sol.salida)}</pre></div>`:'';
       cont.innerHTML+=`<div class="ej-box">
         <h4>✏️ Practica tú mismo</h4>
         <p class="ej-enunciado">${b.enunciado}</p>
@@ -2026,32 +2036,49 @@ function renderAse(){
   document.getElementById('ase-pb').style.width=pctPts+'%';
   document.getElementById('ase-pts-lbl').textContent=ST.puntos+' pts';
   document.getElementById('ase-hint').textContent=ST.puntos>=UMBRAL?'¡Puedes solicitar una cita!':`${UMBRAL-ST.puntos} pts más para solicitar cita`;
-  // Docentes
-  const lista=document.getElementById('docentes-list');
   const inscritas=ST.inscritas||[];
-  const ases=(DATA.asesorias||[]).filter(a=>(inscritas.length===0||inscritas.includes(a.materia_id))&&(a.disponible===true||String(a.disponible).toUpperCase()==='SI'));
+  // Materia en contexto de la cita: la elegida, o la que está estudiando, o la única inscrita
+  let matSel='';
+  if(citaForcePick) matSel='';
+  else if(citaMatFilter && inscritas.includes(citaMatFilter)) matSel=citaMatFilter;
+  else if(curMat && inscritas.includes(curMat.id)) matSel=curMat.id;
+  else if(inscritas.length===1) matSel=inscritas[0];
+  const necesitaSelector = !matSel && inscritas.length>1;
+  const nombreMat=(mid)=>{ const m=(DATA.materias||[]).find(x=>x.id===mid); return m?m.nombre:mid; };
+  // Filtro de slots: disponibles y (si hay materia en contexto) solo de esa materia
+  const disponible=a=>(a.disponible===true||String(a.disponible).toUpperCase()==='SI');
+  const enMateria=a=> matSel ? a.materia_id===matSel : (inscritas.length===0||inscritas.includes(a.materia_id));
+  // Docentes (mismos criterios)
+  const lista=document.getElementById('docentes-list');
+  const ases=(DATA.asesorias||[]).filter(a=>disponible(a)&&enMateria(a));
   if(ases.length){
     const porProf={};
     ases.forEach(a=>{ if(!porProf[a.profesor]) porProf[a.profesor]=[]; porProf[a.profesor].push(a); });
     lista.innerHTML=Object.entries(porProf).map(([prof,slots])=>{
       const initials=prof.replace(/Prof[ar]?\.?\s*/i,'').trim().split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
-      const disp=slots.filter(s=>s.disponible===true||String(s.disponible).toUpperCase()==='SI');
-      const horarios=disp.map(s=>`${s.dia} ${s.hora_inicio}–${s.hora_fin} · ${s.lugar}`).join('<br>');
+      const horarios=slots.map(s=>`${s.dia} ${s.hora_inicio}–${s.hora_fin} · ${s.lugar}`).join('<br>');
       const materias=[...new Set(slots.map(s=>s.materia))].join(' · ');
       return `<div class="doc-card">
         <div class="av">${initials}</div>
         <div style="flex:1"><div class="doc-n">${prof}</div><div class="doc-s">${materias}</div>
-        ${disp.length?`<div class="doc-disp">${horarios}</div>`:'<div class="doc-nodisp">Sin disponibilidad esta semana</div>'}
+        <div class="doc-disp">${horarios}</div>
         </div></div>`;
     }).join('');
   } else {
-    lista.innerHTML=`<div class="doc-card"><div class="av">NL</div><div><div class="doc-n">Profra. N. López Salas</div><div class="doc-s">Lenguaje de Programación · Sistemas Digitales</div><div class="doc-disp">Mar y Jue 14:00–16:00 · Sala 3</div></div></div>`;
+    lista.innerHTML=`<div class="doc-card"><div style="font-size:11px;color:var(--ts);padding:6px">Sin horarios disponibles${matSel?` para ${nombreMat(matSel)}`:''} esta semana.</div></div>`;
   }
   // Sección de solicitud
   const sec=document.getElementById('cita-section');
+  if(necesitaSelector){
+    const botones=inscritas.map(mid=>`<button class="btn btn-o" style="margin-bottom:7px" onclick="elegirMatCita('${mid}')">${nombreMat(mid)}</button>`).join('');
+    sec.innerHTML=`<div class="cita-form"><h3>¿Para qué unidad es la asesoría?</h3>
+      <p style="font-size:11px;color:var(--ts);margin-bottom:10px">Elige la unidad de aprendizaje en la que quieres tu cita.</p>${botones}</div>`;
+    return;
+  }
   if(ST.puntos>=UMBRAL){
-    // Obtener slots disponibles
-    const slotsDisp=(DATA.asesorias||[]).filter(a=>(inscritas.length===0||inscritas.includes(a.materia_id))&&(a.disponible===true||String(a.disponible).toUpperCase()==='SI'));
+    const slotsDisp=(DATA.asesorias||[]).filter(a=>disponible(a)&&enMateria(a));
+    const cambiar = inscritas.length>1 ? `<button onclick="cambiarMatCita()" style="background:none;border:none;color:var(--gu);font-size:10px;text-decoration:underline;cursor:pointer;font-family:var(--fnt)">cambiar</button>` : '';
+    const cabMat = matSel ? `<div style="font-size:11px;color:var(--ts);margin-bottom:8px">Unidad: <strong style="color:var(--nv)">${nombreMat(matSel)}</strong> ${cambiar}</div>` : '';
     const slotsHTML=slotsDisp.map((s,i)=>{
       const fechaSlot=proximaFechaDia(s.dia);
       return `<div id="slot-${i}" onclick="selSlot(${i},'${s.dia}','${s.hora_inicio}','${s.lugar}','${fechaSlot}','${s.materia_id||''}','${s.materia||''}')"
@@ -2062,6 +2089,7 @@ function renderAse(){
     }).join('') || '<div style="font-size:11px;color:var(--ts);padding:8px">No hay horarios disponibles esta semana.</div>';
     sec.innerHTML=`<div class="cita-form">
       <h3>Solicitar cita de tutoría</h3>
+      ${cabMat}
       <div class="req-tag">✅ ${ST.puntos} pts — Requisito cumplido</div>
       <p style="font-size:11px;color:var(--ts);margin-bottom:8px">Selecciona un horario disponible. Las citas requieren <strong>72 horas de anticipación</strong>.</p>
       <div id="slots-lista">${slotsHTML}</div>
@@ -2081,7 +2109,11 @@ function renderAse(){
     sec.innerHTML=`<div class="card card-p" style="margin:0 12px 9px"><div style="font-size:12px;color:var(--ts);text-align:center;padding:4px">Acumula <strong style="color:var(--gu)">${UMBRAL-ST.puntos} pts más</strong> para solicitar una cita de tutoría.</div></div>`;
   }
 }
+function elegirMatCita(mid){ citaMatFilter=mid; citaForcePick=false; renderAse(); }
+function cambiarMatCita(){ citaForcePick=true; renderAse(); }
 let modCita='';
+let citaMatFilter='';   // materia elegida para la cita (selector)
+let citaForcePick=false; // fuerza mostrar el selector de materia
 let slotCita={dia:'',hora:'',lugar:'',fecha:'',materia_id:'',materia_nombre:''};
 
 // Calcular la próxima fecha para un día de la semana (con 72h de anticipación)
@@ -2145,6 +2177,7 @@ async function solicitarCita(){
   const COSTO=umbralCita();
   ST.puntos-=COSTO; ST.puntosCanje=(ST.puntosCanje||0)+COSTO;
   ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy'});
+  registrarCanje(`Cita asesoría ${slotCita.materia_nombre||slotCita.materia_id||''}`.trim(), COSTO);
   save();
   try{
     await enviarCita({
@@ -2199,6 +2232,15 @@ function renderLog(){
       <button class="can-btn ${can?'':'no'}" onclick="canjear('${r.id}')">${ya?'Canjeado':can?'Canjear':'Bloqueado'}</button></div>
     </div>`;
   }).join('');
+  // Mis certificados (reabrir para mostrar al docente)
+  const certs=Object.keys(ST.certificados||{});
+  if(certs.length){
+    const nombreMat=(mid)=>{ const m=(DATA.materias||[]).find(x=>x.id===mid); return m?m.nombre:(ST.certificados[mid].materia||mid); };
+    rl.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:10px 2px 4px">Mis certificados</div>`+
+      certs.map(mid=>`<div class="rec-card"><div class="rec-ico">🏆</div>
+        <div><div class="rec-n">${nombreMat(mid)}</div><div class="rec-s">Certificado de participación</div></div>
+        <div class="rec-r"><button class="can-btn" style="background:var(--gu)" onclick="mostrarCertificado('${mid}')">Ver</button></div></div>`).join('');
+  }
   // Historial
   const hl=document.getElementById('hist-list');
   if(!ST.logros.length){
@@ -2214,7 +2256,21 @@ function renderLog(){
 function canjear(id){
   const r=DATA.recompensas.find(x=>x.id===id);
   if(!r){toast('No disponible');return;}
-  // Si ya se canjeó un PDF, permitir reabrirlo sin volver a cobrar
+  // RF6 — Asesoría: NO se cobra aquí. Lleva a agendar; el costo se cobra al confirmar
+  // la cita (así no hay doble cargo ni queda bloqueada la pantalla de asesorías).
+  if(r.tipo==='asesoria'){
+    const u=umbralCita();
+    if(ST.puntos<u){ toast(`⚠️ Necesitas ${u-ST.puntos} pts más para una cita`); return; }
+    toast('🎓 Vamos a agendar tu asesoría');
+    setTimeout(()=>navRoot('v-ase'),500);
+    return;
+  }
+  // RF — Punto de participación: certificado por materia (con los temas cubiertos)
+  if(r.tipo==='certificado'){
+    abrirCertificado(r);
+    return;
+  }
+  // Reabrir un PDF ya canjeado sin volver a cobrar
   if(ST.canjes.includes(id)){
     if(r.tipo==='pdf' && r.recurso){ window.open(r.recurso,'_blank'); return; }
     toast('Ya canjeada');return;
@@ -2231,13 +2287,8 @@ function canjear(id){
   ST.puntos-=r.pts; ST.canjes.push(id);
   if(r.tipo==='punto') ST.puntosCanje=(ST.puntosCanje||0)+1;
   ST.logros.unshift({t:`🎁 Canjeaste: ${r.n}`,pts:`-${r.pts}`,f:'Hoy'});
+  registrarCanje(r.n, r.pts);   // opción A — el gasto se guarda en el servidor
   save(); renderLog();
-  // RF6 — acción según el tipo de recompensa
-  if(r.tipo==='asesoria'){
-    toast('✅ Asesoría canjeada — agenda tu cita');
-    setTimeout(()=>navRoot('v-ase'),700);   // lleva a agendar con el docente
-    return;
-  }
   if(r.tipo==='pdf'){
     if(r.recurso){ toast('📘 Abriendo tu material…'); window.open(r.recurso,'_blank'); }
     else toast('⚠️ Material no disponible por ahora');
@@ -2245,6 +2296,89 @@ function canjear(id){
   }
   toast(`✅ ¡${r.n} canjeado!`);
 }
+// Opción A — registra un gasto de puntos en el servidor (hoja Canjes) para que el
+// saldo sea real al volver a entrar (puntos = ganados − canjeados).
+async function registrarCanje(concepto, pts){
+  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({accion:'canje',boleta:ST.boleta,concepto:concepto||'',puntos:Number(pts)||0})}); }
+  catch(e){ console.warn('Canje:',e.message); }
+}
+
+// ── Punto de participación: certificado por materia ──────────────────
+// Un certificado por cada materia, con los temas que el alumno cubrió en ELLA.
+function abrirCertificado(r){
+  const inscritas=ST.inscritas||[];
+  // Materia en contexto: la que estudia, o la única inscrita
+  let matId = (curMat && inscritas.includes(curMat.id)) ? curMat.id
+            : (inscritas.length===1 ? inscritas[0] : '');
+  if(matId){ generarCertificado(matId, r); return; }
+  if(!inscritas.length){ toast('⚠️ Inscríbete a una unidad primero'); return; }
+  // Varias inscritas y sin contexto: elegir materia
+  const nombreMat=(mid)=>{ const m=(DATA.materias||[]).find(x=>x.id===mid); return m?m.nombre:mid; };
+  const botones=inscritas.map(mid=>`<button class="btn btn-o" style="margin-bottom:7px" onclick="cerrarOverlay();generarCertificado('${mid}',CANJE_CERT)">${nombreMat(mid)}</button>`).join('');
+  window.CANJE_CERT=r;
+  overlay(`<h3 style="color:var(--gu);margin:0 0 4px">¿De qué materia?</h3>
+    <p style="font-size:12px;color:var(--ts);margin:0 0 12px">Elige la unidad de la que quieres tu certificado de participación.</p>${botones}
+    <button class="btn btn-s" onclick="cerrarOverlay()">Cancelar</button>`);
+}
+function generarCertificado(matId, r){
+  const mat=(DATA.materias||[]).find(m=>m.id===matId);
+  if(!mat){ toast('Materia no encontrada'); return; }
+  // Si ya tiene certificado de esa materia, solo reábrelo (consultable, sin recobrar)
+  if(ST.certificados && ST.certificados[matId]){ mostrarCertificado(matId); return; }
+  if(ST.puntos < r.pts){ toast(`⚠️ Necesitas ${r.pts-ST.puntos} pts más`); return; }
+  const aprob=ST.progreso[matId]?.temasAprobados||{};
+  const temas=(mat.temas||[]).filter((t,i)=>aprob[i]);
+  const f=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  ST.puntos-=r.pts;
+  ST.certificados=ST.certificados||{};
+  ST.certificados[matId]={fecha:f, temas, materia:mat.nombre, boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo};
+  ST.canjes.push('cert:'+matId);
+  ST.logros.unshift({t:`🏆 Certificado de participación: ${mat.nombre}`,pts:`-${r.pts}`,f:'Hoy'});
+  registrarCanje(`Certificado participación ${mat.nombre}`, r.pts);
+  enviarCertificadoCorreo(matId);
+  save(); renderLog();
+  mostrarCertificado(matId);
+}
+function mostrarCertificado(matId){
+  const c=ST.certificados&&ST.certificados[matId];
+  if(!c){ toast('Certificado no disponible'); return; }
+  const temasHTML = c.temas.length
+    ? c.temas.map((t,i)=>`<div style="font-size:12px;color:var(--tx);padding:3px 0;border-bottom:.5px solid var(--bor)">✅ ${i+1}. ${t}</div>`).join('')
+    : '<div style="font-size:12px;color:var(--ts)">Aún sin temas aprobados registrados.</div>';
+  overlay(`
+    <div style="text-align:center">
+      <div style="font-size:30px">🏆</div>
+      <div style="font-size:11px;color:var(--gu);font-weight:800;letter-spacing:.5px;text-transform:uppercase">Certificado de participación</div>
+      <div style="font-size:10px;color:var(--ts);margin-bottom:10px">SDGo! · CECyT 9 · IPN</div>
+    </div>
+    <div style="font-size:13px;color:var(--nv);font-weight:700;text-align:center">${c.nombre}</div>
+    <div style="font-size:11px;color:var(--ts);text-align:center;margin-bottom:10px">Boleta ${c.boleta} · Grupo ${c.grupo}</div>
+    <div style="font-size:12px;color:var(--tx);text-align:center;margin-bottom:8px">Unidad de aprendizaje:<br><strong style="color:var(--gu)">${c.materia}</strong></div>
+    <div style="font-size:10px;color:var(--ts);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Temas cubiertos (${c.temas.length})</div>
+    <div style="background:var(--bg2);border-radius:var(--rad-s);padding:8px 11px;margin-bottom:10px">${temasHTML}</div>
+    <div style="font-size:10px;color:var(--ts);text-align:center;margin-bottom:10px">Emitido el ${c.fecha}. Muéstralo a tu docente.</div>
+    <button class="btn btn-gu" onclick="cerrarOverlay()">Cerrar</button>
+  `);
+}
+async function enviarCertificadoCorreo(matId){
+  const c=ST.certificados[matId]; if(!c) return;
+  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({accion:'certificado',boleta:ST.boleta,nombre:c.nombre,grupo:c.grupo,
+      materia_nombre:c.materia,temas:c.temas,fecha:c.fecha,email_alumno:ST.email||''})}); }
+  catch(e){ console.warn('Certificado:',e.message); }
+}
+// Overlay genérico reutilizable (modal a pantalla)
+function overlay(html){
+  cerrarOverlay();
+  const o=document.createElement('div');
+  o.id='sdgo-overlay';
+  o.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(10,5,15,.55);display:flex;align-items:center;justify-content:center;padding:20px';
+  o.innerHTML=`<div style="background:#fff;border-radius:16px;max-width:340px;width:100%;max-height:85vh;overflow:auto;padding:18px 16px;box-shadow:0 12px 40px rgba(0,0,0,.3)">${html}</div>`;
+  o.addEventListener('click',e=>{ if(e.target===o) cerrarOverlay(); });
+  document.body.appendChild(o);
+}
+function cerrarOverlay(){ const o=document.getElementById('sdgo-overlay'); if(o) o.remove(); }
 function canjearGratis(id){
   toast('📄 Constancia generada — función disponible en v1.1');
 }
@@ -2359,7 +2493,8 @@ async function sincronizarProgreso(boleta){
         ultimaCal: cur.ultimaCal||0
       };
     });
-    if((d.puntos||0)>ST.puntos) ST.puntos=d.puntos;
+    // Opción A — el servidor manda el saldo NETO (ganados − canjeados); es la fuente de verdad
+    if(d.puntos!=null) ST.puntos=d.puntos;
     if(d.promedios) ST.promedios=d.promedios;
     if(typeof d.promedioGlobal==='number') ST.promedioGlobal=d.promedioGlobal;
     if(d.logros&&d.logros.length>=ST.logros.length) ST.logros=d.logros;
