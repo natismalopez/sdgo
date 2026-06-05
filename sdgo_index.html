@@ -172,7 +172,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .def-box h4{font-size:12px;font-weight:700;color:var(--nv);margin-bottom:4px}
 .def-box p{font-size:12px;color:var(--ts);line-height:1.6}
 .code-box{background:#0A1535;border-radius:var(--rad-s);margin:4px 12px 8px;padding:11px 13px;overflow-x:auto}
-.cl{font-family:var(--mono);font-size:12px;line-height:1.9}
+.cl{font-family:var(--mono);font-size:12px;line-height:1.9;color:#E6EDF5}
 .ck{color:#79C0FF}.k{color:#79C0FF;font-weight:500}.cf{color:#D2A8FF}.cc{color:#8B9BB4}.cn{color:#FFA657}.cw{color:#E6EDF5}
 .key-box{background:var(--nab);border-radius:var(--rad-s);margin:4px 12px 8px;padding:10px 12px;border:.5px solid rgba(227,115,34,.25)}
 .key-box h4{font-size:11px;font-weight:700;color:#A85000;margin-bottom:3px}
@@ -1702,7 +1702,8 @@ function hlC(src){
   const stash=[];
   const enc=n=>String(n).replace(/\d/g,d=>'abcdefghij'[d]);
   const keep=h=>{ stash.push(h); return `\u0000${enc(stash.length-1)}\u0000`; };
-  s=s.replace(/\/\/[^\n]*/g, m=>keep(`<span class="cc">${m}</span>`));            // comentarios
+  s=s.replace(/\/\*[\s\S]*?\*\//g, m=>keep(`<span class="cc">${m}</span>`));       // comentarios de bloque
+  s=s.replace(/\/\/[^\n]*/g, m=>keep(`<span class="cc">${m}</span>`));            // comentarios de línea
   s=s.replace(/"[^"\n]*"|'[^'\n]*'/g, m=>keep(`<span class="cf">${m}</span>`));    // cadenas
   s=s.replace(/#[a-zA-Z]+/g, m=>keep(`<span class="cf">${m}</span>`));             // preprocesador
   s=s.replace(/\b(int|float|char|double|void|return|if|else|for|while|do|switch|case|break|continue|struct|const|unsigned|long|short|sizeof|typedef|enum)\b/g,'<span class="k">$1</span>');
@@ -2265,7 +2266,7 @@ async function solicitarCita(){
       fecha:        slotCita.fecha||'',
       lugar:        slotCita.lugar,
       fecha_iso:    slotCita.fechaISO||'',
-      puntos_alumno:puntosMateria(matCita)+COSTO,
+      puntos_alumno:puntosMateria(matCita),
       email_alumno: ST.email||''
     });
     toast(`✅ Cita solicitada. Revisa tu correo ${ST.email||''} (y la carpeta de spam) para la confirmación.`);
@@ -2297,13 +2298,30 @@ function renderLog(){
         <div class="rec-r"><div class="rec-p" style="color:var(--grd)">Gratis</div>
         <button class="can-btn" style="background:var(--gr)" onclick="canjearGratis('${r.id}')">Descargar</button></div></div>`;
     }
+    const t=(r.tipo||'').toLowerCase();
+    // Asesoría: repetible. NO se cobra aquí; lleva a agendar y se cobra por materia al confirmar.
+    if(t==='asesoria'||t==='cita'){
+      return `<div class="rec-card"><div class="rec-ico">${r.ico}</div>
+        <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
+        <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
+        <button class="can-btn" onclick="canjear('${r.id}')">Agendar</button></div></div>`;
+    }
+    // Certificado: un solo canje por materia; disponible si alguna materia inscrita junta los pts.
+    if(t==='certificado'){
+      const dispo=(ST.inscritas||[]).some(mid=>puntosMateria(mid)>=r.pts && !(ST.certificados||{})[mid]);
+      return `<div class="rec-card ${dispo?'':'lk'}"><div class="rec-ico">${r.ico}</div>
+        <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
+        <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
+        <button class="can-btn ${dispo?'':'no'}" onclick="canjear('${r.id}')">${dispo?'Canjear':'Bloqueado'}</button></div></div>`;
+    }
+    // PDF y otros: por saldo global. Si ya se canjeó, se puede volver a abrir sin recobrar.
     const can=ST.puntos>=r.pts&&!ST.canjes.includes(r.id);
     const ya=ST.canjes.includes(r.id);
     return `<div class="rec-card ${can||ya?'':'lk'}">
       <div class="rec-ico">${r.ico}</div>
       <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
       <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
-      <button class="can-btn ${can?'':'no'}" onclick="canjear('${r.id}')">${ya?'Canjeado':can?'Canjear':'Bloqueado'}</button></div>
+      <button class="can-btn ${can||ya?'':'no'}" onclick="canjear('${r.id}')">${ya?'Abrir de nuevo':can?'Canjear':'Bloqueado'}</button></div>
     </div>`;
   }).join('');
   // Mis certificados (reabrir para mostrar al docente)
@@ -2332,7 +2350,7 @@ function canjear(id){
   if(!r){toast('No disponible');return;}
   // RF6 — Asesoría: NO se cobra aquí. Lleva a agendar; el costo se cobra al confirmar
   // la cita (así no hay doble cargo ni queda bloqueada la pantalla de asesorías).
-  if(r.tipo==='asesoria'){
+  if(r.tipo==='asesoria'||r.tipo==='cita'){
     const inscritas=ST.inscritas||[];
     citaMatFilter = (curMat && inscritas.includes(curMat.id)) ? curMat.id : '';
     citaForcePick = !citaMatFilter && inscritas.length>1;
