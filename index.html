@@ -1211,6 +1211,7 @@ function terminarSesionHoy(){
   const min=tiempoHoyTotal();
   const nTemas=Object.values(ST.progreso||{}).reduce((a,p)=>a+Object.keys(p.temasAprobados||{}).length,0);
   detenerTimer();
+  flushPuntosAlServidor();   // guarda los puntos activos al salir → otro dispositivo los jala
   let msg=`Resumen de tu sesión de hoy\n\n⏱  ${min} min estudiados\n📚  ${nTemas} temas aprobados\n⭐  ${ST.puntos} pts\n\n`;
   msg += (min>=LIMITE_MIN)
     ? '✅ ¡Completaste tu tiempo recomendado de hoy! Excelente concentración.'
@@ -1291,6 +1292,31 @@ async function enviarProgreso(p){
   try{ await fetch(API_URL,{method:'POST',
     headers:{'Content-Type':'text/plain;charset=utf-8'},
     body:JSON.stringify({accion:'progreso',...p})}); }catch(e){ console.warn('Progreso:',e.message); }
+}
+// Al SALIR / terminar sesión: re-afirma en el servidor el MEJOR resultado de cada tema,
+// para que cualquier punto que no haya alcanzado a guardarse quede en el ledger y otro
+// dispositivo lo pueda jalar. Es idempotente: el servidor calcula la mejora (si ya estaba,
+// suma 0; si faltaba, lo recupera). No toca canjes ni duplica puntos.
+async function flushPuntosAlServidor(){
+  if(!ST.boleta) return;
+  const envios=[];
+  Object.keys(ST.progreso||{}).forEach(mid=>{
+    const mat=(DATA.materias||[]).find(x=>x.id===mid);
+    const pt=(ST.progreso[mid]&&ST.progreso[mid].puntosTema)||{};
+    Object.keys(pt).forEach(ti=>{
+      const val=Number(pt[ti])||0;
+      if(val>0){
+        const cal = val>=75 ? 100 : 80;   // % que corresponde al valor del tema (75→100%, 50→80%)
+        envios.push(enviarProgreso({
+          boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo,
+          materia_id:mid, materia_nombre:mat?mat.nombre:'',
+          tema_idx:Number(ti), tema_nombre:(mat&&mat.temas&&mat.temas[ti])||`Tema ${Number(ti)+1}`,
+          calificacion:cal, correctas:0, total:0, completado:true, puntos:0
+        }));
+      }
+    });
+  });
+  try{ await Promise.all(envios); }catch(e){ console.warn('Flush puntos:',e.message); }
 }
 
 // ═══════════════════════════════════════════════════════
