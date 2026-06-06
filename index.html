@@ -1064,6 +1064,8 @@ function save(){
       canjes:ST.canjes, certificados:ST.certificados||{}, puntosPorMateria:ST.puntosPorMateria||{}, inscritas:ST.inscritas, insignias:ST.insignias,
       rachaActual:ST.rachaActual, ultimoDia:ST.ultimoDia,
       tiempoHoy:ST.tiempoHoy, fechaHoy:ST.fechaHoy, avisosTiempo:ST.avisosTiempo||{},
+      tiempoReportado:ST.tiempoReportado||0,
+      perfectoLogrado:ST.perfectoLogrado||false,
       puntosCanje:ST.puntosCanje, autoevals:ST.autoevals||{},
       materiasPadronCache:ST.materiasPadronCache||ST.materiasPadron||[],
       promedios:ST.promedios||{}, promedioGlobal:ST.promedioGlobal||0
@@ -1088,22 +1090,24 @@ function loadAlumno(boleta){
       ST.puntosCanje=d.puntosCanje||0; ST.autoevals=d.autoevals||{};
       ST.materiasPadronCache=d.materiasPadronCache||null;
       ST.promedios=d.promedios||{}; ST.promedioGlobal=d.promedioGlobal||0;
+      ST.perfectoLogrado=d.perfectoLogrado||ST.perfectoLogrado||false;
       // Tiempo de estudio: solo se conserva si es del mismo día
       const hoy=fechaHoy();
       ST.fechaHoy=hoy;
       ST.tiempoHoy=(d.fechaHoy===hoy)?(d.tiempoHoy||0):0;
+      ST.tiempoReportado=(d.fechaHoy===hoy)?(d.tiempoReportado||0):0;
       ST.avisosTiempo=(d.fechaHoy===hoy)?(d.avisosTiempo||{}):{};
     } else {
       ST.validado=false;
       ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
       ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0; ST.autoevals={};
-      ST.ultimoDia=''; ST.tiempoHoy=0; ST.fechaHoy=fechaHoy();
+      ST.ultimoDia=''; ST.tiempoHoy=0; ST.tiempoReportado=0; ST.fechaHoy=fechaHoy();
       ST.puntosCanje=0;
     }
   }catch(e){
     ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
     ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0; ST.autoevals={};
-    ST.tiempoHoy=0; ST.fechaHoy=fechaHoy(); ST.puntosCanje=0;
+    ST.tiempoHoy=0; ST.tiempoReportado=0; ST.fechaHoy=fechaHoy(); ST.puntosCanje=0;
   }
 }
 function fechaHoy(){
@@ -1329,7 +1333,7 @@ function verificarInsignias(){
     let ganada=false;
     if(ins.req==='racha' && ST.rachaActual>=Number(ins.val)) ganada=true;
     if(ins.req==='perfecto'){
-      ganada=ST.logros.some(l=>l.t&&l.t.includes('100%'));
+      ganada = !!ST.perfectoLogrado || ST.logros.some(l=>l.t&&l.t.includes('100%'));
     }
     if(ins.req==='modulo'){
       const todas=DATA.materias.every(m=>{
@@ -2043,6 +2047,7 @@ function finalizarQuiz(){
     if(!ST.progreso[matId].intentos) ST.progreso[matId].intentos={};
     ST.progreso[matId].intentos[temaActual]=(ST.progreso[matId].intentos[temaActual]||0)+1;
     if(aprobado) marcarTemaAprobado(matId,temaActual); // ← desbloquea el siguiente tema
+    if(total>0 && correctas===total) ST.perfectoLogrado=true; // 5/5 → insignia Tiro perfecto (aunque dé +0 por repetir)
     if(pts>0) ST.logros.unshift({t:`✏️ Cuestionario ${curMat.nombre} (${pct}%)`,pts:`+${pts}`,f:'Hoy',m:matId});
     save();
   }catch(e){ console.warn('finalizarQuiz (estado):', e.message); }
