@@ -1231,8 +1231,9 @@ function actualizarRacha(){
   // Bonus por racha ≥ 3 días
   if(ST.rachaActual>=3){
     const bonusPts=5;
-    {const rmid=(curMat&&curMat.id)||(ST.inscritas&&ST.inscritas[0]); ganarPuntos(rmid,bonusPts); if(rmid) enviarPuntosExtra(rmid,bonusPts,"Racha de estudio");}
-    ST.logros.unshift({t:`🔥 Racha día ${ST.rachaActual} (+${bonusPts} pts)`,pts:`+${bonusPts}`,f:'Hoy'});
+    const rmid=(curMat&&curMat.id)||(ST.inscritas&&ST.inscritas[0]);
+    ganarPuntos(rmid,bonusPts); if(rmid) enviarPuntosExtra(rmid,bonusPts,"Racha de estudio");
+    ST.logros.unshift({t:`🔥 Racha día ${ST.rachaActual} (+${bonusPts} pts)`,pts:`+${bonusPts}`,f:'Hoy',m:rmid||''});
   }
   verificarInsignias();
   save();
@@ -1243,12 +1244,15 @@ function actualizarRacha(){
 // ═══════════════════════════════════════════════════════
 function calcularPuntosQuiz(correctas, total, matId, temaIdx){
   if(tiempoAgotado()) return 0; // sin puntos si agotó el tiempo
-  const esPerfecto = correctas===total;
+  const esPerfecto = total>0 && correctas===total;
   const esAprobado = total>0 && (correctas/total)>=0.8;
-  let base = esPerfecto?75 : esAprobado?50 : 0;
-  const intentos = ST.progreso[matId]?.intentos?.[temaIdx]||0;
-  let mult = intentos===0?1 : intentos===1?0.6:0.3;
-  return Math.round(base*mult);
+  const valor = esPerfecto?75 : esAprobado?50 : 0;   // valor del tema según su MEJOR resultado
+  if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{},puntosTema:{}};
+  if(!ST.progreso[matId].puntosTema) ST.progreso[matId].puntosTema={};
+  const prev = ST.progreso[matId].puntosTema[temaIdx]||0;
+  const delta = Math.max(0, valor - prev);           // solo se gana la MEJORA, no se reacumula
+  if(valor>prev) ST.progreso[matId].puntosTema[temaIdx]=valor;
+  return delta;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1860,7 +1864,7 @@ function abrirGuia(temaIdxParam){
   if(!ST.canjes.includes(fichaKey) && !tiempoAgotado()){
     cont.innerHTML+=`<div class="ficha-check"><p>✅ ¡Ficha completada! Tema ${temaIdx+1}: ${temaNombre}</p><div class="fc-pts">+10 pts</div></div>`;
     ganarPuntos(curMat.id,10); ST.canjes.push(fichaKey); enviarPuntosExtra(curMat.id,10,`Ficha ${temaNombre}`);
-    ST.logros.unshift({t:`📖 Ficha: ${temaNombre}`,pts:'+10',f:'Hoy'});
+    ST.logros.unshift({t:`📖 Ficha: ${temaNombre}`,pts:'+10',f:'Hoy',m:curMat.id});
     save();
   } else if(tiempoAgotado()){
     cont.innerHTML+=`<div class="key-box"><h4>⏸ Límite de estudio alcanzado</h4><p>Puedes seguir leyendo. Los puntos se reanudan mañana.</p></div>`;
@@ -1991,7 +1995,7 @@ function finalizarQuiz(){
     if(!ST.progreso[matId].intentos) ST.progreso[matId].intentos={};
     ST.progreso[matId].intentos[temaActual]=(ST.progreso[matId].intentos[temaActual]||0)+1;
     if(aprobado) marcarTemaAprobado(matId,temaActual); // ← desbloquea el siguiente tema
-    if(pts>0) ST.logros.unshift({t:`✏️ Cuestionario ${curMat.nombre} (${pct}%)`,pts:`+${pts}`,f:'Hoy'});
+    if(pts>0) ST.logros.unshift({t:`✏️ Cuestionario ${curMat.nombre} (${pct}%)`,pts:`+${pts}`,f:'Hoy',m:matId});
     save();
   }catch(e){ console.warn('finalizarQuiz (estado):', e.message); }
 
@@ -2250,7 +2254,7 @@ async function solicitarCita(){
   const btn=document.getElementById('btn-cita');
   btn.textContent='Enviando…'; btn.disabled=true;
   descontarPuntos(matCita, COSTO); ST.puntosCanje=(ST.puntosCanje||0)+COSTO;
-  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.fecha||slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy'});
+  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.fecha||slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy',m:matCita});
   registrarCanje(`Cita asesoría ${slotCita.materia_nombre||matCita||''}`.trim(), COSTO, matCita);
   save();
   try{
@@ -2312,10 +2316,11 @@ function renderLog(){
     const t=(r.tipo||'').toLowerCase();
     // Asesoría: repetible. NO se cobra aquí; lleva a agendar y se cobra por materia al confirmar.
     if(t==='asesoria'||t==='cita'){
-      return `<div class="rec-card"><div class="rec-ico">${r.ico}</div>
-        <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
+      const dispoA=ptsAct>=r.pts;
+      return `<div class="rec-card ${dispoA?'':'lk'}"><div class="rec-ico">${r.ico}</div>
+        <div><div class="rec-n">${r.n}</div><div class="rec-s">${dispoA?r.s:`Te faltan ${r.pts-ptsAct} pts en esta unidad`}</div></div>
         <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
-        <button class="can-btn" onclick="canjear('${r.id}')">Agendar</button></div></div>`;
+        <button class="can-btn ${dispoA?'':'no'}" onclick="${dispoA?`canjear('${r.id}')`:''}">${dispoA?'Agendar':'Bloqueado'}</button></div></div>`;
     }
     // Certificado: un solo canje por materia; disponible si alguna materia inscrita junta los pts.
     if(t==='certificado'){
@@ -2346,16 +2351,21 @@ function renderLog(){
         <div><div class="rec-n">${nombreMat(mid)}</div><div class="rec-s">Certificado de participación</div></div>
         <div class="rec-r"><button class="can-btn" style="background:var(--gu)" onclick="mostrarCertificado('${mid}')">Ver</button></div></div>`).join('');
   }
-  // Historial
+  // Historial — solo de la unidad activa (los logros generales sin materia se muestran siempre)
   const hl=document.getElementById('hist-list');
-  if(!ST.logros.length){
-    hl.innerHTML='<div style="font-size:11px;color:var(--ts);text-align:center;padding:6px">Tu historial aparecerá aquí.</div>';
+  if(!act){
+    hl.innerHTML='<div style="font-size:11px;color:var(--ts);text-align:center;padding:6px">Selecciona una unidad de aprendizaje para ver su historial.</div>';
   } else {
-    hl.innerHTML=ST.logros.slice(0,8).map(l=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:.5px solid var(--bor)">
-      <div style="width:26px;height:26px;border-radius:7px;background:var(--nab);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">🏆</div>
-      <div style="flex:1;font-size:11px;color:var(--tx)">${l.t}</div>
-      <div style="font-size:11px;color:var(--na);font-weight:700">${l.pts}</div>
-    </div>`).join('');
+    const logrosU=(ST.logros||[]).filter(l=>!l.m || l.m===act.id);
+    if(!logrosU.length){
+      hl.innerHTML='<div style="font-size:11px;color:var(--ts);text-align:center;padding:6px">Aún no hay actividad en esta unidad.</div>';
+    } else {
+      hl.innerHTML=logrosU.slice(0,8).map(l=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:.5px solid var(--bor)">
+        <div style="width:26px;height:26px;border-radius:7px;background:var(--nab);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">🏆</div>
+        <div style="flex:1;font-size:11px;color:var(--tx)">${l.t}</div>
+        <div style="font-size:11px;color:var(--na);font-weight:700">${l.pts}</div>
+      </div>`).join('');
+    }
   }
 }
 function canjear(id){
@@ -2404,7 +2414,7 @@ function canjear(id){
   }
   descontarPuntos(matGasto, r.pts); ST.canjes.push(id);
   ST.puntosCanje=(ST.puntosCanje||0)+r.pts;
-  ST.logros.unshift({t:`🎁 Canjeaste: ${r.n}`,pts:`-${r.pts}`,f:'Hoy'});
+  ST.logros.unshift({t:`🎁 Canjeaste: ${r.n}`,pts:`-${r.pts}`,f:'Hoy',m:matGasto});
   registrarCanje(r.n, r.pts, matGasto);   // opción A — el gasto se guarda en el servidor (con materia)
   save(); renderLog();
   if(r.tipo==='pdf'){
@@ -2482,7 +2492,7 @@ function generarCertificado(matId, r){
   ST.certificados=ST.certificados||{};
   ST.certificados[matId]={fecha:f, temas, materia:mat.nombre, boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo};
   ST.canjes.push('cert:'+matId);
-  ST.logros.unshift({t:`🏆 Certificado de participación: ${mat.nombre}`,pts:`-${r.pts}`,f:'Hoy'});
+  ST.logros.unshift({t:`🏆 Certificado de participación: ${mat.nombre}`,pts:`-${r.pts}`,f:'Hoy',m:matId});
   registrarCanje(`Certificado participación ${mat.nombre}`, r.pts, matId);
   enviarCertificadoCorreo(matId);
   save(); renderLog();
@@ -2639,7 +2649,9 @@ async function sincronizarProgreso(boleta){
         temas: Math.max(cur.temas||0, prog.temas||0, nAprob),
         temasAprobados: ta,
         intentos: cur.intentos||{},
-        ultimaCal: cur.ultimaCal||0
+        ultimaCal: cur.ultimaCal||0,
+        // Mejor por tema (puntos) según el servidor → evita re-otorgar puntos al recargar
+        puntosTema: Object.assign({}, cur.puntosTema||{}, prog.puntosTema||{})
       };
     });
     // Opción A — el servidor manda el saldo NETO (ganados − canjeados); es la fuente de verdad
