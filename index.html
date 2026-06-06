@@ -2419,7 +2419,7 @@ function renderLog(){
   const certs=Object.keys(ST.certificados||{});
   if(certs.length){
     const nombreMat=(mid)=>{ const m=(DATA.materias||[]).find(x=>x.id===mid); return m?m.nombre:(ST.certificados[mid].materia||mid); };
-    rl.innerHTML+=`<div style="font-size:10px;color:var(--ts);font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:10px 2px 4px">Mis certificados</div>`+
+    rl.innerHTML+=`<div class="sec-t">Mis certificados</div>`+
       certs.map(mid=>`<div class="rec-card"><div class="rec-ico">🏆</div>
         <div><div class="rec-n">${nombreMat(mid)}</div><div class="rec-s">Certificado de participación</div></div>
         <div class="rec-r"><button class="can-btn" style="background:var(--gu)" onclick="mostrarCertificado('${mid}')">Ver</button></div></div>`).join('');
