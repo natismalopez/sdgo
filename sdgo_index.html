@@ -1768,6 +1768,7 @@ function escCod(s){
   return String(s==null?'':s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+let temaActivoGuia=null;   // tema que se está viendo en la guía (para que "Practicar" use ESE tema)
 function abrirGuia(temaIdxParam){
   if(!curMat) return;
   // Obtener índice del tema: el solicitado (revisita) o el que está estudiando
@@ -1775,6 +1776,7 @@ function abrirGuia(temaIdxParam){
     ? (ST.progreso[curMat.id]?.temas||0)
     : Number(temaIdxParam);
   temaIdx = Math.min(Math.max(temaIdx,0), curMat.temas.length-1);
+  temaActivoGuia = temaIdx;   // el cuestionario practicará ESTE tema
   // Permitir SIEMPRE la ficha del tema actual y de los anteriores (necesitas leerla
   // antes de aprobar su cuestionario). Solo bloquear saltar a un tema FUTURO sin desbloquear.
   const temaActualMat = Math.min(ST.progreso[curMat.id]?.temas||0, curMat.temas.length-1);
@@ -1911,7 +1913,10 @@ function abrirGuia(temaIdxParam){
 function iniciarCuestionario(){
   if(!curMat){toast('⚠️ Selecciona una materia primero');return;}
   const matId=curMat.id;
-  const temaIdx=Math.min(ST.progreso[matId]?.temas||0, curMat.temas.length-1);
+  // Practicar el tema que se está viendo en la guía; si no, el del progreso
+  const temaProg=Math.min(ST.progreso[matId]?.temas||0, curMat.temas.length-1);
+  let temaIdx=(temaActivoGuia!=null)?temaActivoGuia:temaProg;
+  temaIdx=Math.min(Math.max(temaIdx,0), curMat.temas.length-1);
   // Buscar reactivos: primero en el API, luego en GUIAS local como respaldo
   const reactivosAPI = DATA.reactivosPorTema?.[matId]?.[temaIdx];
   const reactivosLocal = GUIAS[matId]?.[temaIdx]?.reactivos;
