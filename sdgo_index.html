@@ -1121,6 +1121,7 @@ function rolloverDia(){
   if(ST.fechaHoy!==hoy){
     ST.fechaHoy=hoy;
     ST.tiempoHoy=0;
+    ST.tiempoReportado=0;   // nuevo día → nada reportado aún
     ST.avisosTiempo={};   // reinicia los avisos del temporizador cada día
     if(ST.sesionInicio) ST.sesionInicio=Date.now();
   }
@@ -1151,13 +1152,29 @@ function detenerTimer(){
   if(!timerInterval) return;
   rolloverDia();
   commitSesion();
+  reportarTiempoServidor();   // empuja al servidor lo acumulado de este dispositivo
   ST.sesionInicio=null;
   clearInterval(timerInterval); timerInterval=null;
   save();
 }
+// Reporta al servidor SOLO el incremento de este dispositivo (delta), para que el
+// tiempo se sume entre computadora y celular sin duplicarse.
+function reportarTiempoServidor(){
+  if(!ST.boleta) return;
+  const total=tiempoHoyTotal();
+  const delta=total-(ST.tiempoReportado||0);
+  if(delta<1) return;
+  ST.tiempoReportado=(ST.tiempoReportado||0)+delta;
+  save();
+  const mid=(typeof curMat!=='undefined'&&curMat)?curMat.id:'';
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({accion:'tiempo',boleta:ST.boleta,materia_id:mid,minutos:delta})})
+    .catch(e=>console.warn('Tiempo:',e.message));
+}
 function tickTimer(){
   rolloverDia();
   commitSesion();
+  reportarTiempoServidor();   // reporta cada minuto
   save();
   actualizarTimerUI(tiempoHoyTotal());
 }
@@ -2098,21 +2115,26 @@ function renderAse(){
   const UMBRAL = umbralCita();
   const inscritas=ST.inscritas||[];
   // Materia en contexto de la cita: la elegida, o la que está estudiando, o la única inscrita
+  // Unidad ACTIVA = la que se entró por Inicio (mismo criterio que en Puntos)
   let matSel='';
-  if(citaForcePick) matSel='';
+  if(curMat && inscritas.includes(curMat.id)) matSel=curMat.id;
   else if(citaMatFilter && inscritas.includes(citaMatFilter)) matSel=citaMatFilter;
-  else if(curMat && inscritas.includes(curMat.id)) matSel=curMat.id;
-  else if(inscritas.length===1) matSel=inscritas[0];
-  const necesitaSelector = !matSel && inscritas.length>1;
+  const sinUnidad = !matSel;
   // Puntos que cuentan: los de la materia en contexto (bolsa por materia)
   const ptsCtx = matSel ? puntosMateria(matSel) : 0;
-  document.getElementById('ase-pts-val').textContent=`${ptsCtx} puntos`;
-  const pctPts=Math.min(100,Math.round(ptsCtx/UMBRAL*100));
+  document.getElementById('ase-pts-val').textContent = sinUnidad ? '—' : `${ptsCtx} puntos`;
+  const pctPts=sinUnidad?0:Math.min(100,Math.round(ptsCtx/UMBRAL*100));
   document.getElementById('ase-pb').style.width=pctPts+'%';
-  document.getElementById('ase-pts-lbl').textContent=ptsCtx+' pts';
-  document.getElementById('ase-hint').textContent = !matSel ? 'Elige la unidad de tu cita'
+  document.getElementById('ase-pts-lbl').textContent = sinUnidad ? '—' : ptsCtx+' pts';
+  document.getElementById('ase-hint').textContent = sinUnidad ? 'Selecciona una unidad en Inicio'
     : (ptsCtx>=UMBRAL?'¡Puedes solicitar una cita!':`${UMBRAL-ptsCtx} pts más en esta unidad`);
   const nombreMat=(mid)=>{ const m=(DATA.materias||[]).find(x=>x.id===mid); return m?m.nombre:mid; };
+  // Sin unidad activa → aviso "entra por Inicio" (como en Puntos), sin selector de materia
+  if(sinUnidad){
+    document.getElementById('docentes-list').innerHTML=`<div class="doc-card"><div style="font-size:11px;color:var(--ts);padding:6px">Entra a una unidad de aprendizaje para ver sus horarios.</div></div>`;
+    document.getElementById('cita-section').innerHTML=`<div class="card card-p" style="margin:0 12px 9px"><div style="font-size:12.5px;color:var(--ts);text-align:center;padding:10px;line-height:1.5">No hay una unidad activa.<br>Entra por <strong style="color:var(--gu)">Inicio</strong> y selecciona una unidad de aprendizaje para agendar tu asesoría.</div></div>`;
+    return;
+  }
   // Filtro de slots: disponibles y (si hay materia en contexto) solo de esa materia
   const disponible=a=>(a.disponible===true||String(a.disponible).toUpperCase()==='SI');
   const enMateria=a=> matSel ? a.materia_id===matSel : (inscritas.length===0||inscritas.includes(a.materia_id));
@@ -2137,15 +2159,9 @@ function renderAse(){
   }
   // Sección de solicitud
   const sec=document.getElementById('cita-section');
-  if(necesitaSelector){
-    const botones=inscritas.map(mid=>`<button class="btn btn-o" style="margin-bottom:7px" onclick="elegirMatCita('${mid}')">${nombreMat(mid)}</button>`).join('');
-    sec.innerHTML=`<div class="cita-form"><h3>¿Para qué unidad es la asesoría?</h3>
-      <p style="font-size:11px;color:var(--ts);margin-bottom:10px">Elige la unidad de aprendizaje en la que quieres tu cita.</p>${botones}</div>`;
-    return;
-  }
   if(ptsCtx>=UMBRAL){
     const slotsDisp=(DATA.asesorias||[]).filter(a=>disponible(a)&&enMateria(a));
-    const cambiar = inscritas.length>1 ? `<button onclick="cambiarMatCita()" style="background:none;border:none;color:var(--gu);font-size:10px;text-decoration:underline;cursor:pointer;font-family:var(--fnt)">cambiar</button>` : '';
+    const cambiar = '';
     const cabMat = matSel ? `<div style="font-size:11px;color:var(--ts);margin-bottom:8px">Unidad: <strong style="color:var(--nv)">${nombreMat(matSel)}</strong> ${cambiar}</div>` : '';
     const slotsHTML=slotsDisp.map((s,i)=>{
       const fechaSlot=proximaFechaDia(s.dia);
@@ -2661,6 +2677,12 @@ async function sincronizarProgreso(boleta){
     if(d.promedios) ST.promedios=d.promedios;
     if(typeof d.promedioGlobal==='number') ST.promedioGlobal=d.promedioGlobal;
     if(d.logros&&d.logros.length>=ST.logros.length) ST.logros=d.logros;
+    // Tiempo de estudio: base del servidor (incluye otros dispositivos) si es de hoy
+    if(d.fechaHoy && d.fechaHoy===fechaHoy()){
+      const serverMin=Number(d.tiempoHoy)||0;
+      if(serverMin>(ST.tiempoHoy||0)) ST.tiempoHoy=serverMin;
+      ST.tiempoReportado=Math.max(ST.tiempoReportado||0, serverMin); // ya está en el servidor
+    }
     save();
   }catch(e){ console.warn('Sync:',e.message); }
 }
