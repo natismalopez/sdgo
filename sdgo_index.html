@@ -424,7 +424,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
     <div class="pb-bg" style="margin-top:4px;height:5px"><div class="pb-fill" id="timer-pb" style="width:0%;background:var(--na)"></div></div>
   </div>
   <div class="scroll" id="dash-scroll">
-    <div class="mot"><strong id="mot-t">¡Empieza hoy!</strong><span id="mot-s">Elige una materia para comenzar.</span></div>
+    <div class="mot" id="mot-box"><strong id="mot-t">¡Empieza hoy!</strong><span id="mot-s">Elige una materia para comenzar.</span></div>
     <div class="sec-t">Mis unidades de aprendizaje</div>
     <div id="mat-list"></div>
   </div>
@@ -479,7 +479,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
   <div class="hdr">
     <div class="hdr-row">
       <button class="btn-back" onclick="navBack()">‹</button>
-      <div><p id="g-mat-s" style="font-size:10px;color:var(--ts)">Materia</p><h1 id="g-tema-t" style="font-size:14px;color:var(--nv)">Tema</h1></div>
+      <div><p id="g-mat-s" style="font-size:10px;color:rgba(255,255,255,.75)">Materia</p><h1 id="g-tema-t" style="font-size:14px;color:#fff">Tema</h1></div>
       <div style="margin-left:auto;background:var(--gub);border-radius:20px;padding:2px 9px;font-size:9px;color:var(--gu);font-weight:600">En estudio</div>
     </div>
   </div>
@@ -574,7 +574,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
   <div class="scroll">
     <div class="pts-card">
       <div>
-        <div class="pts-l">Puntos acumulados</div>
+        <div class="pts-l" id="log-l">Puntos acumulados</div>
         <div class="pts-v" id="log-pts">0</div>
         <div class="pts-s" id="log-falt">Acumula para canjear</div>
       </div>
@@ -1199,6 +1199,7 @@ function terminarSesionHoy(){
     ? '✅ ¡Completaste tu tiempo recomendado de hoy! Excelente concentración.'
     : '💡 Recuerda: lo recomendado son 45 minutos de estudio concentrado en una sola sesión. ¡Nos vemos en la próxima!';
   alert(msg);
+  curMat=null;   // se cierra la unidad activa
   navRoot('v-dash');   // regresa al inicio (donde puede elegir otra unidad)
 }
 function tiempoAgotado(){
@@ -1230,7 +1231,7 @@ function actualizarRacha(){
   // Bonus por racha ≥ 3 días
   if(ST.rachaActual>=3){
     const bonusPts=5;
-    ST.puntos+=bonusPts;
+    {const rmid=(curMat&&curMat.id)||(ST.inscritas&&ST.inscritas[0]); ganarPuntos(rmid,bonusPts); if(rmid) enviarPuntosExtra(rmid,bonusPts,"Racha de estudio");}
     ST.logros.unshift({t:`🔥 Racha día ${ST.rachaActual} (+${bonusPts} pts)`,pts:`+${bonusPts}`,f:'Hoy'});
   }
   verificarInsignias();
@@ -1607,17 +1608,16 @@ function renderDash(){
   document.getElementById('db-pb').style.width=pct+'%';
   document.getElementById('db-prog-lbl').textContent=`Progreso: ${pct}%`;
   actualizarTimerUI(tiempoHoyTotal());
-  // Motivacional
+  // Aviso (recuadro). Los puntos ya se muestran en cada tarjeta, así que el recuadro
+  // solo aparece para el aviso de límite diario; en lo demás queda oculto.
   const mins=tiempoHoyTotal();
+  const motBox=document.getElementById('mot-box');
   if(mins>=LIMITE_MIN){
+    motBox.style.display='';
     document.getElementById('mot-t').textContent='⏸ Límite diario alcanzado';
     document.getElementById('mot-s').textContent='Puedes seguir estudiando pero los puntos se reanudan mañana.';
-  } else if(ST.logros.length===0){
-    document.getElementById('mot-t').textContent='¡Empieza hoy!';
-    document.getElementById('mot-s').textContent='Elige una materia y gana tus primeros puntos.';
   } else {
-    document.getElementById('mot-t').textContent=`Tienes ${ST.puntos} pts acumulados 🪙`;
-    document.getElementById('mot-s').textContent=ST.rachaActual>1?`🔥 Racha de ${ST.rachaActual} días. ¡Sigue así!`:'Completa cuestionarios para ganar más puntos.';
+    motBox.style.display='none';
   }
   // Tarjetas
   const list=document.getElementById('mat-list');
@@ -1637,7 +1637,7 @@ function renderDash(){
       <div class="mic" style="background:${m.color}">${m.icono}</div>
       <div style="flex:1;min-width:0">
         <div class="mn">${m.nombre}</div>
-        <div class="ms">${p} de ${tot} temas${promM>0?` · Promedio: ${promM}`:''}</div>
+        <div class="ms">${p} de ${tot} temas${promM>0?` · Promedio: ${promM}`:''} · 🪙 ${puntosMateria(m.id)} pts</div>
         <div class="mpb"><div style="width:${pctM}%;background:${fill}"></div></div>
       </div>${badge}
     </div>`;
@@ -1859,7 +1859,7 @@ function abrirGuia(temaIdxParam){
   const fichaKey=`${curMat.id}_f${temaIdx}`;
   if(!ST.canjes.includes(fichaKey) && !tiempoAgotado()){
     cont.innerHTML+=`<div class="ficha-check"><p>✅ ¡Ficha completada! Tema ${temaIdx+1}: ${temaNombre}</p><div class="fc-pts">+10 pts</div></div>`;
-    ST.puntos+=10; ST.canjes.push(fichaKey);
+    ganarPuntos(curMat.id,10); ST.canjes.push(fichaKey); enviarPuntosExtra(curMat.id,10,`Ficha ${temaNombre}`);
     ST.logros.unshift({t:`📖 Ficha: ${temaNombre}`,pts:'+10',f:'Hoy'});
     save();
   } else if(tiempoAgotado()){
@@ -1985,7 +1985,7 @@ function finalizarQuiz(){
   // ── Efectos de estado (no deben impedir que se muestre el resultado) ──
   try{
     pts=calcularPuntosQuiz(correctas,total,matId,temaActual);
-    ST.puntos+=pts;
+    ganarPuntos(matId,pts);
     if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
     ST.progreso[matId].ultimaCal = pct;
     if(!ST.progreso[matId].intentos) ST.progreso[matId].intentos={};
@@ -2285,13 +2285,24 @@ async function solicitarCita(){
 // LOGROS / TIENDA
 // ═══════════════════════════════════════════════════════
 function renderLog(){
-  document.getElementById('log-pts').textContent=ST.puntos;
-  document.getElementById('log-niv').textContent=ST.puntos>=1000?'Nivel 4':ST.puntos>=500?'Nivel 3':ST.puntos>=200?'Nivel 2':'Nivel 1';
-  document.getElementById('log-falt').textContent=`${ST.puntosCanje} pts canjeados este semestre`;
-  const pctPb=Math.min(100,Math.round(ST.puntos/1000*100));
-  document.getElementById('log-pb').style.width=pctPb+'%';
+  // Unidad ACTIVA: la que el alumno entró a estudiar (curMat). Si no hay, se muestra "—".
+  const act = (curMat && (ST.inscritas||[]).includes(curMat.id)) ? curMat : null;
+  const ptsAct = act ? puntosMateria(act.id) : 0;
+  document.getElementById('log-l').textContent = act ? `Puntos · ${act.nombre}` : 'Puntos por unidad';
+  document.getElementById('log-pts').textContent = act ? ptsAct : '—';
+  document.getElementById('log-niv').textContent = act ? (ptsAct>=1000?'Nivel 4':ptsAct>=500?'Nivel 3':ptsAct>=200?'Nivel 2':'Nivel 1') : '—';
+  document.getElementById('log-falt').textContent = act ? `${ST.puntosCanje} pts canjeados este semestre` : 'Selecciona una unidad de aprendizaje';
+  document.getElementById('log-pb').style.width = (act?Math.min(100,Math.round(ptsAct/1000*100)):0)+'%';
   const rl=document.getElementById('rec-list');
-  rl.innerHTML=DATA.recompensas.map(r=>{
+  if(!act){
+    rl.innerHTML=`<div class="card" style="margin:0 12px;padding:18px;text-align:center;color:var(--ts);font-size:12px;line-height:1.5">Entra a una <strong>unidad de aprendizaje</strong> desde Inicio para ver y canjear sus puntos.</div>`;
+  } else {
+  rl.innerHTML=DATA.recompensas.filter(r=>{
+    // Solo recompensas de la unidad activa: las generales (asesoría, certificado) y el
+    // material atado a esta materia (su problemario).
+    if(r.materia_id) return r.materia_id===act.id;
+    return true;
+  }).map(r=>{
     if(r.pts===0){
       return `<div class="rec-card"><div class="rec-ico">${r.ico}</div>
         <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
@@ -2308,14 +2319,15 @@ function renderLog(){
     }
     // Certificado: un solo canje por materia; disponible si alguna materia inscrita junta los pts.
     if(t==='certificado'){
-      const dispo=(ST.inscritas||[]).some(mid=>puntosMateria(mid)>=r.pts && !(ST.certificados||{})[mid]);
+      const dispo=puntosMateria(act.id)>=r.pts && !(ST.certificados||{})[act.id];
       return `<div class="rec-card ${dispo?'':'lk'}"><div class="rec-ico">${r.ico}</div>
         <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
         <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
         <button class="can-btn ${dispo?'':'no'}" onclick="canjear('${r.id}')">${dispo?'Canjear':'Bloqueado'}</button></div></div>`;
     }
-    // PDF y otros: por saldo global. Si ya se canjeó, se puede volver a abrir sin recobrar.
-    const can=ST.puntos>=r.pts&&!ST.canjes.includes(r.id);
+    // PDF/material: se cobra de la bolsa de SU materia (r.materia_id).
+    const saldoMat = puntosMateria(act.id);
+    const can=saldoMat>=r.pts&&!ST.canjes.includes(r.id);
     const ya=ST.canjes.includes(r.id);
     return `<div class="rec-card ${can||ya?'':'lk'}">
       <div class="rec-ico">${r.ico}</div>
@@ -2324,6 +2336,7 @@ function renderLog(){
       <button class="can-btn ${can||ya?'':'no'}" onclick="canjear('${r.id}')">${ya?'Abrir de nuevo':can?'Canjear':'Bloqueado'}</button></div>
     </div>`;
   }).join('');
+  }
   // Mis certificados (reabrir para mostrar al docente)
   const certs=Object.keys(ST.certificados||{});
   if(certs.length){
@@ -2368,7 +2381,19 @@ function canjear(id){
     if(r.tipo==='pdf' && r.recurso){ window.open(r.recurso,'_blank'); return; }
     toast('Ya canjeada');return;
   }
-  if(ST.puntos<r.pts){toast(`⚠️ Necesitas ${r.pts-ST.puntos} pts más`);return;}
+  // Elegir la bolsa de materia: si la recompensa pertenece a una materia (ej. problemario),
+  // se cobra de ESA materia. Si no, de la materia con saldo suficiente.
+  const inscritas=ST.inscritas||[];
+  let matGasto='';
+  if(r.materia_id){
+    if(!inscritas.includes(r.materia_id)){ toast('⚠️ No estás inscrito en esa materia'); return; }
+    if(puntosMateria(r.materia_id) < r.pts){ toast(`⚠️ Necesitas ${r.pts-puntosMateria(r.materia_id)} pts más en esa materia`); return; }
+    matGasto=r.materia_id;
+  } else {
+    matGasto = (curMat && inscritas.includes(curMat.id) && puntosMateria(curMat.id)>=r.pts) ? curMat.id : '';
+    if(!matGasto) matGasto = inscritas.filter(m=>puntosMateria(m)>=r.pts).sort((a,b)=>puntosMateria(b)-puntosMateria(a))[0] || '';
+    if(!matGasto){ toast(`⚠️ Necesitas ${r.pts} pts en una misma materia`); return; }
+  }
   // Verificar que constancias solo se canjeen si hay unidad/módulo completo
   if(r.tipo==='constancia_unidad'||r.tipo==='constancia_modulo'){
     const hayCompleto=Object.values(ST.progreso).some(p=>{
@@ -2377,10 +2402,10 @@ function canjear(id){
     });
     if(!hayCompleto){toast('⚠️ Completa una unidad primero');return;}
   }
-  ST.puntos-=r.pts; ST.canjes.push(id);
-  if(r.tipo==='punto') ST.puntosCanje=(ST.puntosCanje||0)+1;
+  descontarPuntos(matGasto, r.pts); ST.canjes.push(id);
+  ST.puntosCanje=(ST.puntosCanje||0)+r.pts;
   ST.logros.unshift({t:`🎁 Canjeaste: ${r.n}`,pts:`-${r.pts}`,f:'Hoy'});
-  registrarCanje(r.n, r.pts);   // opción A — el gasto se guarda en el servidor
+  registrarCanje(r.n, r.pts, matGasto);   // opción A — el gasto se guarda en el servidor (con materia)
   save(); renderLog();
   if(r.tipo==='pdf'){
     if(r.recurso){ toast('📘 Abriendo tu material…'); window.open(r.recurso,'_blank'); }
@@ -2407,6 +2432,23 @@ function descontarPuntos(mid, pts){
   ST.puntosPorMateria=ST.puntosPorMateria||{};
   ST.puntosPorMateria[mid]=Math.max(0,(ST.puntosPorMateria[mid]||0)-pts);
   ST.puntos=Math.max(0,(ST.puntos||0)-pts);
+}
+// Gana puntos: actualiza A LA VEZ el total global y la bolsa de la materia,
+// para que todas las pantallas (Puntos, Asesorías) muestren lo mismo al instante.
+function ganarPuntos(mid, pts){
+  pts=Number(pts)||0; if(!pts) return;
+  ST.puntos=(ST.puntos||0)+pts;
+  if(mid){ ST.puntosPorMateria=ST.puntosPorMateria||{}; ST.puntosPorMateria[mid]=(ST.puntosPorMateria[mid]||0)+pts; }
+}
+// Persiste en el servidor puntos sueltos (ficha leída / racha) para que no se pierdan
+// al recargar y cuenten en la bolsa por materia.
+async function enviarPuntosExtra(mid, pts, concepto){
+  if(!mid || !pts) return;
+  const mat=(DATA.materias||[]).find(x=>x.id===mid);
+  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({accion:'puntosextra',boleta:ST.boleta,nombre:ST.nombre||ST.boleta,grupo:ST.grupo,
+      materia_id:mid,materia_nombre:mat?mat.nombre:'',puntos:Number(pts)||0,concepto:concepto||''})}); }
+  catch(e){ console.warn('PuntosExtra:',e.message); }
 }
 
 // ── Punto de participación: certificado por materia ──────────────────
@@ -2436,6 +2478,7 @@ function generarCertificado(matId, r){
   const temas=(mat.temas||[]).filter((t,i)=>aprob[i]);
   const f=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
   descontarPuntos(matId, r.pts);
+  ST.puntosCanje=(ST.puntosCanje||0)+r.pts;
   ST.certificados=ST.certificados||{};
   ST.certificados[matId]={fecha:f, temas, materia:mat.nombre, boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo};
   ST.canjes.push('cert:'+matId);
@@ -2517,7 +2560,8 @@ async function cargarDatosAPI(){
         ico: r.ico || r.icono  || '🎁',
         pts: Number(r.pts)||0,
         tipo: r.tipo || '',
-        recurso: r.recurso || ''
+        recurso: r.recurso || '',
+        materia_id: r.materia_id || ''
       }));
     }
     DATA.asesorias=d.asesorias||[];
@@ -2601,6 +2645,7 @@ async function sincronizarProgreso(boleta){
     // Opción A — el servidor manda el saldo NETO (ganados − canjeados); es la fuente de verdad
     if(d.puntos!=null) ST.puntos=d.puntos;
     if(d.puntosPorMateria) ST.puntosPorMateria=d.puntosPorMateria;
+    if(d.puntosCanjeados!=null) ST.puntosCanje=d.puntosCanjeados;
     if(d.promedios) ST.promedios=d.promedios;
     if(typeof d.promedioGlobal==='number') ST.promedioGlobal=d.promedioGlobal;
     if(d.logros&&d.logros.length>=ST.logros.length) ST.logros=d.logros;
