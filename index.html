@@ -1111,7 +1111,10 @@ function loadAlumno(boleta){
   }
 }
 function fechaHoy(){
-  return new Date().toISOString().slice(0,10);
+  // Fecha LOCAL del dispositivo en formato yyyy-mm-dd (no UTC, para no adelantarse de noche)
+  const d=new Date();
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
 }
 
 // ═══════════════════════════════════════════════════════
