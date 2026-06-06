@@ -2716,11 +2716,18 @@ async function sincronizarProgreso(boleta){
     if(d.promedios) ST.promedios=d.promedios;
     if(typeof d.promedioGlobal==='number') ST.promedioGlobal=d.promedioGlobal;
     if(d.logros&&d.logros.length>=ST.logros.length) ST.logros=d.logros;
-    // Tiempo de estudio: base del servidor (incluye otros dispositivos) si es de hoy
-    if(d.fechaHoy && d.fechaHoy===fechaHoy()){
-      const serverMin=Number(d.tiempoHoy)||0;
-      if(serverMin>(ST.tiempoHoy||0)) ST.tiempoHoy=serverMin;
-      ST.tiempoReportado=Math.max(ST.tiempoReportado||0, serverMin); // ya está en el servidor
+    // Tiempo de estudio: EL SERVIDOR MANDA. Si el servidor dice que es otro día, se
+    // reinicia el contador local; el total del día se toma tal cual del servidor (así, si
+    // se vacía la hoja o cambia el día, el dispositivo se actualiza y no re-graba lo viejo).
+    if(d.fechaHoy){
+      if(ST.fechaHoy !== d.fechaHoy){          // el servidor cambió de día → reiniciar
+        ST.fechaHoy = d.fechaHoy;
+        ST.avisosTiempo = {};
+        if(ST.sesionInicio) ST.sesionInicio = Date.now();
+      }
+      const serverMin = Number(d.tiempoHoy)||0;
+      ST.tiempoHoy = serverMin;                // fuente de verdad del total del día
+      ST.tiempoReportado = serverMin;          // ya está en el servidor → no re-reportar
     }
     save();
   }catch(e){ console.warn('Sync:',e.message); }
