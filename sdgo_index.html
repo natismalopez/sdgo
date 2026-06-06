@@ -1006,14 +1006,14 @@ const GUIAS = {
 // CATÁLOGO DE INSIGNIAS
 // ═══════════════════════════════════════════════════════
 const INSIGNIAS_DEF = [
-  {id:'u1',ico:'🧠',nombre:'Algoritmo en mente',desc:'Completa la Unidad 1',color:'linear-gradient(135deg,#7B1135,#B01850)',req:'unidad',val:'0'},
-  {id:'u2',ico:'💻',nombre:'Programador en C',desc:'Completa la Unidad 2',color:'linear-gradient(135deg,#E37322,#F5952A)',req:'unidad',val:'1'},
-  {id:'u3',ico:'📋',nombre:'Maestro de arreglos',desc:'Completa la Unidad 3',color:'linear-gradient(135deg,#0D1B4B,#1E3A8A)',req:'unidad',val:'2'},
-  {id:'u4',ico:'⚙️',nombre:'Función experta',desc:'Completa la Unidad 4',color:'linear-gradient(135deg,#2ECC52,#1A9939)',req:'unidad',val:'3'},
-  {id:'racha',ico:'🔥',nombre:'Racha de oro',desc:'7 días seguidos de uso',color:'linear-gradient(135deg,#F4C20D,#E5B000)',req:'racha',val:'7'},
+  {id:'u1',ico:'🚀',nombre:'Despegue',desc:'Completaste tu primera unidad',color:'linear-gradient(135deg,#7B1135,#B01850)',req:'unidad',val:'0'},
+  {id:'u2',ico:'⚡',nombre:'En racha',desc:'Dos unidades dominadas',color:'linear-gradient(135deg,#E37322,#F5952A)',req:'unidad',val:'1'},
+  {id:'u3',ico:'⭐',nombre:'Imparable',desc:'Tres unidades completadas',color:'linear-gradient(135deg,#0D1B4B,#1E3A8A)',req:'unidad',val:'2'},
+  {id:'u4',ico:'👑',nombre:'Leyenda',desc:'Cuatro unidades, ¡nivel máximo!',color:'linear-gradient(135deg,#2ECC52,#1A9939)',req:'unidad',val:'3'},
+  {id:'racha',ico:'🔥',nombre:'Racha de oro',desc:'7 días seguidos estudiando',color:'linear-gradient(135deg,#F4C20D,#E5B000)',req:'racha',val:'7'},
   {id:'perfecto',ico:'🎯',nombre:'Tiro perfecto',desc:'Primer cuestionario 5/5',color:'linear-gradient(135deg,#F4C20D,#E37322)',req:'perfecto',val:'1'},
-  {id:'modulo',ico:'🏆',nombre:'Sistema completo',desc:'Completa todo el módulo',color:'linear-gradient(135deg,#7B1135,#E37322)',req:'modulo',val:'all'},
-  {id:'asesorpar',ico:'🤝',nombre:'Asesor par',desc:'¡Dominas el material! Acércate con tu docente para apoyar a otros alumnos',color:'linear-gradient(135deg,#1E3A8A,#2ECC52)',req:'asesor_par',val:'0'},
+  {id:'modulo',ico:'🏆',nombre:'Misión cumplida',desc:'Completaste todas tus unidades',color:'linear-gradient(135deg,#7B1135,#E37322)',req:'modulo',val:'all'},
+  {id:'asesorpar',ico:'🤝',nombre:'Mentor',desc:'Dominas el material, ¡ayuda a tu equipo a subir de nivel!',color:'linear-gradient(135deg,#1E3A8A,#2ECC52)',req:'asesor_par',val:'0'},
 ];
 
 // ═══════════════════════════════════════════════════════
@@ -1338,6 +1338,15 @@ function verificarInsignias(){
     if(ins.req==='racha' && ST.rachaActual>=Number(ins.val)) ganada=true;
     if(ins.req==='perfecto'){
       ganada = !!ST.perfectoLogrado || ST.logros.some(l=>l.t&&l.t.includes('100%'));
+    }
+    if(ins.req==='unidad'){
+      // Se activa al completar unidades de aprendizaje (todos los temas de la materia).
+      // val 0→1ª unidad completa, 1→2ª, 2→3ª, 3→4ª.
+      const completas=(DATA.materias||[]).filter(m=>{
+        const p=ST.progreso[m.id];
+        return (m.temas?.length||0)>0 && p && p.temas>=m.temas.length;
+      }).length;
+      if(completas >= Number(ins.val)+1) ganada=true;
     }
     if(ins.req==='modulo'){
       const todas=DATA.materias.every(m=>{
