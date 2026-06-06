@@ -461,7 +461,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
       </div>
       <div class="uc-btn">Ver detalle ›</div>
     </div>
-    <div class="sec-t">Temas de la unidad</div>
+    <div class="sec-t">Temas de la unidad de aprendizaje</div>
     <div class="card" style="padding:0;margin-bottom:10px"><div id="temas-list"></div></div>
     <div style="display:flex;gap:12px;padding:6px 13px 10px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--ts)"><div class="tdot" style="background:var(--gr)"></div>Completado</div>
@@ -1154,6 +1154,7 @@ function iniciarTimer(){
   if(timerInterval) return;
   ST.sesionInicio=Date.now();
   timerInterval=setInterval(tickTimer,60000); // cada minuto
+  actualizarTimerUI(tiempoHoyTotal());   // muestra el tiempo actual al instante (sin esperar 1 min)
 }
 function detenerTimer(){
   if(!timerInterval) return;
@@ -1457,6 +1458,9 @@ async function doLogin(){
     ST.validado=true;
     ST.materiasPadron = alumno.materiasPadron || alumno.materiasInscritas || [];
     ST.inscritasSheet = alumno.materiasSDGo || [];
+    // Correo registrado del alumno (el de su inscripción): se usa para confirmar citas,
+    // así no se vuelve a pedir. Solo se pedirá si el alumno aún no tiene correo guardado.
+    if(alumno.email) ST.email = alumno.email;
   } else {
     // CASO B — no hubo respuesta de la API (sin conexión / servidor caído)
     if(!yaValidado){
@@ -1717,6 +1721,7 @@ function abrirSel(){ renderSel(); navTo('v-sel'); }
 function abrirMateria(id){
   curMat=DATA.materias.find(m=>m.id===id);
   if(!curMat) return;
+  iniciarTimer();   // al entrar a una unidad, reanuda el reloj (continúa desde donde se quedó)
   document.getElementById('mat-t').textContent=curMat.nombre;
   document.getElementById('mat-s').textContent=curMat.unidad;
   document.getElementById('quiz-sub').textContent=`${contarReactivosTotal(id)} reactivos · Necesitas 80% para avanzar`;
