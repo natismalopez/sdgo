@@ -220,6 +220,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .opt.ok{background:var(--grb);border-color:var(--grd)}
 .opt.bad{background:var(--erb);border-color:var(--er)}
 .opt.dis{pointer-events:none}
+.opt.sel{background:var(--gub);border-color:var(--gu)}
 .opt-l{width:28px;height:28px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--nv);flex-shrink:0}
 .opt.ok .opt-l{background:var(--grd);color:#fff}
 .opt.bad .opt-l{background:var(--er);color:#fff}
@@ -386,6 +387,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
       </div>
       <button class="btn btn-p" id="btn-login" onclick="doLogin()">Entrar a SDGo! ›</button>
       <p class="sp-note" style="margin-top:8px">Tu perfil se crea automáticamente con tu boleta la primera vez que ingresas.<br>Solo para uso académico · CECyT 9 IPN</p>
+      <a href="Manual_SDGo.pdf" target="_blank" rel="noopener" download="Manual_SDGo.pdf" style="display:block;margin-top:10px;color:rgba(255,255,255,.9);font-size:12px;text-decoration:underline;font-weight:600">📘 ¿Primera vez? Descarga el manual de usuario</a>
     </div>
   </div>
 </div>
@@ -510,6 +512,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
     <div id="intento-badge"></div>
     <div class="q-body" id="q-body"></div>
     <div style="padding:0 12px 16px">
+      <button class="btn btn-gu" id="btn-enviar" style="display:none" onclick="enviarRespuesta()">Enviar respuesta ›</button>
       <button class="btn btn-s" id="btn-sig" style="display:none" onclick="sigPregunta()">Siguiente ›</button>
       <button class="btn btn-gu" id="btn-fin" style="display:none" onclick="finalizarQuiz()">Ver mi resultado ›</button>
     </div>
@@ -1408,6 +1411,31 @@ function refreshView(id){
   if(id==='v-log')  renderLog();
   if(id==='v-ins')  renderIns();
 }
+// ── Botón "atrás" del celular: navegación interna predecible + confirmación de salida ──
+function hayBackInterno(){
+  const cur=document.querySelector('.view.active')?.id;
+  if(!cur||cur==='v-splash'||cur==='v-load') return false;
+  if(cur==='v-dash') return navStack.length>0;
+  return true;
+}
+function backInterno(){
+  const cur=document.querySelector('.view.active')?.id;
+  if(cur==='v-ins'||cur==='v-log'||cur==='v-ase'){ navRoot('v-dash'); return; }
+  navBack();
+}
+let _exitArmado=false;
+window.addEventListener('popstate', function(){
+  if(hayBackInterno()){
+    backInterno();
+    try{ history.pushState({sdgo:'home'},''); }catch(e){}
+    return;
+  }
+  if(_exitArmado){ try{ history.back(); }catch(e){} return; }
+  _exitArmado=true;
+  toast('Toca atrás de nuevo para salir de SDGo!');
+  setTimeout(()=>{_exitArmado=false;},2000);
+  try{ history.pushState({sdgo:'home'},''); }catch(e){}
+});
 function toast(msg,dur=2800){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),dur); }
 
 // ═══════════════════════════════════════════════════════
@@ -1504,6 +1532,7 @@ async function doLogin(){
   await sincronizarProgreso(b);
   btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
   actualizarRacha(); iniciarTimer();
+  try{ localStorage.setItem('sdgo_sesion', JSON.stringify({boleta:b,grupo:g})); }catch(e){}
   if(primeraVez && ST.nombre) toast(`¡Bienvenido, ${ST.nombre.split(' ')[0]}!`);
   if(!ST.inscritas||!ST.inscritas.length){ renderSel(); navTo('v-sel'); }
   else { renderDash(); navRoot('v-dash'); }
@@ -1533,6 +1562,7 @@ function autoeval(temaIdx, resultado, btn){
 
 function cerrarSesion(){
   detenerTimer();
+  try{ localStorage.removeItem('sdgo_sesion'); }catch(e){}
   ST.boleta=''; ST.grupo=''; ST.nombre=''; ST.curp=''; ST.email='';
   ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
   ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0;
@@ -1809,7 +1839,7 @@ function renderFichasDesdeSheet(bloques, cont){
       cont.innerHTML+=`<div class="ej-box"><h4>✏️ Practica tú mismo</h4><p class="ej-enunciado">${escCod(b.campo1)}</p>
         <a href="https://www.onlinegdb.com/online_c_compiler" target="_blank" class="btn-compiler">💻 Abrir compilador en línea</a><br>
         <button class="btn-sol" onclick="document.getElementById('${solId}').classList.toggle('show');this.textContent=this.textContent.includes('▼')?'Ocultar solución ▲':'Ver solución ▼'">Ver solución ▼</button>
-        <div class="sol-box" id="${solId}"><div style="font-size:10px;color:var(--ts);font-weight:700;padding:4px 0 3px;text-transform:uppercase;letter-spacing:.5px">Solución propuesta</div>${b.campo2?`<div class="code-box" style="margin:0"><div class="cl">${hlC(b.campo2)}</div></div>`:''}${salidaSol}</div></div>`;
+        <div class="sol-box" id="${solId}"><div style="font-size:10px;color:var(--ts);font-weight:700;padding:4px 0 3px;text-transform:uppercase;letter-spacing:.5px">Solución propuesta</div>${b.campo2?`<div class="code-box" style="margin:0"><div class="cl">${hlC(b.campo2)}</div></div>`:''}${salidaSol}</div><div class="autoeval"><p>¿Cómo te fue?</p><button class="ae-btn" onclick="autoeval(temaActivoGuia,'solo',this)">✅ Lo logré solo</button><button class="ae-btn" onclick="autoeval(temaActivoGuia,'ayuda',this)">🤔 Necesité ayuda</button><button class="ae-btn" onclick="autoeval(temaActivoGuia,'no',this)">❌ No lo intenté</button></div></div>`;
     }
   });
 }
@@ -2013,18 +2043,35 @@ function renderPregunta(){
   document.getElementById('q-cnt').textContent=`${quiz.idx+1} / ${total}`;
   document.getElementById('btn-sig').style.display='none';
   document.getElementById('btn-fin').style.display='none';
+  document.getElementById('btn-enviar').style.display='none';
   quiz.respondida=false;
+  quiz.sel=null;
   const preg=quiz.preguntas[quiz.idx];
   const letras=['A','B','C','D'];
   const imgHtml=preg.img?`<div style="margin-bottom:12px;border-radius:var(--rad);overflow:hidden;border:.5px solid var(--bor)"><img src="${preg.img}" style="width:100%;max-height:200px;object-fit:contain;display:block"></div>`:'';
   document.getElementById('q-body').innerHTML=`
     <div class="q-txt">${preg.p.replace(/\n/g,'<br>')}</div>
     ${imgHtml}
-    ${preg.ops.map((o,i)=>`<div class="opt" id="opt-${i}" onclick="responder(${i})">
+    ${preg.ops.map((o,i)=>`<div class="opt" id="opt-${i}" onclick="seleccionarOpcion(${i})">
       <div class="opt-l">${letras[i]}</div>
       <div class="opt-t">${o}</div>
     </div>`).join('')}
     <div id="fb-area"></div>`;
+}
+function seleccionarOpcion(i){
+  if(quiz.respondida) return;
+  quiz.sel=i;
+  const preg=quiz.preguntas[quiz.idx];
+  for(let k=0;k<preg.ops.length;k++){
+    document.getElementById('opt-'+k).classList.toggle('sel', k===i);
+  }
+  document.getElementById('btn-enviar').style.display='flex';
+}
+function enviarRespuesta(){
+  if(quiz.respondida) return;
+  if(quiz.sel===null||quiz.sel===undefined){ toast('Selecciona una opción primero'); return; }
+  document.getElementById('btn-enviar').style.display='none';
+  responder(quiz.sel);
 }
 function responder(idx){
   if(quiz.respondida) return;
@@ -2034,6 +2081,7 @@ function responder(idx){
   if(ok) quiz.correctas++;
   for(let i=0;i<preg.ops.length;i++){
     const el=document.getElementById('opt-'+i);
+    el.classList.remove('sel');
     el.classList.add('dis');
     if(i===preg.c) el.classList.add('ok');
     else if(i===idx&&!ok) el.classList.add('bad');
@@ -2760,10 +2808,30 @@ async function enviarCita(p){
 // ═══════════════════════════════════════════════════════
 // INICIO
 // ═══════════════════════════════════════════════════════
+async function restaurarSesion(){
+  let s=null;
+  try{ s=JSON.parse(localStorage.getItem('sdgo_sesion')||'null'); }catch(e){}
+  if(!s||!s.boleta||!s.grupo) return false;
+  let prev=null;
+  try{ prev=JSON.parse(localStorage.getItem('sdgo_'+s.boleta)||'null'); }catch(e){}
+  if(!prev||!prev.validado) return false;
+  ST.boleta=s.boleta; ST.grupo=s.grupo;
+  loadAlumno(s.boleta);
+  if((!ST.materiasPadron||!ST.materiasPadron.length)&&ST.materiasPadronCache) ST.materiasPadron=ST.materiasPadronCache;
+  ST.validado=true;
+  try{ await sincronizarProgreso(s.boleta); }catch(e){ console.warn('Restaurar sync:',e.message); }
+  actualizarRacha(); iniciarTimer();
+  if(!ST.inscritas||!ST.inscritas.length){ renderSel(); navTo('v-sel'); }
+  else { renderDash(); navRoot('v-dash'); }
+  return true;
+}
 async function initApp(){
   showView('v-load');
   await cargarDatosAPI();
-  showView('v-splash');
+  let restaurada=false;
+  try{ restaurada=await restaurarSesion(); }catch(e){ console.warn('Restaurar:',e.message); }
+  if(!restaurada) showView('v-splash');
+  try{ history.pushState({sdgo:'home'},''); }catch(e){}
 }
 // ═══════════════════════════════════════════════════════
 // CONSTANCIAS PDF — generadas en el dispositivo con jsPDF
