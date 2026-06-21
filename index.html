@@ -509,6 +509,9 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
     </div>
   </div>
   <div class="scroll nonav">
+    <div style="font-size:10.5px;color:var(--ts);padding:8px 12px 0;display:flex;align-items:flex-start;gap:6px;line-height:1.4">
+      <span style="flex-shrink:0">🔒</span><span>Tu boleta aparece como marca de agua sobre el examen para cuidar la honestidad académica.</span>
+    </div>
     <div id="intento-badge"></div>
     <div class="q-body" id="q-body"></div>
     <div style="padding:0 12px 16px">
@@ -1423,18 +1426,34 @@ function backInterno(){
   if(cur==='v-ins'||cur==='v-log'||cur==='v-ase'){ navRoot('v-dash'); return; }
   navBack();
 }
-let _exitArmado=false;
+let _saliendo=false;
+function confirmarSalida(){
+  if(document.getElementById('sdgo-overlay')) return;
+  overlay(`<div style="text-align:center">
+      <div style="font-size:30px">🚪</div>
+      <h3 style="color:var(--gu);margin:6px 0 4px;font-size:16px">¿Salir de SDGo!?</h3>
+      <p style="font-size:12px;color:var(--ts);margin:0 0 14px">Tu avance queda guardado. Podrás volver a entrar con tu boleta cuando quieras.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-s" style="flex:1" onclick="cerrarOverlay()">Quedarme</button>
+      <button class="btn btn-gu" style="flex:1" onclick="salirApp()">Salir</button>
+    </div>`);
+}
+function salirApp(){
+  cerrarOverlay();
+  _saliendo=true;
+  setTimeout(()=>{_saliendo=false;},800);
+  try{ history.go(-5); }catch(e){ try{ history.back(); }catch(_){} }
+}
 window.addEventListener('popstate', function(){
+  if(_saliendo) return;
   if(hayBackInterno()){
     backInterno();
     try{ history.pushState({sdgo:'home'},''); }catch(e){}
     return;
   }
-  if(_exitArmado){ try{ history.back(); }catch(e){} return; }
-  _exitArmado=true;
-  toast('Toca atrás de nuevo para salir de SDGo!');
-  setTimeout(()=>{_exitArmado=false;},2000);
   try{ history.pushState({sdgo:'home'},''); }catch(e){}
+  confirmarSalida();
 });
 function toast(msg,dur=2800){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),dur); }
 
@@ -1697,6 +1716,34 @@ function modificarCorreo(){
 // ═══════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════
+// ── Onboarding: recorrido breve la primera vez (y reabrible desde "¿Cómo funciona?") ──
+const ONBOARDING=[
+  {ic:'👋',t:'¡Bienvenido a SDGo!',d:'Aquí estudias, practicas y ganas puntos. Te explico lo básico en 5 pasos.'},
+  {ic:'📚',t:'Tus unidades de aprendizaje',d:'Toca una unidad para ver sus temas, leer las fichas de estudio y practicar.'},
+  {ic:'✏️',t:'Practica y gana puntos',d:'Cada tema tiene un cuestionario. Al aprobarlo ganas puntos y se desbloquea el siguiente tema.'},
+  {ic:'🔒',t:'Tu boleta en el examen',d:'Durante los cuestionarios verás TU número de boleta repetido en el fondo (marca de agua). Es normal: identifica que el examen es tuyo y cuida la honestidad académica.'},
+  {ic:'🏅',t:'Insignias, Puntos y Asesorías',d:'En la barra de abajo ves tus insignias, tus puntos para canjear y puedes pedir asesoría con tu docente.'}
+];
+function mostrarOnboarding(paso){
+  paso=paso||0;
+  const s=ONBOARDING[paso]; if(!s){ cerrarOverlay(); return; }
+  const ultimo=paso===ONBOARDING.length-1;
+  const dots=ONBOARDING.map((_,i)=>'<span style="width:7px;height:7px;border-radius:50%;background:'+(i===paso?'var(--gu)':'var(--bor)')+';display:inline-block;margin:0 3px"></span>').join('');
+  const accion=ultimo?'cerrarOverlay()':'mostrarOnboarding('+(paso+1)+')';
+  const txtBtn=ultimo?'¡Entendido! ✓':'Siguiente ›';
+  const saltar=ultimo?'':'<div style="text-align:center;margin-top:10px"><a onclick="cerrarOverlay()" style="font-size:11px;color:var(--ts);cursor:pointer;text-decoration:underline">Saltar</a></div>';
+  overlay('<div style="text-align:center"><div style="font-size:40px;margin-bottom:4px">'+s.ic+'</div>'
+    +'<h3 style="color:var(--gu);margin:0 0 6px;font-size:17px">'+s.t+'</h3>'
+    +'<p style="font-size:13px;color:var(--tx);line-height:1.5;margin:0 0 14px">'+s.d+'</p>'
+    +'<div style="margin-bottom:14px">'+dots+'</div></div>'
+    +'<button class="btn btn-gu" onclick="'+accion+'">'+txtBtn+'</button>'+saltar);
+}
+function abrirAyuda(){ mostrarOnboarding(0); }
+function onboardingAuto(){
+  if(localStorage.getItem('sdgo_onb')) return;
+  try{ localStorage.setItem('sdgo_onb','1'); }catch(e){}
+  setTimeout(()=>{ if(document.querySelector('.view.active')?.id==='v-dash') mostrarOnboarding(0); }, 700);
+}
 function renderDash(){
   const nombre=ST.nombre||`Grupo ${ST.grupo}`;
   document.getElementById('db-saludo').textContent=`Hola, ${nombre.split(' ')[0]}`;
@@ -1752,9 +1799,12 @@ function renderDash(){
     if(acc) acc+='<span style="color:var(--bor)"> · </span>';
     acc+=`<button onclick="modificarCorreo()" style="background:none;border:none;font-size:12px;color:var(--ts);cursor:pointer;font-family:var(--fnt);text-decoration:underline">✉️ Modificar correo</button>`;
   }
+  if(acc) acc+='<span style="color:var(--bor)"> · </span>';
+  acc+=`<button onclick="abrirAyuda()" style="background:none;border:none;font-size:12px;color:var(--ts);cursor:pointer;font-family:var(--fnt);text-decoration:underline">❔ ¿Cómo funciona?</button>`;
   if(acc){
     list.innerHTML+=`<div style="text-align:center;padding:4px 0 10px;line-height:1.9">${acc}</div>`;
   }
+  onboardingAuto();
 }
 function abrirSel(){ renderSel(); navTo('v-sel'); }
 
