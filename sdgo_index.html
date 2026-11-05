@@ -164,13 +164,31 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .tema-row{display:flex;align-items:center;justify-content:space-between;padding:8px 13px;border-bottom:.5px solid var(--bor)}
 .tema-row:last-child{border:none}
 .tema-nm{font-size:11px;color:var(--tx)}
+.uni-hdr{padding:10px 13px 7px;background:var(--gub);border-bottom:.5px solid var(--bor)}
+.uni-hdr:not(:first-child){border-top:1px solid var(--bor)}
+.uni-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.uni-lbl{font-size:9px;font-weight:800;color:var(--gu);text-transform:uppercase;letter-spacing:.6px}
+.uni-cnt{font-size:9px;color:var(--ts);white-space:nowrap}
+.uni-nm{font-size:12px;font-weight:700;color:var(--nv);line-height:1.3;margin-top:1px}
+.uni-pb{height:3px;background:var(--bor);border-radius:2px;margin-top:6px;overflow:hidden}
+.uni-pb div{height:100%;border-radius:2px}
+.uni-const{margin-top:7px;background:var(--na);color:#fff;border:none;border-radius:7px;padding:6px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fnt)}
+.uni-const.curso{background:var(--gu);display:block;width:calc(100% - 26px);margin:10px 13px}
 .tdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .lock-ico{font-size:12px}
 
 /* ─── GUÍA ────────────────────────────────── */
 .def-box{background:#EEF5FF;border-left:3px solid var(--na);border-radius:0 var(--rad-s) var(--rad-s) 0;margin:8px 12px 4px;padding:10px 12px}
 .def-box h4{font-size:12px;font-weight:700;color:var(--nv);margin-bottom:4px}
-.def-box p{font-size:12px;color:var(--ts);line-height:1.6}
+.def-box p{font-size:12px;color:var(--ts);line-height:1.6;white-space:pre-line}
+/* Momento pedagógico: pregunta con respuesta oculta (recuerda / predice / piensa) */
+.preg-box{background:#EAF1FA;border-left:3px solid #1B4F8A;border-radius:0 var(--rad-s) var(--rad-s) 0;margin:8px 12px 4px;padding:10px 12px}
+.preg-box .preg-lbl{font-size:10px;font-weight:700;color:#1B4F8A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.preg-box .preg-q{font-size:12.5px;color:var(--nv);line-height:1.6;font-weight:600}
+.preg-box .preg-hint{font-size:11px;color:var(--ts);margin-top:6px;font-style:italic}
+.preg-box .btn-sol{margin-top:8px}
+.preg-box .sol-box p{font-size:12px;color:var(--ts);line-height:1.6;white-space:pre-line}
+.sol-txt{font-size:12px;color:var(--nv);line-height:1.7;white-space:pre-line;background:#F7F7F9;border-radius:var(--rad-s);padding:9px 11px}
 .code-box{background:#0A1535;border-radius:var(--rad-s);margin:4px 12px 8px;padding:11px 13px;overflow-x:auto}
 .cl{font-family:var(--mono);font-size:12px;line-height:1.9;color:#E6EDF5}
 .ck{color:#79C0FF}.k{color:#79C0FF;font-weight:500}.cf{color:#D2A8FF}.cc{color:#8B9BB4}.cn{color:#FFA657}.cw{color:#E6EDF5}
@@ -204,15 +222,6 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
   background-repeat:repeat;
 }
 #wm-overlay.activo{ display:block; }
-/* Aviso de captura */
-.cap-warning{
-  position:fixed;top:0;left:50%;transform:translateX(-50%);
-  background:var(--er);color:#fff;padding:10px 20px;
-  font-size:13px;font-weight:600;border-radius:0 0 10px 10px;
-  z-index:999;animation:slideDown .3s ease;
-  font-family:var(--fnt);text-align:center;
-  box-shadow:0 4px 20px rgba(0,0,0,.3);
-}
 @keyframes slideDown{from{transform:translateX(-50%) translateY(-100%)}to{transform:translateX(-50%) translateY(0)}}
 .q-txt{font-size:13px;font-weight:600;color:var(--tx);line-height:1.6;margin-bottom:14px}
 .opt{background:#fff;border:2px solid var(--bor);border-radius:var(--rad);margin-bottom:9px;padding:11px 13px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:border-color .15s,background .15s}
@@ -220,6 +229,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .opt.ok{background:var(--grb);border-color:var(--grd)}
 .opt.bad{background:var(--erb);border-color:var(--er)}
 .opt.dis{pointer-events:none}
+.opt.sel{background:var(--gub);border-color:var(--gu)}
 .opt-l{width:28px;height:28px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--nv);flex-shrink:0}
 .opt.ok .opt-l{background:var(--grd);color:#fff}
 .opt.bad .opt-l{background:var(--er);color:#fff}
@@ -386,6 +396,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
       </div>
       <button class="btn btn-p" id="btn-login" onclick="doLogin()">Entrar a SDGo! ›</button>
       <p class="sp-note" style="margin-top:8px">Tu perfil se crea automáticamente con tu boleta la primera vez que ingresas.<br>Solo para uso académico · CECyT 9 IPN</p>
+      <a href="Manual_SDGo.pdf" target="_blank" rel="noopener" download="Manual_SDGo.pdf" style="display:block;margin-top:10px;color:rgba(255,255,255,.9);font-size:12px;text-decoration:underline;font-weight:600">📘 ¿Primera vez? Descarga el manual de usuario</a>
     </div>
   </div>
 </div>
@@ -507,9 +518,13 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
     </div>
   </div>
   <div class="scroll nonav">
+    <div style="font-size:10.5px;color:var(--ts);padding:8px 12px 0;display:flex;align-items:flex-start;gap:6px;line-height:1.4">
+      <span style="flex-shrink:0">🔒</span><span>Tu boleta aparece como marca de agua sobre el examen para cuidar la honestidad académica.</span>
+    </div>
     <div id="intento-badge"></div>
     <div class="q-body" id="q-body"></div>
     <div style="padding:0 12px 16px">
+      <button class="btn btn-gu" id="btn-enviar" style="display:none" onclick="enviarRespuesta()">Enviar respuesta ›</button>
       <button class="btn btn-s" id="btn-sig" style="display:none" onclick="sigPregunta()">Siguiente ›</button>
       <button class="btn btn-gu" id="btn-fin" style="display:none" onclick="finalizarQuiz()">Ver mi resultado ›</button>
     </div>
@@ -1025,8 +1040,8 @@ let DATA = {
   recompensas:[
     {id:'cita',n:'Cita de tutoría',s:'30 min con la docente (presencial o Meet)',ico:'🎓',pts:150,tipo:'cita',recurso:''},
     {id:'punto',n:'Punto extra en calificación',s:'Se registra ante la docente (tope: 4 por semestre)',ico:'⭐',pts:1000,tipo:'punto',recurso:''},
-    {id:'const_u',n:'Constancia de Unidad',s:'PDF automático al completar una unidad',ico:'📜',pts:0,tipo:'pdf',recurso:'gratis'},
-    {id:'const_m',n:'Constancia de Módulo',s:'PDF automático al completar el módulo completo',ico:'🏆',pts:0,tipo:'pdf',recurso:'gratis'},
+    {id:'const_u',n:'Constancia de unidad',s:'Gratis al completar todos los temas de una unidad',ico:'📜',pts:0,tipo:'constancia_unidad',recurso:''},
+    {id:'const_c',n:'Constancia del curso',s:'Gratis al completar todos los temas de la materia',ico:'🏆',pts:0,tipo:'constancia_curso',recurso:''},
   ],
   asesorias:[],
   config:{}
@@ -1095,6 +1110,7 @@ function loadAlumno(boleta){
       const hoy=fechaHoy();
       ST.fechaHoy=hoy;
       ST.tiempoHoy=(d.fechaHoy===hoy)?(d.tiempoHoy||0):0;
+      if(d.fechaHoy) DATA.fechaServidor=d.fechaHoy;
       ST.tiempoReportado=(d.fechaHoy===hoy)?(d.tiempoReportado||0):0;
       ST.avisosTiempo=(d.fechaHoy===hoy)?(d.avisosTiempo||{}):{};
     } else {
@@ -1284,10 +1300,44 @@ function calcularPuntosQuiz(correctas, total, matId, temaIdx){
 // ═══════════════════════════════════════════════════════
 // DESBLOQUEO DE TEMAS (80%)
 // ═══════════════════════════════════════════════════════
-function temaDesbloqueado(matId, temaIdx){
+// ── Desbloqueo de temas: por avance, por fecha de la planeación docente, o ambos ──
+// modo_desbloqueo (hoja Materias): 'progreso' (default) | 'fecha' | 'ambos'
+// fecha_apertura (hoja Temas, opcional): el tema se abre a partir de esa fecha.
+function hoyServidor(){
+  // Preferir la fecha del SERVIDOR (no la del teléfono, que el alumno puede adelantar)
+  return DATA.fechaServidor || ST.fechaHoy || fechaHoy();
+}
+function normFecha(f){
+  // Acepta 'yyyy-mm-dd' o 'dd/mm/yyyy' → 'yyyy-mm-dd' (comparable como texto)
+  if(!f) return '';
+  f=String(f).trim();
+  const m=f.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  return f.slice(0,10);
+}
+function fechaBonita(iso){
+  const M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m?`${Number(m[3])} de ${M[Number(m[2])-1]}`:iso;
+}
+function temaAbiertoPorFecha(matId, temaIdx){
+  const f=normFecha(DATA.fechasApertura?.[matId]?.[temaIdx]);
+  return !f || hoyServidor()>=f;
+}
+function temaAprobadoPrevio(matId, temaIdx){
   if(temaIdx===0) return true;
-  const prev=temaIdx-1;
-  return !!(ST.progreso[matId]?.temasAprobados?.[prev]);
+  return !!(ST.progreso[matId]?.temasAprobados?.[temaIdx-1]);
+}
+function temaDesbloqueado(matId, temaIdx){
+  const modo=(DATA.modosDesbloqueo?.[matId]||'progreso').toLowerCase();
+  if(modo==='fecha')  return temaAbiertoPorFecha(matId,temaIdx);
+  if(modo==='ambos')  return temaAbiertoPorFecha(matId,temaIdx) && temaAprobadoPrevio(matId,temaIdx);
+  return temaAprobadoPrevio(matId,temaIdx);
+}
+// null = abierto; 'fecha' = falta que llegue la fecha; 'progreso' = falta aprobar el anterior
+function motivoBloqueo(matId, temaIdx){
+  if(temaDesbloqueado(matId,temaIdx)) return null;
+  return temaAbiertoPorFecha(matId,temaIdx) ? 'progreso' : 'fecha';
 }
 function marcarTemaAprobado(matId, temaIdx){
   if(!ST.progreso[matId]) ST.progreso[matId]={temas:0,intentos:{},temasAprobados:{}};
@@ -1408,6 +1458,47 @@ function refreshView(id){
   if(id==='v-log')  renderLog();
   if(id==='v-ins')  renderIns();
 }
+// ── Botón "atrás" del celular: navegación interna predecible + confirmación de salida ──
+function hayBackInterno(){
+  const cur=document.querySelector('.view.active')?.id;
+  if(!cur||cur==='v-splash'||cur==='v-load') return false;
+  if(cur==='v-dash') return navStack.length>0;
+  return true;
+}
+function backInterno(){
+  const cur=document.querySelector('.view.active')?.id;
+  if(cur==='v-ins'||cur==='v-log'||cur==='v-ase'){ navRoot('v-dash'); return; }
+  navBack();
+}
+let _saliendo=false;
+function confirmarSalida(){
+  if(document.getElementById('sdgo-overlay')) return;
+  overlay(`<div style="text-align:center">
+      <div style="font-size:30px">🚪</div>
+      <h3 style="color:var(--gu);margin:6px 0 4px;font-size:16px">¿Salir de SDGo!?</h3>
+      <p style="font-size:12px;color:var(--ts);margin:0 0 14px">Tu avance queda guardado. Podrás volver a entrar con tu boleta cuando quieras.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-s" style="flex:1" onclick="cerrarOverlay()">Quedarme</button>
+      <button class="btn btn-gu" style="flex:1" onclick="salirApp()">Salir</button>
+    </div>`);
+}
+function salirApp(){
+  cerrarOverlay();
+  _saliendo=true;
+  setTimeout(()=>{_saliendo=false;},800);
+  try{ history.go(-5); }catch(e){ try{ history.back(); }catch(_){} }
+}
+window.addEventListener('popstate', function(){
+  if(_saliendo) return;
+  if(hayBackInterno()){
+    backInterno();
+    try{ history.pushState({sdgo:'home'},''); }catch(e){}
+    return;
+  }
+  try{ history.pushState({sdgo:'home'},''); }catch(e){}
+  confirmarSalida();
+});
 function toast(msg,dur=2800){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),dur); }
 
 // ═══════════════════════════════════════════════════════
@@ -1504,6 +1595,7 @@ async function doLogin(){
   await sincronizarProgreso(b);
   btn.textContent='Entrar a SDGo! ›'; btn.disabled=false;
   actualizarRacha(); iniciarTimer();
+  try{ localStorage.setItem('sdgo_sesion', JSON.stringify({boleta:b,grupo:g})); }catch(e){}
   if(primeraVez && ST.nombre) toast(`¡Bienvenido, ${ST.nombre.split(' ')[0]}!`);
   if(!ST.inscritas||!ST.inscritas.length){ renderSel(); navTo('v-sel'); }
   else { renderDash(); navRoot('v-dash'); }
@@ -1533,6 +1625,7 @@ function autoeval(temaIdx, resultado, btn){
 
 function cerrarSesion(){
   detenerTimer();
+  try{ localStorage.removeItem('sdgo_sesion'); }catch(e){}
   ST.boleta=''; ST.grupo=''; ST.nombre=''; ST.curp=''; ST.email='';
   ST.puntos=0; ST.logros=[]; ST.progreso={}; ST.canjes=[];
   ST.inscritas=[]; ST.insignias=[]; ST.rachaActual=0;
@@ -1575,7 +1668,7 @@ function renderSel(){
         <div class="chk">✓</div>
         <div class="mic" style="background:${m.color}">${m.icono}</div>
         <div><div style="font-size:13px;font-weight:700;color:var(--nv)">${m.nombre}</div>
-        <div style="font-size:10px;color:var(--ts)">${m.unidad}</div>
+        <div style="font-size:10px;color:var(--ts)">${subtituloMateria(m)}</div>
         <div style="font-size:9px;color:var(--gr);font-weight:700;margin-top:3px">● Inscrita</div></div>
       </div>`;
     } else {
@@ -1583,7 +1676,7 @@ function renderSel(){
         <div class="chk"></div>
         <div class="mic" style="background:${m.color}">${m.icono}</div>
         <div><div style="font-size:13px;font-weight:700;color:var(--nv)">${m.nombre}</div>
-        <div style="font-size:10px;color:var(--ts)">${m.unidad}</div>
+        <div style="font-size:10px;color:var(--ts)">${gruposUnidad(m)?`${gruposUnidad(m).length} unidades didácticas`:m.unidad}</div>
         <div style="font-size:9px;color:var(--ts);margin-top:3px">${m.temas?.length||0} temas · ${contarReactivosTotal(m.id)} reactivos</div></div>
       </div>`;
     }
@@ -1667,6 +1760,36 @@ function modificarCorreo(){
 // ═══════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════
+// ── Onboarding: recorrido breve la primera vez (y reabrible desde "¿Cómo funciona?") ──
+const ONBOARDING=[
+  {ic:'👋',t:'¡Bienvenido a SDGo!',d:'Aquí estudias, practicas y ganas puntos. Te explico lo básico en 5 pasos.'},
+  {ic:'📚',t:'Tus unidades de aprendizaje',d:'Toca una unidad para ver sus temas, leer las fichas de estudio y practicar.'},
+  {ic:'✏️',t:'Practica y gana puntos',d:'Cada tema tiene un cuestionario. Al aprobarlo ganas puntos y se desbloquea el siguiente tema.'},
+  {ic:'🔒',t:'Tu boleta en el examen',d:'Durante los cuestionarios verás TU número de boleta repetido en el fondo (marca de agua). Es normal: identifica que el examen es tuyo y cuida la honestidad académica.'},
+  {ic:'🏅',t:'Insignias, Puntos y Asesorías',d:'En la barra de abajo ves tus insignias, tus puntos para canjear y puedes pedir asesoría con tu docente.'}
+];
+function mostrarOnboarding(paso){
+  paso=paso||0;
+  const s=ONBOARDING[paso]; if(!s){ cerrarOverlay(); return; }
+  const ultimo=paso===ONBOARDING.length-1;
+  const dots=ONBOARDING.map((_,i)=>'<span style="width:7px;height:7px;border-radius:50%;background:'+(i===paso?'var(--gu)':'var(--bor)')+';display:inline-block;margin:0 3px"></span>').join('');
+  const accion=ultimo?'cerrarOverlay()':'mostrarOnboarding('+(paso+1)+')';
+  const txtBtn=ultimo?'¡Entendido! ✓':'Siguiente ›';
+  const btnAtras=paso>0?'<button class="btn btn-s" style="flex:1" onclick="mostrarOnboarding('+(paso-1)+')">‹ Atrás</button>':'';
+  const saltar=ultimo?'':'<div style="text-align:center;margin-top:10px"><a onclick="cerrarOverlay()" style="font-size:11px;color:var(--ts);cursor:pointer;text-decoration:underline">Saltar</a></div>';
+  overlay('<div style="text-align:center"><div style="font-size:40px;margin-bottom:4px">'+s.ic+'</div>'
+    +'<h3 style="color:var(--gu);margin:0 0 6px;font-size:17px">'+s.t+'</h3>'
+    +'<p style="font-size:13px;color:var(--tx);line-height:1.5;margin:0 0 10px">'+s.d+'</p>'
+    +'<div style="font-size:10px;color:var(--ts);margin-bottom:4px">Paso '+(paso+1)+' de '+ONBOARDING.length+'</div>'
+    +'<div style="margin-bottom:14px">'+dots+'</div></div>'
+    +'<div style="display:flex;gap:8px">'+btnAtras+'<button class="btn btn-gu" style="flex:2" onclick="'+accion+'">'+txtBtn+'</button></div>'+saltar);
+}
+function abrirAyuda(){ mostrarOnboarding(0); }
+function onboardingAuto(){
+  if(localStorage.getItem('sdgo_onb')) return;
+  try{ localStorage.setItem('sdgo_onb','1'); }catch(e){}
+  setTimeout(()=>{ if(document.querySelector('.view.active')?.id==='v-dash') mostrarOnboarding(0); }, 700);
+}
 function renderDash(){
   const nombre=ST.nombre||`Grupo ${ST.grupo}`;
   document.getElementById('db-saludo').textContent=`Hola, ${nombre.split(' ')[0]}`;
@@ -1722,9 +1845,12 @@ function renderDash(){
     if(acc) acc+='<span style="color:var(--bor)"> · </span>';
     acc+=`<button onclick="modificarCorreo()" style="background:none;border:none;font-size:12px;color:var(--ts);cursor:pointer;font-family:var(--fnt);text-decoration:underline">✉️ Modificar correo</button>`;
   }
+  if(acc) acc+='<span style="color:var(--bor)"> · </span>';
+  acc+=`<button onclick="abrirAyuda()" style="background:none;border:none;font-size:12px;color:var(--ts);cursor:pointer;font-family:var(--fnt);text-decoration:underline">❔ ¿Cómo funciona?</button>`;
   if(acc){
     list.innerHTML+=`<div style="text-align:center;padding:4px 0 10px;line-height:1.9">${acc}</div>`;
   }
+  onboardingAuto();
 }
 function abrirSel(){ renderSel(); navTo('v-sel'); }
 
@@ -1736,13 +1862,14 @@ function abrirMateria(id){
   if(!curMat) return;
   iniciarTimer();   // al entrar a una unidad, reanuda el reloj (continúa desde donde se quedó)
   document.getElementById('mat-t').textContent=curMat.nombre;
-  document.getElementById('mat-s').textContent=curMat.unidad;
+  document.getElementById('mat-s').textContent=subtituloMateria(curMat);
   document.getElementById('quiz-sub').textContent=`${contarReactivosTotal(id)} reactivos · Necesitas 80% para avanzar`;
   const p=ST.progreso[id]?.temas||0;
   const pct=Math.round(p/(curMat.temas?.length||1)*100);
   document.getElementById('mat-pct').textContent=pct+'%';
   const list=document.getElementById('temas-list');
   list.innerHTML='';
+  const grupos=gruposUnidad(curMat);
   (curMat.temas||[]).forEach((t,i)=>{
     const aprobado=ST.progreso[id]?.temasAprobados?.[i];
     const desbloq=temaDesbloqueado(id,i);
@@ -1751,10 +1878,72 @@ function abrirMateria(id){
     // Los temas desbloqueados (en proceso o completados) se pueden abrir para releer su ficha
     const clickable=desbloq;
     const onclick=clickable?` onclick="abrirGuia(${i})" style="cursor:pointer"`:'';
-    const hint=aprobado?'<span style="font-size:9px;color:var(--na);font-weight:600">Releer ›</span>':(desbloq?'<span style="font-size:9px;color:var(--ts)">Abrir ›</span>':'');
+    const motivo=desbloq?null:motivoBloqueo(id,i);
+    const fechaTxt=(motivo==='fecha')?`<span style="font-size:9px;color:var(--ts)">Se abre el ${fechaBonita(normFecha(DATA.fechasApertura?.[id]?.[i]))}</span>`:'';
+    const hint=aprobado?'<span style="font-size:9px;color:var(--na);font-weight:600">Releer ›</span>':(desbloq?'<span style="font-size:9px;color:var(--ts)">Abrir ›</span>':fechaTxt);
+    // Encabezado de unidad didáctica antes de su primer tema
+    const g=grupos?grupos.find(x=>x.temas[0]===i):null;
+    if(g){
+      const hechos=g.temas.filter(k=>ST.progreso[id]?.temasAprobados?.[k]).length;
+      const comp=hechos===g.temas.length;
+      const pctU=Math.round(hechos/g.temas.length*100);
+      list.innerHTML+=`<div class="uni-hdr"><div class="uni-top"><span class="uni-lbl">${g.lbl}</span><span class="uni-cnt">${comp?'✅ Completada':`${hechos} de ${g.temas.length} temas`}</span></div>
+        <div class="uni-nm">${escCod(g.titulo)}</div>
+        <div class="uni-pb"><div style="width:${pctU}%;background:${comp?'var(--gr)':'var(--na)'}"></div></div>
+        ${comp?`<button class="uni-const" onclick="generarConstancia('unidad',{matId:'${id}',unidadNum:${g.num}})">📥 Constancia de ${g.lbl}</button>`:''}</div>`;
+    }
     list.innerHTML+=`<div class="tema-row"${onclick}><span class="tema-nm">${i+1}. ${t}</span><div style="display:flex;align-items:center;gap:6px">${hint}<span class="lock-ico">${ico}</span><div class="tdot" style="background:${col}"></div></div></div>`;
   });
+  // Constancia del curso completo
+  if(cursoCompleto(curMat)){
+    list.innerHTML+=`<button class="uni-const curso" onclick="generarConstancia('curso',{matId:'${id}'})">🏆 Descargar constancia del curso</button>`;
+  }
   navTo('v-mat');
+}
+// ── Unidades didácticas ─────────────────────────────────────────────
+// Agrupa los temas consecutivos que comparten unidad. La numeración interna de los
+// temas (0..N-1) no cambia: progreso, fichas, reactivos y canjes siguen igual.
+// Devuelve null si la materia no tiene unidades capturadas (se ve como lista corrida).
+function gruposUnidad(m){
+  const u=m?.unidades||[];
+  if(!u.some(x=>x)) return null;
+  const g=[];
+  (m.temas||[]).forEach((t,i)=>{
+    const nom=u[i]||'';
+    const ult=g[g.length-1];
+    if(ult && ult.nombre===nom) ult.temas.push(i);
+    else g.push({nombre:nom, temas:[i]});
+  });
+  g.forEach((x,k)=>{
+    const mm=String(x.nombre).match(/^\s*(unidad\s*\d+)\s*[:.\-]\s*(.+)$/i);
+    x.lbl=mm?mm[1].replace(/\s+/,' '):`Unidad ${k+1}`;
+    x.titulo=mm?mm[2].trim():(x.nombre||`Unidad ${k+1}`);
+    x.num=k+1;
+  });
+  return g;
+}
+function unidadCompleta(matId,g){
+  const ap=ST.progreso[matId]?.temasAprobados||{};
+  return g.temas.every(i=>ap[i]);
+}
+function cursoCompleto(m){
+  const ap=ST.progreso[m.id]?.temasAprobados||{};
+  return (m.temas||[]).length>0 && m.temas.every((t,i)=>ap[i]);
+}
+// Unidad en curso: la primera con temas sin aprobar (o la última si ya terminó todo)
+function unidadEnCurso(m){
+  const g=gruposUnidad(m);
+  if(!g) return null;
+  return g.find(x=>!unidadCompleta(m.id,x)) || g[g.length-1];
+}
+function grupoDeTema(m,i){
+  const g=gruposUnidad(m);
+  return g ? g.find(x=>x.temas.includes(i)) : null;
+}
+function subtituloMateria(m){
+  const u=unidadEnCurso(m);
+  if(!u) return m.unidad||'';
+  return cursoCompleto(m) ? `✅ Curso completado · ${gruposUnidad(m).length} unidades` : `${u.lbl}: ${u.titulo}`;
 }
 // Cuenta los reactivos disponibles de una materia (API > GUIAS local)
 function contarReactivosTotal(matId){
@@ -1785,11 +1974,27 @@ function hlC(src){
   return s.replace(/\n/g,'<br>');
 }
 // Render de fichas provenientes de la hoja Fichas (Google Sheets)
+// Extrae el ID de un video de YouTube desde cualquier formato de enlace
+// (watch?v=, youtu.be/, embed/, shorts/, live/). Devuelve '' si no es YouTube.
+function ytId(url){
+  if(!url) return '';
+  const s=String(url).trim();
+  const m=s.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{6,20})/);
+  return m?m[1]:'';
+}
 function renderFichasDesdeSheet(bloques, cont){
   bloques.forEach((b,bi)=>{
     const t=String(b.tipo||'').toLowerCase();
     if(t==='def'){
       cont.innerHTML+=`<div class="def-box"><h4>${escCod(b.campo1)}</h4><p>${escCod(b.campo2)}</p></div>`;
+    } else if(t==='pregunta'){
+      // campo1=pregunta · campo2=respuesta (oculta hasta que el alumno la pide) · campo3=etiqueta del momento
+      const pid='shpreg-'+bi;
+      const lbl=b.campo3||'Tu turno antes de seguir';
+      cont.innerHTML+=`<div class="preg-box"><div class="preg-lbl">🤔 ${escCod(lbl)}</div><div class="preg-q">${escCod(b.campo1)}</div>
+        <div class="preg-hint">Contesta en tu cuaderno antes de ver la respuesta.</div>
+        <button class="btn-sol" onclick="document.getElementById('${pid}').classList.toggle('show');this.textContent=this.textContent.includes('▼')?'Ocultar respuesta ▲':'Ver respuesta ▼'">Ver respuesta ▼</button>
+        <div class="sol-box" id="${pid}"><p>${escCod(b.campo2)}</p></div></div>`;
     } else if(t==='formula'||t==='sintaxis'){
       const nota=b.campo3?`<div class="formula-nota">${escCod(b.campo3)}</div>`:'';
       cont.innerHTML+=`<div class="formula-box"><div class="formula-lbl">${escCod(b.campo1)||'Sintaxis'}</div><div class="formula-txt">${hlC(b.campo2)}</div>${nota}</div>`;
@@ -1803,13 +2008,27 @@ function renderFichasDesdeSheet(bloques, cont){
       const expl=b.campo4?`<div class="img-box-expl">${escCod(b.campo4)}</div>`:'';
       const sim=b.campo5?`<a href="${b.campo5}" target="_blank" class="img-box-link">🔗 Abrir simulador interactivo</a>`:'';
       cont.innerHTML+=`<div class="img-box">${b.campo1?`<div class="img-box-lbl">${escCod(b.campo1)}</div>`:''}<img src="${b.campo2}" alt="${escCod(b.campo3)||'Diagrama'}" loading="lazy" onerror="this.parentElement.style.display='none'">${cap}${expl}${sim}</div>`;
+    } else if(t==='video'){
+      // campo1=título · campo2=URL de YouTube · campo3=nota/descripción (opcional)
+      const vid=ytId(b.campo2);
+      const nota=b.campo3?`<div class="img-box-cap">${escCod(b.campo3)}</div>`:'';
+      if(vid){
+        cont.innerHTML+=`<div class="img-box">${b.campo1?`<div class="img-box-lbl">🎬 ${escCod(b.campo1)}</div>`:''}<div style="position:relative;width:100%;padding-top:56.25%;border-radius:var(--rad-s);overflow:hidden;background:#000"><iframe src="https://www.youtube-nocookie.com/embed/${vid}" title="${escCod(b.campo1)||'Video'}" style="position:absolute;inset:0;width:100%;height:100%;border:0" loading="lazy" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe></div>${nota}</div>`;
+      } else if(b.campo2){
+        cont.innerHTML+=`<div class="img-box">${b.campo1?`<div class="img-box-lbl">🎬 ${escCod(b.campo1)}</div>`:''}<a href="${b.campo2}" target="_blank" class="img-box-link">▶️ Ver video</a>${nota}</div>`;
+      }
     } else if(t==='ejercicio'){
       const solId='shsol-'+bi;
-      const salidaSol=b.campo3?`<div class="cod-salida"><div class="cod-salida-lbl">Salida</div><pre>${escCod(b.campo3)}</pre></div>`:'';
+      // ¿La solución es código? Solo entonces se muestra el compilador y el resaltado de sintaxis.
+      // En materias de circuitos la solución es un procedimiento: se muestra como texto y "Resultado".
+      const esCodigo=/#include|printf|scanf|\b(int|float|char|void|double)\s+\w|[{}]|;\s*$/m.test(b.campo2||'');
+      const salidaSol=b.campo3?`<div class="cod-salida"><div class="cod-salida-lbl">${esCodigo?'Salida':'Resultado'}</div><pre>${escCod(b.campo3)}</pre></div>`:'';
+      const compilador=esCodigo?`<a href="https://www.onlinegdb.com/online_c_compiler" target="_blank" class="btn-compiler">💻 Abrir compilador en línea</a><br>`:'';
+      const cuerpoSol=b.campo2?(esCodigo?`<div class="code-box" style="margin:0"><div class="cl">${hlC(b.campo2)}</div></div>`:`<div class="sol-txt">${escCod(b.campo2)}</div>`):'';
       cont.innerHTML+=`<div class="ej-box"><h4>✏️ Practica tú mismo</h4><p class="ej-enunciado">${escCod(b.campo1)}</p>
-        <a href="https://www.onlinegdb.com/online_c_compiler" target="_blank" class="btn-compiler">💻 Abrir compilador en línea</a><br>
+        ${compilador}
         <button class="btn-sol" onclick="document.getElementById('${solId}').classList.toggle('show');this.textContent=this.textContent.includes('▼')?'Ocultar solución ▲':'Ver solución ▼'">Ver solución ▼</button>
-        <div class="sol-box" id="${solId}"><div style="font-size:10px;color:var(--ts);font-weight:700;padding:4px 0 3px;text-transform:uppercase;letter-spacing:.5px">Solución propuesta</div>${b.campo2?`<div class="code-box" style="margin:0"><div class="cl">${hlC(b.campo2)}</div></div>`:''}${salidaSol}</div></div>`;
+        <div class="sol-box" id="${solId}"><div style="font-size:10px;color:var(--ts);font-weight:700;padding:4px 0 3px;text-transform:uppercase;letter-spacing:.5px">Solución propuesta</div>${cuerpoSol}${salidaSol}</div><div class="autoeval"><p>¿Cómo te fue?</p><button class="ae-btn" onclick="autoeval(temaActivoGuia,'solo',this)">✅ Lo logré solo</button><button class="ae-btn" onclick="autoeval(temaActivoGuia,'ayuda',this)">🤔 Necesité ayuda</button><button class="ae-btn" onclick="autoeval(temaActivoGuia,'no',this)">❌ No lo intenté</button></div></div>`;
     }
   });
 }
@@ -1832,20 +2051,30 @@ function abrirGuia(temaIdxParam){
   // antes de aprobar su cuestionario). Solo bloquear saltar a un tema FUTURO sin desbloquear.
   const temaActualMat = Math.min(ST.progreso[curMat.id]?.temas||0, curMat.temas.length-1);
   if(temaIdx > temaActualMat && !temaDesbloqueado(curMat.id, temaIdx)){
-    toast('🔒 Aprueba el tema anterior para desbloquear este'); return;
+    if(motivoBloqueo(curMat.id,temaIdx)==='fecha'){
+      toast(`🔒 Este tema se abre el ${fechaBonita(normFecha(DATA.fechasApertura?.[curMat.id]?.[temaIdx]))}`);
+    } else {
+      toast('🔒 Aprueba el tema anterior para desbloquear este');
+    }
+    return;
   }
   const temaNombre = curMat.temas[temaIdx] || 'Guía de estudio';
   // Sub-paso B — si la hoja Fichas (Google Sheets) tiene bloques para este tema, úsalos.
   const sheetBloques = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.bloques;
   if(Array.isArray(sheetBloques) && sheetBloques.length){
-    document.getElementById('g-mat-s').textContent=`${curMat.nombre} · Tema ${temaIdx+1} de ${curMat.temas.length}`;
+    document.getElementById('g-mat-s').textContent=`${grupoDeTema(curMat,temaIdx)?grupoDeTema(curMat,temaIdx).lbl+' · ':curMat.nombre+' · '}Tema ${temaIdx+1} de ${curMat.temas.length}`;
     document.getElementById('g-tema-t').textContent=temaNombre;
     const cont=document.getElementById('g-content');
     cont.innerHTML='<div style="height:10px"></div>';
     renderFichasDesdeSheet(sheetBloques, cont);
     const pdfUrlSheet = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.pdf_url || '';
     const pdfUrl = pdfUrlSheet || `fichas/ficha-${curMat.id}-t${temaIdx}.pdf`;
-    cont.innerHTML+=`<div style="padding:0 12px 6px"><a href="${pdfUrl}" target="_blank" rel="noopener" class="btn-ficha-pdf" download="SDGo_${curMat.id}_tema${temaIdx+1}.pdf">📥 Descargar ficha en PDF</a></div>`;
+    // Si el Sheet apunta a la tarjeta de repaso, esa es la descarga libre del tema;
+    // la autoasesoría completa se obtiene como canje en la tienda (Mis logros y canjes).
+    const esTarjeta=/tarjeta/i.test(pdfUrl);
+    const lblPdf=esTarjeta?'📥 Descargar tarjeta de repaso (PDF)':'📥 Descargar ficha en PDF';
+    const notaCanje=esTarjeta?`<div style="font-size:11px;color:var(--ts);text-align:center;padding:4px 6px 0;line-height:1.5">📘 La autoasesoría completa de este tema (teoría, ejemplos, práctica por niveles y solucionario) está disponible como canje en <strong>Mis logros y canjes</strong>.</div>`:'';
+    cont.innerHTML+=`<div style="padding:0 12px 6px"><a href="${pdfUrl}" target="_blank" rel="noopener" class="btn-ficha-pdf" download="SDGo_${curMat.id}_tema${temaIdx+1}${esTarjeta?'_tarjeta':''}.pdf">${lblPdf}</a>${notaCanje}</div>`;
     cont.innerHTML+=`<div class="g-nav"><button onclick="navBack()">‹ Volver</button><button class="g-main" onclick="iniciarCuestionario()">Practicar ✏️</button><button onclick="navRoot('v-dash')">Inicio</button></div>`;
     navTo('v-guia');
     return;
@@ -1946,9 +2175,10 @@ function abrirGuia(temaIdxParam){
   const pdfUrlSheet = DATA.fichasPorTema?.[curMat.id]?.[temaIdx]?.pdf_url || '';
   const pdfUrlLocal = `fichas/ficha-${curMat.id}-t${temaIdx}.pdf`;
   const pdfUrl = pdfUrlSheet || pdfUrlLocal;
+  const esTarjetaL=/tarjeta/i.test(pdfUrl);
   const btnPdf = `<a href="${pdfUrl}" target="_blank" rel="noopener" class="btn-ficha-pdf"
-       download="SDGo_${curMat.id}_tema${temaIdx+1}.pdf"
-       onerror="this.style.display='none'">📥 Descargar ficha en PDF</a>`;
+       download="SDGo_${curMat.id}_tema${temaIdx+1}${esTarjetaL?'_tarjeta':''}.pdf"
+       onerror="this.style.display='none'">${esTarjetaL?'📥 Descargar tarjeta de repaso (PDF)':'📥 Descargar ficha en PDF'}</a>`;
   cont.innerHTML+=`<div style="padding:0 12px 6px">${btnPdf}</div>`;
   cont.innerHTML+=`<div class="g-nav">
     <button onclick="navBack()">‹ Volver</button>
@@ -1968,6 +2198,14 @@ function iniciarCuestionario(){
   const temaProg=Math.min(ST.progreso[matId]?.temas||0, curMat.temas.length-1);
   let temaIdx=(temaActivoGuia!=null)?temaActivoGuia:temaProg;
   temaIdx=Math.min(Math.max(temaIdx,0), curMat.temas.length-1);
+  if(!temaDesbloqueado(matId, temaIdx)){
+    if(motivoBloqueo(matId,temaIdx)==='fecha'){
+      toast(`🔒 Este tema se abre el ${fechaBonita(normFecha(DATA.fechasApertura?.[matId]?.[temaIdx]))}`);
+    } else {
+      toast('🔒 Aprueba el tema anterior para desbloquear este');
+    }
+    return;
+  }
   // Buscar reactivos: primero en el API, luego en GUIAS local como respaldo
   const reactivosAPI = DATA.reactivosPorTema?.[matId]?.[temaIdx];
   const reactivosLocal = GUIAS[matId]?.[temaIdx]?.reactivos;
@@ -1984,16 +2222,27 @@ function iniciarCuestionario(){
   const intentoNum=(ST.progreso[matId].intentos?.[temaIdx]||0);
   const temaNombre=curMat.temas[temaIdx]||'Cuestionario';
   // Sanear reactivos: respuesta correcta como número 0-3, exactamente 4 opciones en texto
+  // Barajado justo (Fisher-Yates): revuelve preguntas y opciones en cada intento,
+  // para que copiar posiciones o memorizar letras no funcione.
+  function barajar(arr){
+    const a=arr.slice();
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
   const limpios = temaData.reactivos.map(r=>{
     let ops = Array.isArray(r.ops) ? r.ops.slice(0,4).map(o=>String(o??'')) : [];
     while(ops.length<4) ops.push('—');
     let c = Number(r.c);
     if(!Number.isInteger(c) || c<0 || c>3) c=0;
-    return { p:String(r.p??''), ops, c, exp:String(r.exp??''), img:r.img||'', cap:r.cap||'' };
+    // Barajar las opciones y reubicar el índice de la correcta
+    const orden = barajar([0,1,2,3]);
+    const opsB = orden.map(i=>ops[i]);
+    const cB = orden.indexOf(c);
+    return { p:String(r.p??''), ops:opsB, c:cB, exp:String(r.exp??''), img:r.img||'', cap:r.cap||'' };
   });
   // RF4 — cuántas preguntas: num_preguntas del tema (hoja Temas) o 5 por defecto
   const nPreg = Number(DATA.numPreguntas?.[matId]?.[temaIdx]) || 5;
-  quiz={preguntas:[...limpios].sort(()=>Math.random()-.5).slice(0,nPreg),idx:0,correctas:0,respondida:false,intentoNum,temaIdx};
+  quiz={preguntas:barajar(limpios).slice(0,nPreg),idx:0,correctas:0,respondida:false,intentoNum,temaIdx};
   document.getElementById('q-sub').textContent=`${curMat.nombre} · Tema ${temaIdx+1}`;
   // Mostrar badge de intento
   const badge=document.getElementById('intento-badge');
@@ -2013,18 +2262,37 @@ function renderPregunta(){
   document.getElementById('q-cnt').textContent=`${quiz.idx+1} / ${total}`;
   document.getElementById('btn-sig').style.display='none';
   document.getElementById('btn-fin').style.display='none';
+  document.getElementById('btn-enviar').style.display='none';
   quiz.respondida=false;
+  quiz.sel=null;
   const preg=quiz.preguntas[quiz.idx];
   const letras=['A','B','C','D'];
-  const imgHtml=preg.img?`<div style="margin-bottom:12px;border-radius:var(--rad);overflow:hidden;border:.5px solid var(--bor)"><img src="${preg.img}" style="width:100%;max-height:200px;object-fit:contain;display:block"></div>`:'';
+  // Figura del reactivo con su pie (imagen_caption). Si la imagen no carga, se oculta el recuadro completo.
+  const capHtml=preg.cap?`<div class="img-box-cap">${escCod(preg.cap)}</div>`:'';
+  const imgHtml=preg.img?`<div style="margin-bottom:12px;border-radius:var(--rad);overflow:hidden;border:.5px solid var(--bor);background:#fff"><img src="${preg.img}" alt="${escCod(preg.cap)||'Figura del reactivo'}" style="width:100%;max-height:220px;object-fit:contain;display:block" onerror="this.parentElement.style.display='none'">${capHtml}</div>`:'';
   document.getElementById('q-body').innerHTML=`
     <div class="q-txt">${preg.p.replace(/\n/g,'<br>')}</div>
     ${imgHtml}
-    ${preg.ops.map((o,i)=>`<div class="opt" id="opt-${i}" onclick="responder(${i})">
+    ${preg.ops.map((o,i)=>`<div class="opt" id="opt-${i}" onclick="seleccionarOpcion(${i})">
       <div class="opt-l">${letras[i]}</div>
       <div class="opt-t">${o}</div>
     </div>`).join('')}
     <div id="fb-area"></div>`;
+}
+function seleccionarOpcion(i){
+  if(quiz.respondida) return;
+  quiz.sel=i;
+  const preg=quiz.preguntas[quiz.idx];
+  for(let k=0;k<preg.ops.length;k++){
+    document.getElementById('opt-'+k).classList.toggle('sel', k===i);
+  }
+  document.getElementById('btn-enviar').style.display='flex';
+}
+function enviarRespuesta(){
+  if(quiz.respondida) return;
+  if(quiz.sel===null||quiz.sel===undefined){ toast('Selecciona una opción primero'); return; }
+  document.getElementById('btn-enviar').style.display='none';
+  responder(quiz.sel);
 }
 function responder(idx){
   if(quiz.respondida) return;
@@ -2034,6 +2302,7 @@ function responder(idx){
   if(ok) quiz.correctas++;
   for(let i=0;i<preg.ops.length;i++){
     const el=document.getElementById('opt-'+i);
+    el.classList.remove('sel');
     el.classList.add('dis');
     if(i===preg.c) el.classList.add('ok');
     else if(i===idx&&!ok) el.classList.add('bad');
@@ -2091,12 +2360,26 @@ function finalizarQuiz(){
     const umsg=document.getElementById('res-unlock-msg');
     if(aprobado && temaActual<(curMat.temas?.length||1)-1){
       const siguiente = curMat.temas[temaActual+1] || `Tema ${temaActual+2}`;
-      umsg.innerHTML=`<div class="res-unlock">🔓 ¡Desbloqueado! Siguiente: ${siguiente}</div>`;
+      if(!temaAbiertoPorFecha(curMat.id, temaActual+1)){
+        umsg.innerHTML=`<div class="res-unlock">✅ ¡Aprobado! El siguiente tema (${siguiente}) se abre el ${fechaBonita(normFecha(DATA.fechasApertura?.[curMat.id]?.[temaActual+1]))}</div>`;
+      } else {
+        umsg.innerHTML=`<div class="res-unlock">🔓 ¡Desbloqueado! Siguiente: ${siguiente}</div>`;
+      }
     } else if(aprobado && temaActual>=(curMat.temas?.length||1)-1){
       umsg.innerHTML=`<div class="res-unlock">🏆 ¡Completaste todos los temas de ${curMat.nombre}!</div>`;
     } else if(!aprobado){
       umsg.innerHTML=`<div class="res-locked">🔒 Necesitas 80% para desbloquear el siguiente tema</div>`;
     } else { umsg.innerHTML=''; }
+    // Constancias: al cerrar una unidad didáctica y al completar el curso
+    if(aprobado){
+      const gU=grupoDeTema(curMat,temaActual);
+      if(gU && unidadCompleta(matId,gU)){
+        umsg.innerHTML+=`<div class="res-unlock">🎉 ¡Completaste la ${gU.lbl}: ${escCod(gU.titulo)}!<br><button class="uni-const" onclick="generarConstancia('unidad',{matId:'${matId}',unidadNum:${gU.num}})">📥 Descargar constancia de la unidad</button></div>`;
+      }
+      if(cursoCompleto(curMat)){
+        umsg.innerHTML+=`<div class="res-unlock"><button class="uni-const" style="background:var(--gu)" onclick="generarConstancia('curso',{matId:'${matId}'})">🏆 Descargar constancia del curso</button></div>`;
+      }
+    }
     // RF1 — botones de navegación según el resultado
     const rb=document.getElementById('res-btns');
     if(rb){
@@ -2120,7 +2403,12 @@ function finalizarQuiz(){
       tema_idx:temaActual, tema_nombre:(curMat.temas&&curMat.temas[temaActual])||`Tema ${temaActual+1}`,
       calificacion:pct, correctas:correctas, total:total,
       completado:aprobado, puntos:pts
-    });
+    }).then(()=>enviarResultado({
+      boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo,
+      materia_id:matId, materia_nombre:curMat.nombre,
+      calificacion:pct, correctas:correctas, total:total,
+      puntos:pts, modo:'normal', tema_idx:temaActual
+    }));
   }catch(e){ console.warn('finalizarQuiz (envío):', e.message); }
 }
 
@@ -2462,6 +2750,7 @@ function canjear(id){
   // Reabrir un PDF ya canjeado sin volver a cobrar
   if(ST.canjes.includes(id)){
     if(r.tipo==='pdf' && r.recurso){ window.open(r.recurso,'_blank'); return; }
+    if(/^constancia_/.test(r.tipo||'')){ canjearGratis(id); return; }   // se vuelve a descargar sin cobrar
     toast('Ya canjeada');return;
   }
   // Elegir la bolsa de materia: si la recompensa pertenece a una materia (ej. problemario),
@@ -2478,12 +2767,12 @@ function canjear(id){
     if(!matGasto){ toast(`⚠️ Necesitas ${r.pts} pts en una misma materia`); return; }
   }
   // Verificar que constancias solo se canjeen si hay unidad/módulo completo
-  if(r.tipo==='constancia_unidad'||r.tipo==='constancia_modulo'){
-    const hayCompleto=Object.values(ST.progreso).some(p=>{
-      const mat=DATA.materias.find(m=>ST.inscritas.includes(m.id));
-      return mat && (p.temas||0)>=mat.temas.length;
-    });
-    if(!hayCompleto){toast('⚠️ Completa una unidad primero');return;}
+  if(/^constancia_/.test(r.tipo||'')){
+    const mat=(DATA.materias||[]).find(m=>m.id===matGasto);
+    const ok = r.tipo==='constancia_unidad'
+      ? !!(mat && (gruposUnidad(mat)||[]).some(x=>unidadCompleta(mat.id,x)))
+      : !!(mat && cursoCompleto(mat));
+    if(!ok){toast('🔒 Completa los temas primero');return;}
   }
   descontarPuntos(matGasto, r.pts); ST.canjes.push(id);
   ST.puntosCanje=(ST.puntosCanje||0)+r.pts;
@@ -2495,6 +2784,7 @@ function canjear(id){
     else toast('⚠️ Material no disponible por ahora');
     return;
   }
+  if(/^constancia_/.test(r.tipo||'')){ canjearGratis(id); return; }
   toast(`✅ ¡${r.n} canjeado!`);
 }
 // Opción A — registra un gasto de puntos en el servidor (hoja Canjes) para que el
@@ -2610,8 +2900,30 @@ function overlay(html){
   document.body.appendChild(o);
 }
 function cerrarOverlay(){ const o=document.getElementById('sdgo-overlay'); if(o) o.remove(); }
+// Recompensas gratuitas (costo 0) de la tienda: constancias de unidad y de curso.
+// Son las mismas que se ofrecen al aprobar; aquí solo se vuelven a descargar.
 function canjearGratis(id){
-  toast('📄 Constancia generada — función disponible en v1.1');
+  const r=(DATA.recompensas||[]).find(x=>x.id===id);
+  const mat=(curMat && (ST.inscritas||[]).includes(curMat.id)) ? curMat : null;
+  if(!r||!mat){ toast('Entra a una unidad de aprendizaje primero'); return; }
+  const t=String(r.tipo||'').toLowerCase();
+  if(t==='constancia_curso'||t==='constancia_modulo'){
+    generarConstancia('curso',{matId:mat.id}); return;
+  }
+  if(t==='constancia_unidad'){
+    const g=gruposUnidad(mat);
+    if(!g){ toast('Esta materia aún no tiene unidades capturadas'); return; }
+    const hechas=g.filter(x=>unidadCompleta(mat.id,x));
+    if(!hechas.length){ toast('🔒 Completa todos los temas de una unidad para obtener su constancia'); return; }
+    if(hechas.length===1){ generarConstancia('unidad',{matId:mat.id,unidadNum:hechas[0].num}); return; }
+    overlay(`<h3 style="color:var(--gu);margin:0 0 4px">¿De qué unidad?</h3>
+      <p style="font-size:12px;color:var(--ts);margin:0 0 12px">Unidades completadas en ${escCod(mat.nombre)}.</p>
+      ${hechas.map(x=>`<button class="btn btn-o" style="margin-bottom:7px" onclick="cerrarOverlay();generarConstancia('unidad',{matId:'${mat.id}',unidadNum:${x.num}})">${x.lbl}: ${escCod(x.titulo)}</button>`).join('')}
+      <button class="btn btn-s" onclick="cerrarOverlay()">Cancelar</button>`);
+    return;
+  }
+  if(r.recurso){ window.open(r.recurso,'_blank'); return; }
+  toast('Material no disponible por ahora');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2627,11 +2939,17 @@ async function cargarDatosAPI(){
     const d=json.data;
     DATA.materias=(d.materias||[]).map(m=>({
       id:m.id,nombre:m.nombre,icono:m.icono,color:m.color,unidad:m.unidad,
-      temas:(d.temas&&d.temas[m.id])||[]
+      temas:(d.temas&&d.temas[m.id])||[],
+      // unidades[i] = unidad didáctica del tema i ('' si la hoja no la indica)
+      unidades:((d.temas&&d.temas[m.id])||[]).map((_,i)=>String(d.unidadesTemas?.[m.id]?.[i]||''))
     }));
     // Reactivos agrupados por tema {matId: {temaIdx: [reactivos]}}
     DATA.reactivosPorTema = d.reactivos||{};
     DATA.numPreguntas = d.numPreguntas||{};
+    // Planeación docente: fechas de apertura por tema y modo de desbloqueo por materia
+    DATA.fechasApertura = d.fechasApertura||{};
+    DATA.modosDesbloqueo = d.modosDesbloqueo||{};
+    if(d.fechaServidor) DATA.fechaServidor = d.fechaServidor;
     // Fichas del Sheets {matId: {temaIdx: {pdf_url, bloques:[...]}}}
     DATA.fichasPorTema = d.fichas||{};
     // Normalizar recompensas del Sheet (nombre/desc/icono) al formato que usa la app (n/s/ico)
@@ -2652,7 +2970,10 @@ async function cargarDatosAPI(){
     try{ localStorage.setItem('sdgo_cache',JSON.stringify({
       ts:Date.now(),materias:DATA.materias,asesorias:DATA.asesorias,
       reactivosPorTema:DATA.reactivosPorTema,
-      fichasPorTema:DATA.fichasPorTema
+      fichasPorTema:DATA.fichasPorTema,
+      fechasApertura:DATA.fechasApertura,
+      modosDesbloqueo:DATA.modosDesbloqueo,
+      fechaServidor:DATA.fechaServidor||''
     })); }catch(e){}
   }catch(e){
     console.warn('API no disponible:',e.message);
@@ -2662,6 +2983,9 @@ async function cargarDatosAPI(){
         DATA.materias=cache.materias; DATA.asesorias=cache.asesorias||[];
         DATA.reactivosPorTema=cache.reactivosPorTema||{};
         DATA.fichasPorTema=cache.fichasPorTema||{};
+        DATA.fechasApertura=cache.fechasApertura||{};
+        DATA.modosDesbloqueo=cache.modosDesbloqueo||{};
+        if(cache.fechaServidor) DATA.fechaServidor=cache.fechaServidor;
       }
     }catch(ce){}
     if(!DATA.materias.length) usarDatosLocales();
@@ -2760,10 +3084,30 @@ async function enviarCita(p){
 // ═══════════════════════════════════════════════════════
 // INICIO
 // ═══════════════════════════════════════════════════════
+async function restaurarSesion(){
+  let s=null;
+  try{ s=JSON.parse(localStorage.getItem('sdgo_sesion')||'null'); }catch(e){}
+  if(!s||!s.boleta||!s.grupo) return false;
+  let prev=null;
+  try{ prev=JSON.parse(localStorage.getItem('sdgo_'+s.boleta)||'null'); }catch(e){}
+  if(!prev||!prev.validado) return false;
+  ST.boleta=s.boleta; ST.grupo=s.grupo;
+  loadAlumno(s.boleta);
+  if((!ST.materiasPadron||!ST.materiasPadron.length)&&ST.materiasPadronCache) ST.materiasPadron=ST.materiasPadronCache;
+  ST.validado=true;
+  try{ await sincronizarProgreso(s.boleta); }catch(e){ console.warn('Restaurar sync:',e.message); }
+  actualizarRacha(); iniciarTimer();
+  if(!ST.inscritas||!ST.inscritas.length){ renderSel(); navTo('v-sel'); }
+  else { renderDash(); navRoot('v-dash'); }
+  return true;
+}
 async function initApp(){
   showView('v-load');
   await cargarDatosAPI();
-  showView('v-splash');
+  let restaurada=false;
+  try{ restaurada=await restaurarSesion(); }catch(e){ console.warn('Restaurar:',e.message); }
+  if(!restaurada) showView('v-splash');
+  try{ history.pushState({sdgo:'home'},''); }catch(e){}
 }
 // ═══════════════════════════════════════════════════════
 // CONSTANCIAS PDF — generadas en el dispositivo con jsPDF
@@ -2773,18 +3117,24 @@ const DOCENTE_NOMBRE = 'Natisma Julieta López Salas';
 const DOCENTE_CARGO  = 'Docente · CECyT 9 · IPN';
 
 function generarConstancia(tipo, datosExtra) {
+  // tipo: 'unidad' (una unidad didáctica) | 'curso' (todas las unidades de la materia)
   if(!window.jspdf) { toast('⚠️ Cargando generador, intenta en un momento'); return; }
+  const mat = (DATA.materias||[]).find(m=>m.id===(datosExtra?.matId||curMat?.id)) || curMat;
+  if(!mat){ toast('Materia no encontrada'); return; }
+  const grupos = gruposUnidad(mat);
+  const esCurso = tipo==='curso' || tipo==='modulo';
+  const g = (!esCurso && grupos) ? grupos.find(x=>x.num===Number(datosExtra?.unidadNum)) : null;
+  // Solo se emite si de verdad está completo
+  if(esCurso ? !cursoCompleto(mat) : !(g && unidadCompleta(mat.id,g))){
+    toast('🔒 Completa todos los temas para obtener la constancia'); return;
+  }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'letter' });
   const W = 215.9;
 
   // Banda superior guinda
   doc.setFillColor(123,17,53); doc.rect(0,0,W,30,'F');
-
-  // Logo CECyT 9
   try { doc.addImage(LOGO_CECYT9,'PNG',8,4,22,22); } catch(e) {}
-
-  // Institución
   doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(255,255,255);
   doc.text('INSTITUTO POLITÉCNICO NACIONAL', 36, 12);
   doc.setFont('helvetica','normal'); doc.setFontSize(9);
@@ -2792,66 +3142,71 @@ function generarConstancia(tipo, datosExtra) {
   doc.text('"Juan de Dios Bátiz" · Técnico en Sistemas Digitales', 36, 23);
   doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(227,115,34);
   doc.text('SDGo!', W-18, 20, {align:'right'});
-
-  // Línea naranja
   doc.setDrawColor(227,115,34); doc.setLineWidth(1.5); doc.line(15,37,W-15,37);
 
   // Título
   doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(123,17,53);
   doc.text('CONSTANCIA DE COMPLETACIÓN', W/2, 52, {align:'center'});
-  const sub = tipo==='modulo' ? 'Módulo Completo · Técnico en Sistemas Digitales'
-    : `${datosExtra?.unidad||'Unidad de Aprendizaje'} · Técnico en Sistemas Digitales`;
   doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(13,27,75);
-  doc.text(sub, W/2, 62, {align:'center'});
+  doc.text(`Unidad de aprendizaje: ${mat.nombre}`, W/2, 61, {align:'center'});
 
-  // Cuerpo
+  // Alumno
   doc.setFontSize(11); doc.setTextColor(80,80,80);
-  doc.text('Se hace constar que el alumno:', W/2, 78, {align:'center'});
-
-  // Nombre
+  doc.text('Se hace constar que el alumno:', W/2, 75, {align:'center'});
   const nombre = (ST.nombre||ST.boleta).toUpperCase();
-  doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(13,27,75);
-  doc.text(nombre, W/2, 92, {align:'center'});
-  doc.setDrawColor(123,17,53); doc.setLineWidth(0.4); doc.line(W/2-65,95,W/2+65,95);
-
-  // Boleta y grupo
+  doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(13,27,75);
+  doc.text(nombre, W/2, 88, {align:'center'});
+  doc.setDrawColor(123,17,53); doc.setLineWidth(0.4); doc.line(W/2-65,91,W/2+65,91);
   doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(80,80,80);
-  doc.text(`Boleta: ${ST.boleta}   ·   Grupo: ${ST.grupo}`, W/2, 104, {align:'center'});
+  doc.text(`Boleta: ${ST.boleta}   ·   Grupo: ${ST.grupo}`, W/2, 99, {align:'center'});
 
-  // Texto logro
+  // Logro
   doc.setFontSize(12); doc.setTextColor(60,60,60);
-  const logro = tipo==='modulo'
-    ? 'ha completado satisfactoriamente el Módulo de\nLenguaje de Programación en la plataforma SDGo!'
-    : `ha completado satisfactoriamente\n${datosExtra?.unidad||'la Unidad de Aprendizaje'}\nen la plataforma de apoyo académico SDGo!`;
-  doc.text(logro, W/2, 120, {align:'center'});
+  let y = 113;
+  const titulo = esCurso
+    ? `ha completado satisfactoriamente todos los temas de ${mat.nombre}`
+    : `ha completado satisfactoriamente la ${g.lbl}: ${g.titulo}`;
+  const lineas = doc.splitTextToSize(titulo, W-50);
+  doc.text(lineas, W/2, y, {align:'center'}); y += lineas.length*6 + 2;
+  doc.text('en la plataforma de apoyo académico SDGo!', W/2, y, {align:'center'}); y += 11;
 
-  // Puntos y fecha
+  // Detalle: temas de la unidad, o unidades del curso
+  doc.setFontSize(10); doc.setTextColor(90,90,90);
+  const det = esCurso
+    ? (grupos ? grupos.map(x=>`${x.lbl}: ${x.titulo}`) : (mat.temas||[]).map((t,i)=>`Tema ${i+1}: ${t}`))
+    : g.temas.map(i=>`Tema ${i+1}: ${mat.temas[i]}`);
+  det.forEach(t=>{
+    const l = doc.splitTextToSize('• '+t, W-60);
+    doc.text(l, 30, y); y += l.length*5 + 1;
+  });
+
+  // Puntos de la materia y fecha
+  y = Math.max(y+8, 160);
   doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(227,115,34);
-  doc.text(`Puntos acumulados: ${ST.puntos} pts`, W/2, 150, {align:'center'});
+  doc.text(`Puntos en ${mat.nombre}: ${puntosMateria(mat.id)} pts`, W/2, y, {align:'center'});
   const fecha = new Date().toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
   doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(120,120,120);
-  doc.text(`Ciudad de México, a ${fecha}`, W/2, 162, {align:'center'});
+  doc.text(`Ciudad de México, a ${fecha}`, W/2, y+10, {align:'center'});
 
   // Firmas
+  const yf = Math.max(y+40, 210);
   doc.setDrawColor(13,27,75); doc.setLineWidth(0.4);
-  doc.line(28,198,105,198); doc.line(W-105,198,W-28,198);
+  doc.line(28,yf,105,yf); doc.line(W-105,yf,W-28,yf);
   doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(13,27,75);
-  doc.text(DOCENTE_NOMBRE, 66, 203, {align:'center'});
-  doc.text(ST.nombre||ST.boleta, W-66, 203, {align:'center'});
+  doc.text(DOCENTE_NOMBRE, 66, yf+5, {align:'center'});
+  doc.text(ST.nombre||ST.boleta, W-66, yf+5, {align:'center'});
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(120,120,120);
-  doc.text(DOCENTE_CARGO, 66, 208, {align:'center'});
-  doc.text(`Boleta: ${ST.boleta}`, W-66, 208, {align:'center'});
+  doc.text(DOCENTE_CARGO, 66, yf+10, {align:'center'});
+  doc.text(`Boleta: ${ST.boleta}`, W-66, yf+10, {align:'center'});
 
   // Pie guinda
   doc.setFillColor(123,17,53); doc.rect(0,262,W,17.4,'F');
   doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(255,255,255);
-  doc.text('SDGo! · Plataforma de apoyo académico · CECyT 9 "Juan de Dios Bátiz" · IPN · 2026', W/2, 272, {align:'center'});
+  doc.text(`SDGo! · Plataforma de apoyo académico · CECyT 9 "Juan de Dios Bátiz" · IPN · ${new Date().getFullYear()}`, W/2, 272, {align:'center'});
 
-  const archivo = tipo==='modulo'
-    ? `SDGo_Modulo_${ST.boleta}.pdf`
-    : `SDGo_${(datosExtra?.unidad||'Unidad').replace(/\s+/g,'_')}_${ST.boleta}.pdf`;
+  const archivo = esCurso ? `SDGo_${mat.id}_curso_${ST.boleta}.pdf` : `SDGo_${mat.id}_unidad${g.num}_${ST.boleta}.pdf`;
   doc.save(archivo);
-  toast('📄 Constancia descargada exitosamente');
+  toast('📄 Constancia descargada');
 }
 
 function mostrarBannerConstancia(tipo, unidadNombre) {
@@ -2902,7 +3257,7 @@ function activarMarcaAgua() {
   const svg =
    `<svg xmlns='http://www.w3.org/2000/svg' width='${tw}' height='${th}'>`+
    `<text x='0' y='${th - 10}' font-family='Courier New,monospace' `+
-   `font-size='${F}' font-weight='700' fill='rgba(123,17,53,0.15)' `+
+   `font-size='${F}' font-weight='700' fill='rgba(123,17,53,0.28)' `+
    `xml:space='preserve'>${phrase}</text></svg>`;
   const encoded = 'data:image/svg+xml,' + encodeURIComponent(svg);
   overlay.style.backgroundImage = 'url("' + encoded + '")';
@@ -2918,84 +3273,6 @@ function desactivarMarcaAgua() {
   }
 }
 
-// ═══════════════════════════════════════════════════════
-// SEGURIDAD — Detección de capturas de pantalla
-// ═══════════════════════════════════════════════════════
-let capturaLog = []; // registro de intentos
-
-function registrarIntentoCap() {
-  const ahora = new Date().toLocaleTimeString('es-MX');
-  capturaLog.push({ hora: ahora, pregunta: quiz.idx + 1 });
-
-  // Mostrar aviso visual
-  const old = document.querySelector('.cap-warning');
-  if (old) old.remove();
-  const w = document.createElement('div');
-  w.className = 'cap-warning';
-  w.innerHTML = `⚠️ Intento de captura detectado · Pregunta marcada como incorrecta`;
-  document.body.appendChild(w);
-  setTimeout(() => w.remove(), 3500);
-
-  // Si hay pregunta activa y no fue respondida, marcarla incorrecta automáticamente
-  if (!quiz.respondida && document.getElementById('q-body').querySelector('.opt')) {
-    quiz.respondida = true;
-    const preg = quiz.preguntas[quiz.idx];
-    // Marcar todas las opciones como deshabilitadas
-    for (let i = 0; i < preg.ops.length; i++) {
-      const el = document.getElementById('opt-' + i);
-      if (!el) continue;
-      el.classList.add('dis');
-      if (i === preg.c) el.classList.add('ok'); // mostrar la correcta
-    }
-    // Feedback de penalización
-    document.getElementById('fb-area').innerHTML = `
-      <div class="fb bad">
-        <div class="fb-ico">📸</div>
-        <div>
-          <div class="fb-t bad">Captura detectada — pregunta invalidada</div>
-          <div class="fb-d">Esta pregunta fue marcada como incorrecta. Respuesta correcta: ${['A','B','C','D'][preg.c]}. ${preg.exp}</div>
-        </div>
-      </div>`;
-    const ultima = quiz.idx === quiz.preguntas.length - 1;
-    document.getElementById(ultima ? 'btn-fin' : 'btn-sig').style.display = 'flex';
-  }
-  toast('📸 Captura detectada — quedará registrado');
-}
-
-// Detectar teclas de captura en computadora
-document.addEventListener('keydown', function(e) {
-  const enQuiz = document.getElementById('v-quiz')?.classList.contains('active');
-  if (!enQuiz) return;
-
-  // PrintScreen
-  if (e.key === 'PrintScreen' || e.code === 'PrintScreen') {
-    e.preventDefault(); registrarIntentoCap(); return;
-  }
-  // Ctrl+P (imprimir)
-  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
-    e.preventDefault(); registrarIntentoCap(); return;
-  }
-  // Ctrl+Shift+S / Ctrl+S
-  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 's') {
-    e.preventDefault(); registrarIntentoCap(); return;
-  }
-  // Win+Shift+S (recorte Windows) — se detecta como secuencia de Meta+Shift+S
-  if (e.metaKey && e.shiftKey && e.key === 's') {
-    e.preventDefault(); registrarIntentoCap(); return;
-  }
-  // F12 durante cuestionario
-  if (e.key === 'F12') {
-    e.preventDefault();
-    toast('⚠️ Las herramientas de desarrollador están desactivadas durante el cuestionario');
-    return;
-  }
-  // Ctrl+U (ver código fuente)
-  if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
-    e.preventDefault(); return;
-  }
-});
-
-// Ocultar cuestionario al cambiar de app o minimizar ventana
 document.addEventListener('visibilitychange', function() {
   const enQuiz = document.getElementById('v-quiz')?.classList.contains('active');
   if (!enQuiz) return;

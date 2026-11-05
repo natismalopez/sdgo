@@ -1,7 +1,7 @@
-// SDGo! Service Worker — v26
+// SDGo! Service Worker — v27
 // Estrategia: network-first para el HTML (para que las versiones nuevas lleguen
 // solas al recargar, sin que el alumno limpie caché) y la API siempre por red.
-const CACHE = 'sdgo-v48';
+const CACHE = 'sdgo-v56';
 const ASSETS = ['./index.html','./manifest.json'];
 
 self.addEventListener('install', e => {
@@ -39,6 +39,19 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put('./index.html', copy));
         return res;
       }).catch(() => caches.match('./index.html').then(c => c || caches.match(req)))
+    );
+    return;
+  }
+
+  // PDFs e imágenes del contenido (fichas/, img/): network-first, para que una
+  // ficha o tarjeta corregida llegue al alumno sin quedarse pegada en caché.
+  if (url.pathname.indexOf('/fichas/') !== -1 || url.pathname.indexOf('/img/') !== -1) {
+    e.respondWith(
+      fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
+        return res;
+      }).catch(() => caches.match(req))
     );
     return;
   }
