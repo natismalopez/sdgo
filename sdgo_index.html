@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SDGo!">
 <title>SDGo! — CECyT 9 IPN</title>
+<link rel="icon" type="image/png" href="img/escudoCECyT9.png">
 <link rel="manifest" href="manifest.json">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -94,7 +95,8 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 
 /* ─── SPLASH / REGISTRO ───────────────────── */
 #v-splash{background:var(--gu);align-items:center;justify-content:center;padding:28px 24px}
-.sp-logo{width:72px;height:72px;border-radius:18px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:14px}
+.sp-logo{width:92px;height:92px;border-radius:50%;background:#fff;border:3px solid rgba(255,255,255,.25);box-shadow:0 4px 18px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden}
+.sp-logo img{width:84px;height:84px;object-fit:contain;display:block}
 .sp-sd{font-size:24px;font-weight:800;color:#fff;letter-spacing:1px;line-height:1}
 .sp-go{font-size:13px;font-weight:700;color:var(--na)}
 .sp-name{font-size:32px;font-weight:800;color:#fff;margin-bottom:2px}
@@ -377,7 +379,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 <!-- SPLASH / LOGIN -->
 <div class="view" id="v-splash">
   <div style="flex:1;background:var(--gu);overflow-y:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px">
-    <div class="sp-logo"><div class="sp-sd">SD</div><div class="sp-go">Go! ›</div></div>
+    <div class="sp-logo"><img src="img/escudoCECyT9.png" alt="Escudo CECyT 9 Juan de Dios Bátiz"></div>
     <div class="sp-name">SDG<em>o!</em></div>
     <div class="sp-bar"></div>
     <p class="sp-sub">Tu guía de estudio para<br>Sistemas Digitales · CECyT 9</p>

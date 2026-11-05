@@ -1,8 +1,8 @@
 // SDGo! Service Worker — v27
 // Estrategia: network-first para el HTML (para que las versiones nuevas lleguen
 // solas al recargar, sin que el alumno limpie caché) y la API siempre por red.
-const CACHE = 'sdgo-v56';
-const ASSETS = ['./index.html','./manifest.json'];
+const CACHE = 'sdgo-v57';
+const ASSETS = ['./index.html','./manifest.json','./img/escudoCECyT9.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
