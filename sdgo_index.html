@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#7B1135">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SDGo!">
-<title>SDGo! ::: CECyT 9 IPN</title>
+<title>SDGo! — CECyT 9 IPN</title>
 <link rel="icon" type="image/png" href="img/escudoCECyT9.png">
 <link rel="manifest" href="manifest.json">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -304,6 +304,17 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 .pts-tag{background:rgba(227,115,34,.2);border:.5px solid rgba(227,115,34,.4);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--na);font-weight:600}
 .rec-card{background:#fff;border-radius:var(--rad);margin:0 12px 7px;padding:11px 13px;border:.5px solid var(--bor);display:flex;align-items:center;gap:9px}
 .rec-card.lk{opacity:.5}
+.ub{margin:10px 12px 4px;background:#fff;border:.5px solid var(--bor);border-radius:var(--rad);padding:9px 11px}
+.ub-t{font-size:9.5px;color:var(--ts);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.ub-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ub-chip{border:1px solid var(--bor);background:#fff;color:var(--tx);border-radius:16px;padding:5px 10px;font-size:11.5px;font-family:var(--fnt);cursor:pointer}
+.ub-chip.on{background:var(--gu);border-color:var(--gu);color:#fff;font-weight:700}
+.ub-back{display:block;margin-top:8px;background:none;border:none;padding:0;color:var(--gu);font-size:12px;font-weight:700;font-family:var(--fnt);cursor:pointer;text-align:left}
+.antes{margin:10px 12px 4px;background:#fff;border:.5px solid var(--bor);border-left:3px solid var(--gu);border-radius:0 var(--rad) var(--rad) 0;padding:10px 12px}
+.antes-t{font-size:12.5px;font-weight:800;color:var(--gu);margin-bottom:2px}
+.antes-s{font-size:10.5px;color:var(--ts);margin-bottom:8px;line-height:1.4}
+.antes a{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:.5px solid var(--bor);color:var(--tx);text-decoration:none;font-size:12px}
+.antes a span.r{margin-left:auto;color:var(--na);font-weight:700;font-size:11px}
 .rec-ico{font-size:20px;width:30px;text-align:center;flex-shrink:0}
 .rec-n{font-size:12px;font-weight:700;color:var(--nv)}
 .rec-s{font-size:10px;color:var(--ts)}
@@ -438,6 +449,13 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
   </div>
   <div class="scroll" id="dash-scroll">
     <div class="mot" id="mot-box"><strong id="mot-t">¡Empieza hoy!</strong><span id="mot-s">Elige una materia para comenzar.</span></div>
+    <div class="antes" id="dash-antes">
+      <div class="antes-t">📐 Antes de empezar</div>
+      <div class="antes-s">Las herramientas matemáticas que necesitas para cualquier materia. Gratis.</div>
+      <a href="fichas/ficha-ce-t00-propedeutico.pdf" target="_blank" rel="noopener">📘 Autoasesoría 00 · Nivelación matemática<span class="r">Abrir ›</span></a>
+      <a href="fichas/guia-conversiones.pdf" target="_blank" rel="noopener">📏 Guía rápida de conversiones (prefijos y unidades)<span class="r">Abrir ›</span></a>
+      <a href="fichas/tarjeta-ce-t00.pdf" target="_blank" rel="noopener">🗂️ Tarjeta de repaso en una página<span class="r">Abrir ›</span></a>
+    </div>
     <div class="sec-t">Mis unidades de aprendizaje</div>
     <div id="mat-list"></div>
   </div>
@@ -573,6 +591,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 <div class="view" id="v-ase">
   <div class="hdr"><p style="font-size:10px;color:rgba(255,255,255,.5)">Acompañamiento</p><h1>Asesorías</h1></div>
   <div class="scroll">
+    <div id="ub-ase"></div>
     <div class="niv-card">
       <div class="niv-lbl">Tus puntos</div>
       <div class="niv-val" id="ase-pts-val">0 puntos</div>
@@ -589,6 +608,7 @@ html,body{height:100%;width:100%;font-family:var(--fnt);background:#D8D2CC;overf
 <div class="view" id="v-log">
   <div class="hdr"><p style="font-size:10px;color:rgba(255,255,255,.5)">Tienda académica</p><h1>Mis logros y canjes</h1></div>
   <div class="scroll">
+    <div id="ub-log"></div>
     <div class="pts-card">
       <div>
         <div class="pts-l" id="log-l">Puntos acumulados</div>
@@ -1040,8 +1060,7 @@ let DATA = {
   materias:[],
   reactivosPorTema:{},
   recompensas:[
-    {id:'cita',n:'Cita de tutoría',s:'30 min con la docente (presencial o Meet)',ico:'🎓',pts:150,tipo:'cita',recurso:''},
-    {id:'punto',n:'Punto extra en calificación',s:'Se registra ante la docente (tope: 4 por semestre)',ico:'⭐',pts:1000,tipo:'punto',recurso:''},
+    {id:'r1',n:'Asesoría con la docente',s:'Agenda una asesoría en su horario',ico:'🎓',pts:100,tipo:'asesoria',recurso:''},
     {id:'const_u',n:'Constancia de unidad',s:'Gratis al completar todos los temas de una unidad',ico:'📜',pts:0,tipo:'constancia_unidad',recurso:''},
     {id:'const_c',n:'Constancia del curso',s:'Gratis al completar todos los temas de la materia',ico:'🏆',pts:0,tipo:'constancia_curso',recurso:''},
   ],
@@ -2249,10 +2268,9 @@ function iniciarCuestionario(){
   // Mostrar badge de intento
   const badge=document.getElementById('intento-badge');
   if(intentoNum===0){
-    badge.innerHTML=`<div class="intentos-badge" style="background:var(--grb)"><span class="ib-txt" style="color:var(--grd)">1er intento — puntaje completo</span><span class="ib-pct" style="color:var(--grd)">100%</span></div>`;
+    badge.innerHTML=`<div class="intentos-badge" style="background:var(--grb)"><span class="ib-txt" style="color:var(--grd)">Primer intento · ganas los puntos completos del tema</span></div>`;
   } else {
-    const pctLabel=intentoNum===1?'60%':'30%';
-    badge.innerHTML=`<div class="intentos-badge"><span class="ib-txt">Intento ${intentoNum+1} · ${temaNombre} — puntos reducidos al ${pctLabel}</span><span class="ib-pct">${pctLabel}</span></div>`;
+    badge.innerHTML=`<div class="intentos-badge"><span class="ib-txt">Intento ${intentoNum+1} · solo sumas los puntos de lo que mejores</span></div>`;
   }
   renderPregunta();
   navTo('v-quiz');
@@ -2371,6 +2389,8 @@ function finalizarQuiz(){
       umsg.innerHTML=`<div class="res-unlock">🏆 ¡Completaste todos los temas de ${curMat.nombre}!</div>`;
     } else if(!aprobado){
       umsg.innerHTML=`<div class="res-locked">🔒 Necesitas 80% para desbloquear el siguiente tema</div>`;
+      const rRes=(DATA.recompensas||[]).find(x=>x.id===idAutoasesoria(matId,temaActual) && x.recurso);
+      if(rRes) umsg.innerHTML+=`<div class="res-unlock">📘 Te liberamos gratis la autoasesoría completa de este tema, con todo explicado paso a paso.<br><button class="uni-const" onclick="window.open('${rRes.recurso}','_blank')">📥 Descargar autoasesoría</button></div>`;
     } else { umsg.innerHTML=''; }
     // Constancias: al cerrar una unidad didáctica y al completar el curso
     if(aprobado){
@@ -2459,6 +2479,7 @@ function umbralCita(){
   return (v && v>0) ? v : 100;
 }
 function renderAse(){
+  renderUnidadBar('ub-ase');
   const UMBRAL = umbralCita();
   const inscritas=ST.inscritas||[];
   // Materia en contexto de la cita: la elegida, o la que está estudiando, o la única inscrita
@@ -2473,12 +2494,12 @@ function renderAse(){
   const pctPts=sinUnidad?0:Math.min(100,Math.round(ptsCtx/UMBRAL*100));
   document.getElementById('ase-pb').style.width=pctPts+'%';
   document.getElementById('ase-pts-lbl').textContent = sinUnidad ? '—' : ptsCtx+' pts';
-  document.getElementById('ase-hint').textContent = sinUnidad ? 'Selecciona una unidad en Inicio'
+  document.getElementById('ase-hint').textContent = sinUnidad ? 'Elige arriba una unidad de aprendizaje'
     : (ptsCtx>=UMBRAL?'¡Puedes solicitar una cita!':`${UMBRAL-ptsCtx} pts más en esta unidad`);
   const nombreMat=(mid)=>{ const m=(DATA.materias||[]).find(x=>x.id===mid); return m?m.nombre:mid; };
   // Sin unidad activa → aviso "entra por Inicio" (como en Puntos), sin selector de materia
   if(sinUnidad){
-    document.getElementById('docentes-list').innerHTML=`<div class="doc-card"><div style="font-size:11px;color:var(--ts);padding:6px">Entra a una unidad de aprendizaje para ver sus horarios.</div></div>`;
+    document.getElementById('docentes-list').innerHTML=`<div class="doc-card"><div style="font-size:11px;color:var(--ts);padding:6px">Elige arriba una unidad de aprendizaje para ver sus horarios.</div></div>`;
     document.getElementById('cita-section').innerHTML=`<div class="card card-p" style="margin:0 12px 9px"><div style="font-size:12.5px;color:var(--ts);text-align:center;padding:10px;line-height:1.5">No hay una unidad activa.<br>Entra por <strong style="color:var(--gu)">Inicio</strong> y selecciona una unidad de aprendizaje para agendar tu asesoría.</div></div>`;
     return;
   }
@@ -2651,7 +2672,44 @@ async function solicitarCita(){
 // ═══════════════════════════════════════════════════════
 // LOGROS / TIENDA
 // ═══════════════════════════════════════════════════════
+// Barra de unidad activa (Puntos y Asesorías): muestra en qué materia estás, permite
+// cambiarla sin pasar por Inicio y volver a la unidad con un toque.
+function renderUnidadBar(elId){
+  const el=document.getElementById(elId); if(!el) return;
+  const ins=(DATA.materias||[]).filter(m=>(ST.inscritas||[]).includes(m.id));
+  if(!ins.length){ el.innerHTML=''; return; }
+  const act=(curMat && (ST.inscritas||[]).includes(curMat.id)) ? curMat.id : '';
+  el.innerHTML=`<div class="ub"><div class="ub-t">${act?'Unidad de aprendizaje':'Elige la unidad de aprendizaje'}</div>
+    <div class="ub-chips">${ins.map(m=>`<button class="ub-chip ${m.id===act?'on':''}" onclick="elegirUnidad('${m.id}')">${m.icono||'📘'} ${escCod(m.nombre)}</button>`).join('')}</div>
+    ${act?`<button class="ub-back" onclick="volverAUnidad()">‹ Volver a ${escCod(curMat.nombre)}</button>`:''}</div>`;
+}
+function elegirUnidad(id){
+  const m=(DATA.materias||[]).find(x=>x.id===id); if(!m) return;
+  curMat=m; citaMatFilter=id;
+  const cur=document.querySelector('.view.active')?.id;
+  if(cur) refreshView(cur);
+}
+function volverAUnidad(){
+  if(!curMat){ navRoot('v-dash'); return; }
+  const id=curMat.id;
+  navStack=[]; showView('v-dash'); renderDash();
+  abrirMateria(id);
+}
+// Autoasesoría completa de rescate: gratis para el tema donde el alumno no llegó al 80 %
+// (reprobó al menos un intento). Recompensa con id f-<materia>-t<tema>.
+function idAutoasesoria(matId,temaIdx){ return `f-${matId}-t${temaIdx}`; }
+function rescateLiberado(matId,temaIdx){
+  const pr=ST.progreso&&ST.progreso[matId]; if(!pr) return false;
+  const n=(pr.intentos&&pr.intentos[temaIdx])||0;
+  const ap=!!(pr.temasAprobados&&pr.temasAprobados[temaIdx]);
+  return n>=2 || (n>=1 && !ap);
+}
+function temaDeRecompensa(r){
+  const m=String(r.id||'').match(/^f-([a-z]+)-t(\d+)$/);
+  return m?{mat:m[1],tema:Number(m[2])}:null;
+}
 function renderLog(){
+  renderUnidadBar('ub-log');
   // Unidad ACTIVA: la que el alumno entró a estudiar (curMat). Si no hay, se muestra "—".
   const act = (curMat && (ST.inscritas||[]).includes(curMat.id)) ? curMat : null;
   const ptsAct = act ? puntosMateria(act.id) : 0;
@@ -2662,7 +2720,7 @@ function renderLog(){
   document.getElementById('log-pb').style.width = (act?Math.min(100,Math.round(ptsAct/1000*100)):0)+'%';
   const rl=document.getElementById('rec-list');
   if(!act){
-    rl.innerHTML=`<div class="card" style="margin:0 12px;padding:18px;text-align:center;color:var(--ts);font-size:12px;line-height:1.5">Entra a una <strong>unidad de aprendizaje</strong> desde Inicio para ver y canjear sus puntos.</div>`;
+    rl.innerHTML=`<div class="card" style="margin:0 12px;padding:18px;text-align:center;color:var(--ts);font-size:12px;line-height:1.5">Elige arriba una <strong>unidad de aprendizaje</strong> para ver lo que puedes canjear y cuántos puntos necesitas.</div>`;
   } else {
   rl.innerHTML=DATA.recompensas.filter(r=>{
     // Solo recompensas de la unidad activa: las generales (asesoría, certificado) y el
@@ -2670,6 +2728,14 @@ function renderLog(){
     if(r.materia_id) return r.materia_id===act.id;
     return true;
   }).map(r=>{
+    // Autoasesoría completa liberada gratis porque el alumno la necesita (no llegó al 80 %)
+    const tr=temaDeRecompensa(r);
+    if(r.pts>0 && tr && tr.mat===act.id && rescateLiberado(act.id,tr.tema) && r.recurso){
+      return `<div class="rec-card"><div class="rec-ico">${r.ico}</div>
+        <div><div class="rec-n">${r.n}</div><div class="rec-s">Liberada gratis para ayudarte con el tema ${tr.tema+1}</div></div>
+        <div class="rec-r"><div class="rec-p" style="color:var(--grd)">Gratis</div>
+        <button class="can-btn" style="background:var(--gr)" onclick="window.open('${r.recurso}','_blank')">Descargar</button></div></div>`;
+    }
     if(r.pts===0){
       return `<div class="rec-card"><div class="rec-ico">${r.ico}</div>
         <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
@@ -2679,17 +2745,20 @@ function renderLog(){
     const t=(r.tipo||'').toLowerCase();
     // Asesoría: repetible. NO se cobra aquí; lleva a agendar y se cobra por materia al confirmar.
     if(t==='asesoria'||t==='cita'){
-      const dispoA=ptsAct>=r.pts;
+      const costoA=umbralCita();   // el costo real es el de Configuracion (puntos_cita)
+      const dispoA=ptsAct>=costoA;
       return `<div class="rec-card ${dispoA?'':'lk'}"><div class="rec-ico">${r.ico}</div>
-        <div><div class="rec-n">${r.n}</div><div class="rec-s">${dispoA?r.s:`Te faltan ${r.pts-ptsAct} pts en esta unidad`}</div></div>
-        <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
+        <div><div class="rec-n">${r.n}</div><div class="rec-s">${dispoA?r.s:`Te faltan ${costoA-ptsAct} pts en esta unidad`}</div></div>
+        <div class="rec-r"><div class="rec-p">${costoA.toLocaleString()} pts</div>
         <button class="can-btn ${dispoA?'':'no'}" onclick="${dispoA?`canjear('${r.id}')`:''}">${dispoA?'Agendar':'Bloqueado'}</button></div></div>`;
     }
     // Certificado: un solo canje por materia; disponible si alguna materia inscrita junta los pts.
     if(t==='certificado'){
-      const dispo=puntosMateria(act.id)>=r.pts && !(ST.certificados||{})[act.id];
+      const yaCert=!!(ST.certificados||{})[act.id];
+      const dispo=puntosMateria(act.id)>=r.pts && !yaCert;
+      const faltan=Math.max(0,r.pts-puntosMateria(act.id));
       return `<div class="rec-card ${dispo?'':'lk'}"><div class="rec-ico">${r.ico}</div>
-        <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
+        <div><div class="rec-n">${r.n}</div><div class="rec-s">${yaCert?'Ya lo obtuviste en esta unidad (uno por semestre)':dispo?r.s:`${r.s} · Te faltan ${faltan} pts`}</div></div>
         <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
         <button class="can-btn ${dispo?'':'no'}" onclick="canjear('${r.id}')">${dispo?'Canjear':'Bloqueado'}</button></div></div>`;
     }
@@ -2699,7 +2768,7 @@ function renderLog(){
     const ya=ST.canjes.includes(r.id);
     return `<div class="rec-card ${can||ya?'':'lk'}">
       <div class="rec-ico">${r.ico}</div>
-      <div><div class="rec-n">${r.n}</div><div class="rec-s">${r.s}</div></div>
+      <div><div class="rec-n">${r.n}</div><div class="rec-s">${(can||ya)?r.s:`${r.s} · Te faltan ${r.pts-saldoMat} pts`}</div></div>
       <div class="rec-r"><div class="rec-p">${r.pts.toLocaleString()} pts</div>
       <button class="can-btn ${can||ya?'':'no'}" onclick="canjear('${r.id}')">${ya?'Abrir de nuevo':can?'Canjear':'Bloqueado'}</button></div>
     </div>`;
@@ -2934,11 +3003,37 @@ function canjearGratis(id){
 async function cargarDatosAPI(){
   try{
     { const lm=document.getElementById('load-msg'); if(lm) lm.textContent='Cargando contenido…'; }
-    const res=await Promise.race([fetch(API_URL),new Promise((_,r)=>setTimeout(()=>r('timeout'),7000))]);
-    if(res==='timeout') throw new Error('timeout');
-    const json=await res.json();
+    // Si el Apps Script tarda (arranque en frío), se usa la caché y la respuesta se aplica
+    // en cuanto llega, sin que el alumno tenga que recargar.
+    const pedido=fetch(API_URL).then(r=>r.json());
+    const json=await Promise.race([pedido,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),12000))])
+      .catch(e=>{
+        pedido.then(j=>{ if(j&&j.ok){ aplicarDatosAPI(j.data); const v=document.querySelector('.view.active')?.id; if(v) refreshView(v); } }).catch(()=>{});
+        throw e;
+      });
     if(!json.ok) throw new Error(json.error);
-    const d=json.data;
+    aplicarDatosAPI(json.data);
+  }catch(e){
+    console.warn('API no disponible:',e.message);
+    try{
+      const cache=JSON.parse(localStorage.getItem('sdgo_cache')||'null');
+      if(cache&&cache.materias&&cache.materias.length){
+        DATA.materias=cache.materias; DATA.asesorias=cache.asesorias||[];
+        DATA.reactivosPorTema=cache.reactivosPorTema||{};
+        DATA.fichasPorTema=cache.fichasPorTema||{};
+        DATA.fechasApertura=cache.fechasApertura||{};
+        DATA.modosDesbloqueo=cache.modosDesbloqueo||{};
+        if(cache.recompensas&&cache.recompensas.length) DATA.recompensas=cache.recompensas;
+        if(cache.numPreguntas) DATA.numPreguntas=cache.numPreguntas;
+        if(cache.config) DATA.config=cache.config;
+        if(cache.fechaServidor) DATA.fechaServidor=cache.fechaServidor;
+      }
+    }catch(ce){}
+    if(!DATA.materias.length) usarDatosLocales();
+  }
+}
+function aplicarDatosAPI(d){
+  {
     DATA.materias=(d.materias||[]).map(m=>({
       id:m.id,nombre:m.nombre,icono:m.icono,color:m.color,unidad:m.unidad,
       temas:(d.temas&&d.temas[m.id])||[],
@@ -2975,22 +3070,11 @@ async function cargarDatosAPI(){
       fichasPorTema:DATA.fichasPorTema,
       fechasApertura:DATA.fechasApertura,
       modosDesbloqueo:DATA.modosDesbloqueo,
+      recompensas:DATA.recompensas,
+      numPreguntas:DATA.numPreguntas,
+      config:DATA.config,
       fechaServidor:DATA.fechaServidor||''
     })); }catch(e){}
-  }catch(e){
-    console.warn('API no disponible:',e.message);
-    try{
-      const cache=JSON.parse(localStorage.getItem('sdgo_cache')||'null');
-      if(cache&&cache.materias&&cache.materias.length){
-        DATA.materias=cache.materias; DATA.asesorias=cache.asesorias||[];
-        DATA.reactivosPorTema=cache.reactivosPorTema||{};
-        DATA.fichasPorTema=cache.fichasPorTema||{};
-        DATA.fechasApertura=cache.fechasApertura||{};
-        DATA.modosDesbloqueo=cache.modosDesbloqueo||{};
-        if(cache.fechaServidor) DATA.fechaServidor=cache.fechaServidor;
-      }
-    }catch(ce){}
-    if(!DATA.materias.length) usarDatosLocales();
   }
 }
 // Refresco manual: vuelve a leer el contenido del Sheet y re-renderiza la vista
@@ -3148,7 +3232,7 @@ function generarConstancia(tipo, datosExtra) {
 
   // Título
   doc.setFont('helvetica','bold'); doc.setFontSize(19); doc.setTextColor(123,17,53);
-  doc.text('CONSTANCIA DE COMPLETACIÓN', W/2, 52, {align:'center'});
+  doc.text('CONSTANCIA DE FINALIZACIÓN', W/2, 52, {align:'center'});
   doc.setFont('helvetica','normal'); doc.setFontSize(11); doc.setTextColor(13,27,75);
   doc.text(`Unidad de aprendizaje: ${mat.nombre}`, W/2, 61, {align:'center'});
 
