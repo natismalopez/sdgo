@@ -2530,7 +2530,7 @@ function renderAse(){
     const cambiar = '';
     const cabMat = matSel ? `<div style="font-size:11px;color:var(--ts);margin-bottom:8px">Unidad: <strong style="color:var(--nv)">${nombreMat(matSel)}</strong> ${cambiar}</div>` : '';
     const slotsHTML=slotsDisp.map((s,i)=>{
-      const fechaSlot=proximaFechaDia(s.dia);
+      const fechaSlot=proximaFechaDia(s.dia, s.hora_inicio);
       return `<div id="slot-${i}" onclick="selSlot(${i},'${s.dia}','${s.hora_inicio}','${s.lugar}','${fechaSlot}','${s.materia_id||''}','${s.materia||''}')"
         style="padding:9px 11px;background:var(--bg2);border:2px solid var(--bor);border-radius:var(--rad-s);cursor:pointer;margin-bottom:6px">
         <div style="font-size:11px;font-weight:600;color:var(--nv)">${s.dia} ${s.hora_inicio} · ${s.lugar}</div>
@@ -2566,32 +2566,29 @@ let citaMatFilter='';   // materia elegida para la cita (selector)
 let citaForcePick=false; // fuerza mostrar el selector de materia
 let slotCita={dia:'',hora:'',lugar:'',fecha:'',materia_id:'',materia_nombre:''};
 
-// Calcular la próxima fecha para un día de la semana (con 72h de anticipación)
-function proximaFechaDia(diaNombre){
+// Próxima fecha real de un horario (día + hora) que quede a 72 h o más de ahora.
+// Antes se redondeaba al inicio del día y una cita podía quedar a 71 h: el servidor la rechazaba.
+function fechaSlotDate(diaNombre, horaStr){
   const dias={'Lunes':1,'Martes':2,'Miércoles':3,'Jueves':4,'Viernes':5,'Sábado':6,'Domingo':0};
   const objetivo=dias[diaNombre];
-  if(objetivo===undefined) return '';
-  const min72=new Date(Date.now()+72*60*60*1000);
-  const d=new Date(min72);
-  d.setHours(0,0,0,0);
-  let intentos=0;
-  while(d.getDay()!==objetivo && intentos<14){ d.setDate(d.getDate()+1); intentos++; }
-  return d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+  if(objetivo===undefined) return null;
+  const [h,m]=String(horaStr||'0:00').split(':');
+  const min72=Date.now()+72*60*60*1000;
+  const d=new Date(); d.setHours(Number(h)||0,Number(m)||0,0,0);
+  for(let k=0;k<21;k++){
+    if(d.getDay()===objetivo && d.getTime()>=min72) return d;
+    d.setDate(d.getDate()+1);
+  }
+  return null;
 }
-
-// Calcular fecha ISO para el slot (para el calendar)
+function proximaFechaDia(diaNombre, horaStr){
+  const d=fechaSlotDate(diaNombre, horaStr);
+  return d ? d.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'}) : '';
+}
+// Fecha ISO del slot (para el calendar y para la validación de 72 h del servidor)
 function fechaISOSlot(diaNombre, horaStr){
-  const dias={'Lunes':1,'Martes':2,'Miércoles':3,'Jueves':4,'Viernes':5,'Sábado':6,'Domingo':0};
-  const objetivo=dias[diaNombre];
-  if(objetivo===undefined) return '';
-  const min72=new Date(Date.now()+72*60*60*1000);
-  const d=new Date(min72);
-  d.setHours(0,0,0,0);
-  let intentos=0;
-  while(d.getDay()!==objetivo && intentos<14){ d.setDate(d.getDate()+1); intentos++; }
-  const [h,m]=horaStr.split(':');
-  d.setHours(Number(h),Number(m),0,0);
-  return d.toISOString();
+  const d=fechaSlotDate(diaNombre, horaStr);
+  return d ? d.toISOString() : '';
 }
 
 function selSlot(idx,dia,hora,lugar,fechaLabel,matId,matNombre){
@@ -2635,12 +2632,10 @@ async function solicitarCita(){
   }
   const btn=document.getElementById('btn-cita');
   btn.textContent='Enviando…'; btn.disabled=true;
-  descontarPuntos(matCita, COSTO); ST.puntosCanje=(ST.puntosCanje||0)+COSTO;
-  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) — ${slotCita.dia} ${slotCita.fecha||slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy',m:matCita});
-  registrarCanje(`Cita asesoría ${slotCita.materia_nombre||matCita||''}`.trim(), COSTO, matCita);
-  save();
+  if(!slotCita.fechaISO) slotCita.fechaISO=fechaISOSlot(slotCita.dia, slotCita.hora);
+  let resp={ok:null};
   try{
-    await enviarCita({
+    resp = await enviarCita({
       boleta:       ST.boleta,
       nombre_alumno:ST.nombre||ST.boleta,
       grupo:        ST.grupo,
@@ -2652,13 +2647,27 @@ async function solicitarCita(){
       fecha:        slotCita.fecha||'',
       lugar:        slotCita.lugar,
       fecha_iso:    slotCita.fechaISO||'',
-      puntos_alumno:puntosMateria(matCita),
+      puntos_alumno:Math.max(0,puntosMateria(matCita)-COSTO),
       email_alumno: ST.email||''
     });
-    toast(`✅ Cita solicitada. Revisa tu correo ${ST.email||''} (y la carpeta de spam) para la confirmación.`);
-  }catch(e){
-    toast('✅ Solicitud registrada. La docente confirmará en 72 hrs.');
+  }catch(e){ resp={ok:null,error:e.message}; }
+  if(resp.ok===false){
+    // El servidor la rechazó (por ejemplo, menos de 72 h): no se cobra nada.
+    toast(`⚠️ No se registró la cita: ${resp.error}. No se descontaron puntos; intenta de nuevo.`);
+    btn.textContent='Enviar solicitud ›'; btn.disabled=false;
+    return;
   }
+  if(resp.ok===null){
+    toast('⚠️ No hubo conexión con el servidor. Intenta de nuevo; no se descontaron puntos.');
+    btn.textContent='Enviar solicitud ›'; btn.disabled=false;
+    return;
+  }
+  // Registrada en el servidor: ahora sí se cobra
+  descontarPuntos(matCita, COSTO); ST.puntosCanje=(ST.puntosCanje||0)+COSTO;
+  ST.logros.unshift({t:`🎓 Cita solicitada (${modCita}) · ${slotCita.dia} ${slotCita.fecha||slotCita.hora}`,pts:`-${COSTO}`,f:'Hoy',m:matCita});
+  registrarCanje(`Cita asesoría ${slotCita.materia_nombre||matCita||''}`.trim(), COSTO, matCita);
+  save();
+  toast(`✅ Cita registrada y correo de confirmación enviado a ${ST.email||'tu correo'} (revisa también spam).`);
   // RF7 — lista de cotejo para llegar preparado a la asesoría
   const COTEJO_URL='https://natismalopez.github.io/sdgo/fichas/lista-cotejo-asesoria.pdf';
   setTimeout(()=>{ if(confirm('¿Descargar la lista de cotejo para preparar tu asesoría con dudas concretas?')) window.open(COTEJO_URL,'_blank'); }, 500);
@@ -2919,14 +2928,29 @@ function generarCertificado(matId, r){
   const aprob=ST.progreso[matId]?.temasAprobados||{};
   const temas=(mat.temas||[]).filter((t,i)=>aprob[i]);
   const f=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+  const datosCert={fecha:f, temas, materia:mat.nombre, boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo};
+  if(window._enviandoCert) return;
+  window._enviandoCert=true;
+  toast('📨 Enviando tu certificado a coordinación…');
+  enviarCertificadoCorreo(datosCert).then(res=>{
+    window._enviandoCert=false;
+    if(!res.ok){
+      toast(`⚠️ No se pudo enviar el certificado${res.error?': '+res.error:''}. No se descontaron puntos; intenta de nuevo.`);
+      return;
+    }
+    registrarCertificado(matId, r, datosCert);
+    toast(`✅ Certificado enviado a coordinación${ST.email?' con copia a '+ST.email:''}.`);
+  });
+}
+function registrarCertificado(matId, r, datosCert){
+  const mat=(DATA.materias||[]).find(m=>m.id===matId)||{nombre:matId};
   descontarPuntos(matId, r.pts);
   ST.puntosCanje=(ST.puntosCanje||0)+r.pts;
   ST.certificados=ST.certificados||{};
-  ST.certificados[matId]={fecha:f, temas, materia:mat.nombre, boleta:ST.boleta, nombre:ST.nombre||ST.boleta, grupo:ST.grupo};
+  ST.certificados[matId]=datosCert;
   ST.canjes.push('cert:'+matId);
   ST.logros.unshift({t:`🏆 Certificado de participación: ${mat.nombre}`,pts:`-${r.pts}`,f:'Hoy',m:matId});
   registrarCanje(`Certificado participación ${mat.nombre}`, r.pts, matId);
-  enviarCertificadoCorreo(matId);
   save(); renderLog();
   mostrarCertificado(matId);
 }
@@ -2951,12 +2975,16 @@ function mostrarCertificado(matId){
     <button class="btn btn-gu" onclick="cerrarOverlay()">Cerrar</button>
   `);
 }
-async function enviarCertificadoCorreo(matId){
-  const c=ST.certificados[matId]; if(!c) return;
-  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify({accion:'certificado',boleta:ST.boleta,nombre:c.nombre,grupo:c.grupo,
-      materia_nombre:c.materia,temas:c.temas,fecha:c.fecha,email_alumno:ST.email||''})}); }
-  catch(e){ console.warn('Certificado:',e.message); }
+// Envía el certificado por correo y devuelve {ok:true} solo si el servidor confirmó el envío.
+async function enviarCertificadoCorreo(c){
+  if(!c) return {ok:false,error:'Sin datos'};
+  try{
+    const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({accion:'certificado',boleta:ST.boleta,nombre:c.nombre,grupo:c.grupo,
+        materia_nombre:c.materia,temas:c.temas,fecha:c.fecha,email_alumno:ST.email||''})});
+    const j=await res.json();
+    return j&&j.ok ? {ok:true} : {ok:false,error:(j&&j.error)||''};
+  }catch(e){ console.warn('Certificado:',e.message); return {ok:false,error:'sin conexión'}; }
 }
 // Overlay genérico reutilizable (modal a pantalla)
 function overlay(html){
@@ -3161,8 +3189,14 @@ async function sincronizarProgreso(boleta){
 async function enviarResultado(p){
   try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion:'resultado',...p})}); }catch(e){ console.warn('Resultado:',e.message); }
 }
+// Devuelve {ok:true} si el servidor registró la cita; {ok:false,error} si la rechazó;
+// {ok:null} si no se pudo leer la respuesta (sin red): en ese caso no se sabe.
 async function enviarCita(p){
-  try{ await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion:'cita',...p})}); }catch(e){ console.warn('Cita:',e.message); }
+  try{
+    const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({accion:'cita',...p})});
+    const j=await r.json();
+    return j&&j.ok ? {ok:true,data:j.data||{}} : {ok:false,error:(j&&j.error)||'No se pudo registrar la cita'};
+  }catch(e){ console.warn('Cita:',e.message); return {ok:null,error:e.message}; }
 }
 
 // ═══════════════════════════════════════════════════════
