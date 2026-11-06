@@ -1242,7 +1242,7 @@ function actualizarTimerUI(min){
   const av=ST.avisosTiempo;
   if(min>=LIMITE_MIN && !av.fin){
     av.fin=true; save();
-    toast('⏱ Alcanzaste tus 45 min de hoy. Puedes seguir estudiando, pero ya no sumas puntos');
+    toast('⏱ Completaste tus 45 min recomendados de hoy. Tus avances siguen contando; descansar también ayuda a aprender');
   } else if(min>=40 && min<LIMITE_MIN && !av.t40){
     av.t40=true; save();
     toast('⏳ Te quedan ~5 min de tu sesión recomendada');
@@ -1306,7 +1306,7 @@ function actualizarRacha(){
 // SISTEMA DE PUNTOS
 // ═══════════════════════════════════════════════════════
 function calcularPuntosQuiz(correctas, total, matId, temaIdx){
-  if(tiempoAgotado()) return 0; // sin puntos si agotó el tiempo
+  // v59: los 45 min son una recomendación; ya no quitan puntos (el servidor tampoco los aplica)
   const esPerfecto = total>0 && correctas===total;
   const esAprobado = total>0 && (correctas/total)>=0.8;
   const valor = esPerfecto?75 : esAprobado?50 : 0;   // valor del tema según su MEJOR resultado
@@ -1824,13 +1824,13 @@ function renderDash(){
   document.getElementById('db-prog-lbl').textContent=`Progreso: ${pct}%`;
   actualizarTimerUI(tiempoHoyTotal());
   // Aviso (recuadro). Los puntos ya se muestran en cada tarjeta, así que el recuadro
-  // solo aparece para el aviso de límite diario; en lo demás queda oculto.
+  // solo aparece al completar los 45 min recomendados; en lo demás queda oculto.
   const mins=tiempoHoyTotal();
   const motBox=document.getElementById('mot-box');
   if(mins>=LIMITE_MIN){
     motBox.style.display='';
-    document.getElementById('mot-t').textContent='⏸ Límite diario alcanzado';
-    document.getElementById('mot-s').textContent='Puedes seguir estudiando pero los puntos se reanudan mañana.';
+    document.getElementById('mot-t').textContent='✅ Completaste tus 45 min recomendados de hoy';
+    document.getElementById('mot-s').textContent='Buen trabajo. Si sigues estudiando tus avances siguen contando; un descanso también ayuda a aprender.';
   } else {
     motBox.style.display='none';
   }
@@ -2181,13 +2181,11 @@ function abrirGuia(temaIdxParam){
   });
   // Puntos por ficha — una vez por tema
   const fichaKey=`${curMat.id}_f${temaIdx}`;
-  if(!ST.canjes.includes(fichaKey) && !tiempoAgotado()){
+  if(!ST.canjes.includes(fichaKey)){
     cont.innerHTML+=`<div class="ficha-check"><p>✅ ¡Ficha completada! Tema ${temaIdx+1}: ${temaNombre}</p><div class="fc-pts">+10 pts</div></div>`;
     ganarPuntos(curMat.id,10); ST.canjes.push(fichaKey); enviarPuntosExtra(curMat.id,10,`Ficha ${temaNombre}`);
     ST.logros.unshift({t:`📖 Ficha: ${temaNombre}`,pts:'+10',f:'Hoy',m:curMat.id});
     save();
-  } else if(tiempoAgotado()){
-    cont.innerHTML+=`<div class="key-box"><h4>⏸ Límite de estudio alcanzado</h4><p>Puedes seguir leyendo. Los puntos se reanudan mañana.</p></div>`;
   } else {
     cont.innerHTML+=`<div class="ficha-check" style="opacity:.6"><p>📖 Ficha ya completada — Tema ${temaIdx+1}</p><div class="fc-pts">+10 ✓</div></div>`;
   }
@@ -2373,7 +2371,7 @@ function finalizarQuiz(){
     document.getElementById('rs-ok').textContent=correctas;
     document.getElementById('rs-bad').textContent=total-correctas;
     document.getElementById('rs-tot').textContent=total;
-    document.getElementById('res-pts-v').textContent=pts>0?'+'+pts:(tiempoAgotado()?'Límite diario':'Sin puntos');
+    document.getElementById('res-pts-v').textContent=pts>0?'+'+pts:(aprobado?'Sin puntos nuevos':'Sin puntos');
     const circle=document.getElementById('res-circle');
     circle.style.borderColor=pct>=80?'var(--gr)':aprobado?'var(--na)':'var(--er)';
     circle.style.background=pct>=80?'var(--grb)':aprobado?'var(--nab)':'var(--erb)';
